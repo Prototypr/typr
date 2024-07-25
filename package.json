@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/Prototypr/typr#readme",
   "dependencies": {
-    "@tiptap/core": "^2.4.0",
     "react": "^18.2.0",
     "@tiptap/react": "^2.4.0",
     "@tippyjs/react": "^4.2.6",
