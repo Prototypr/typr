@@ -19,7 +19,7 @@
     "url": "https://github.com/Prototypr/typr/issues"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@prototypr"
+    "registry": "https://registry.npmjs.org/"
   },
   "homepage": "https://github.com/Prototypr/typr#readme",
   "dependencies": {
