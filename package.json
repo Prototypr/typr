@@ -1,8 +1,9 @@
 {
   "name": "@prototypr/typr",
-  "version": "0.0.51",
+  "version": "0.0.54",
   "description": "Prototypr Editor",
   "main": "Editor.js",
+  "files": ["dist"],
   "scripts": {
     "build": "babel src --out-dir dist --copy-files",
     "prepublishOnly": "npm run build"
