@@ -1,6 +1,6 @@
 {
   "name": "@prototypr/typr",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Prototypr Editor",
   "main": "Editor.js",
   "scripts": {
@@ -27,7 +27,6 @@
   "dependencies": {
     "@geist-ui/icons": "^1.0.2",
     "@heroicons/react": "^1.0.5",
-    "@prototypr/typr": "^0.0.3",
     "@radix-ui/colors": "^0.1.8",
     "@radix-ui/react-checkbox": "^1.0.1",
     "@radix-ui/react-collapsible": "^1.0.1",
