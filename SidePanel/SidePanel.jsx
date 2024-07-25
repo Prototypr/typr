@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Portal } from "react-portal";
-import useUser from "@/lib/iron-session/useUser";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import ImageUploader from "./ImageUploader";
 
@@ -32,11 +31,11 @@ const SidePanel = ({
   editor,
   postObject,
   refetchPost,
+  user,
   updatePostSettings,
 }) => {
-  const { user } = useUser({
-    redirectIfFound: false,
-  });
+
+  
 
   const [rootElement] = useState(() => document.querySelector(`body`));
 

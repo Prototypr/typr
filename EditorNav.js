@@ -1,7 +1,6 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
-// import useUser from "@/lib/iron-session/useUser";
 import { useState, useEffect } from "react";
 import jsCookie from "js-cookie";
 

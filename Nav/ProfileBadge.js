@@ -10,7 +10,6 @@ import { blue, mauve, blackA, gray, green } from "@radix-ui/colors";
 //   ChevronRightIcon,
 // } from '@radix-ui/react-icons';
 import { signOut } from "next-auth/react";
-// import useUser from "@/lib/iron-session/useUser";
 import fetchJson from "../utils/fetchJson";
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";

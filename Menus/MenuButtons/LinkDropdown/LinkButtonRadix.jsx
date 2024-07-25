@@ -6,7 +6,7 @@ import * as PopoverPrimitive from '@radix-ui/react-popover';
 // import ImageLinkField from './ImageLinkField/ImageLinkField'
 import LinkField from './LinkField/LinkField'
 
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/Primitives/Collabsible';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../../Primitives/Collabsible';
 import { useEffect } from 'react';
 
 const slideUpAndFade = keyframes({

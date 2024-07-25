@@ -18,7 +18,7 @@ import { useState, useEffect } from "react";
 // });
 
 import { useIntl } from "react-intl";
-import UserMenu from "@/components/Navbar/UserMenu";
+import UserMenu from "./UserMenu";
 
 const StyledMenu = styled(NavigationMenuPrimitive.Root, {
   position: "relative",

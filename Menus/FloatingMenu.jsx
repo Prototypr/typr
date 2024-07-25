@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { FloatingMenu } from "@tiptap/react";
-// import useUser from "@/lib/iron-session/useUser";
 import toast from "react-hot-toast";
 import { styled, keyframes } from "@stitches/react";
 import { violet, mauve, blackA } from "@radix-ui/colors";
