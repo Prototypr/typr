@@ -1,6 +1,6 @@
 {
   "name": "typr",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Prototypr Editor",
   "main": "Editor.js",
   "scripts": {
@@ -17,6 +17,9 @@
   "license": "none yet",
   "bugs": {
     "url": "https://github.com/Prototypr/typr/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@prototypr"
   },
   "homepage": "https://github.com/Prototypr/typr#readme",
   "dependencies": {
