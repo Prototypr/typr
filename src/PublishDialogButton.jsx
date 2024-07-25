@@ -58,7 +58,7 @@ export const PublishDialogButton = ({ onSave, canPublish, postObject }) => {
                         postObject?.title == postObject?.draft_title))))
           }
           variant="confirmRounded"
-          className="text-[13px] font-normal h-[25px] px-2 outline outline-blue-600 outline-1 py-0 mr-1 my-auto"
+          className="!text-[13px] !font-normal !h-[25px] !px-2 !outline !outline-blue-600 !outline-1 !py-0 !mr-1 !my-auto"
         >
           {
             // if there's a draft version different from the content, and post is not published
