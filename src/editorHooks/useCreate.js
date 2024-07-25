@@ -1,3 +1,4 @@
+import React from "react";
 import toast from "react-hot-toast";
 import { getCreatePostData } from "./libs/getCreatePostData";
 import { useState } from "react";

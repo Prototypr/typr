@@ -1,3 +1,5 @@
+import React from 'react';
+
 const ImageLoadingSpinner= ({showPlaceholder, isLoading}) =><div
 className={`${(isLoading)?'relative':'absolute hidden'} h-7 w-7 mx-auto bg-opacity-30 z-10 p-1 rounded-lg text-gray-700 flex flex-col justify-center top-0 left-0 bg-white transition-all duration-200`}
 >

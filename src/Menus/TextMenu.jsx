@@ -5,6 +5,7 @@ import LinkInput from "./MenuButtons/LinkDropdown/LinkButtonRadix";
 import { TextSelection } from "prosemirror-state";
 import { styled } from '@stitches/react';
 import { blackA, slate } from '@radix-ui/colors';
+import React from 'react';
 
 import {roundArrow} from 'tippy.js';
 import 'tippy.js/dist/svg-arrow.css';

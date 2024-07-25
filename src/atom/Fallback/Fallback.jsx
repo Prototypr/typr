@@ -1,5 +1,6 @@
 import Spinner from "../Spinner/Spinner";
 import clsx from "classnames";
+import React from 'react';
 
 /**
  * General use fallback component

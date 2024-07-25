@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { PublishDialogButton } from "./PublishDialogButton";
 import SidePanelTrigger from "./SidePanel/SidePanelTrigger";
 /**

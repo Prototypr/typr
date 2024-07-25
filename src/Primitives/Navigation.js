@@ -1,3 +1,4 @@
+import React from 'react';
 
 import { indigo, gray } from "@radix-ui/colors";
 

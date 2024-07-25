@@ -1,3 +1,5 @@
+import React from 'react';
+
 import dynamic from "next/dynamic";
 
 import { useCallback, useEffect, useState } from "react";
@@ -19,6 +21,9 @@ import { debounce } from "lodash";
 // const InterviewEditor = dynamic(() => import("@/components/Editor/InterviewEditor"), {
 //   ssr: false
 // });
+import '../dist/styles.css';
+
+// Rest of your component code
 const saveDebounceDelay = 3000;
 
 /**

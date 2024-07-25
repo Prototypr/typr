@@ -1,3 +1,5 @@
+import React from 'react';
+
 import dynamic from "next/dynamic";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import Link from "next/link";

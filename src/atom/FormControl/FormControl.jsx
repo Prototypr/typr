@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import clsx from "classnames";
+import React from 'react';
 
 const FormControl = forwardRef((props, ref) => {
   const { className, inValid, isFullWidth = true, children, ...rest } = props;

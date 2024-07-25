@@ -1,3 +1,5 @@
+import React from 'react';
+
 const defaultClass = "w-5 h-5 my-auto text-gray-400";
 
 export const LocationIcon = ({ className = defaultClass }) => (

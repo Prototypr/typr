@@ -1,4 +1,5 @@
 import FontFormatMenu from './FontFormatMenu'
+import React from 'react';
 
 import { styled } from '@stitches/react';
 import { blackA, slate } from '@radix-ui/colors';

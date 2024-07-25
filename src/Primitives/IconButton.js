@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { blue, mauve, blackA, slate } from '@radix-ui/colors';
 import { styled } from '@stitches/react';
 

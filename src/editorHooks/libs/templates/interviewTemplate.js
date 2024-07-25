@@ -1,3 +1,5 @@
+import React from 'react';
+
 export const getInterViewTemplate = ({ productName }) => {
   return {
     type: "doc",

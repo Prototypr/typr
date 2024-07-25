@@ -2,6 +2,8 @@ import { BubbleMenu } from "@tiptap/react";
 import { TextSelection } from "prosemirror-state";
 import ImagePopoverButton from "./MenuButtons/ImagePopoverButton/ImagePopoverButton";
 import { useState } from "react";
+import React from 'react';
+
 import "tippy.js/dist/svg-arrow.css";
 
 import "tippy.js/animations/scale-subtle.css";

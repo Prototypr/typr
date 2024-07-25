@@ -9,6 +9,7 @@ import VideoModalButton from "./MenuButtons/VideoPopoverButton/VideoPopoverButto
 // import ImagePopoverButton from "./MenuButtons/ImagePopoverButton/ImagePopoverButton";
 import { useState } from "react";
 // import { posToDOMRect } from "@tiptap/core";
+import React from 'react';
 
 // import { roundArrow } from "tippy.js";
 import "tippy.js/dist/svg-arrow.css";

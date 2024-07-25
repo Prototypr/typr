@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { styled } from "@stitches/react";
 import { blackA, blue, mauve, slate, pinkDark, red, orange} from "@radix-ui/colors";
 const Button = styled("button", {

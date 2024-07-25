@@ -1,11 +1,13 @@
 {
   "name": "@prototypr/typr",
-  "version": "0.0.54",
+  "version": "0.0.56",
   "description": "Prototypr Editor",
   "main": "Editor.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "babel src --out-dir dist --copy-files",
+    "build": "babel src --out-dir dist --copy-files && tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -95,6 +97,9 @@
     "@babel/cli": "^7.x.x",
     "@babel/core": "^7.x.x",
     "@babel/preset-env": "^7.x.x",
-    "@babel/preset-react": "^7.x.x"
+    "@babel/preset-react": "^7.x.x",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.40",
+    "tailwindcss": "^3.4.6"
   }
 }

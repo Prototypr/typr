@@ -1,5 +1,7 @@
 import clsx from "classnames";
 import { forwardRef, isValidElement, cloneElement } from "react";
+import React from 'react';
+
 
 const getSize = (size) => {
   switch (size) {

@@ -2,7 +2,8 @@ import { BubbleMenu } from "@tiptap/react";
 import LinkInput from "./MenuButtons/LinkDropdown/LinkButtonRadix";
 // import FontFormatButton from "./MenuButtons/FontFormatDropdown/FontFormatButton";
 // import MergeTagsButton from "./MenuButtons/MergeTags/MergeTagsButton";
-import { TextSelection } from "prosemirror-state";
+import React from 'react';
+
 import { styled } from '@stitches/react';
 import { blackA, slate } from '@radix-ui/colors';
 

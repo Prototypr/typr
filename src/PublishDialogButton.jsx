@@ -1,3 +1,5 @@
+import React from 'react';
+
 import dynamic from "next/dynamic";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import {

@@ -1,5 +1,6 @@
 import { NodeViewWrapper } from "@tiptap/react";
 import { useEffect, useState } from "react";
+import React from 'react';
 
 const ImageNodeView = props => {
   const [blob, setBlob] = useState(null);
