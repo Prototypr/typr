@@ -1,5 +1,5 @@
 {
-  "name": "typr",
+  "name": "@prototypr/typr",
   "version": "0.0.3",
   "description": "Prototypr Editor",
   "main": "Editor.js",
@@ -19,7 +19,8 @@
     "url": "https://github.com/Prototypr/typr/issues"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "homepage": "https://github.com/Prototypr/typr#readme",
   "dependencies": {
