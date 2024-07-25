@@ -1,6 +1,6 @@
 {
   "name": "@prototypr/typr",
-  "version": "0.0.56",
+  "version": "0.0.57",
   "description": "Prototypr Editor",
   "main": "Editor.js",
   "files": [
