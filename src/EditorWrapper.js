@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
 import dynamic from "next/dynamic";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
 
 const Editor = dynamic(() => import("./Editor"), {
@@ -18,10 +18,8 @@ import { useRouter } from "next/router";
 import EditorNav from "./EditorNav";
 import { useConfirmTabClose } from "./useConfirmTabClose";
 import { debounce } from "lodash";
-// const InterviewEditor = dynamic(() => import("@/components/Editor/InterviewEditor"), {
-//   ssr: false
-// });
-import '../dist/styles.css';
+
+import "../dist/styles.css";
 
 // Rest of your component code
 const saveDebounceDelay = 3000;
@@ -42,6 +40,8 @@ export default function EditorWrapper({
   // @todo api stuff usable:
   getUserArticle,
   getSlugFromArticleId,
+  children,
+  childProps = {}, // Add this line to accept custom props
 }) {
   const router = useRouter();
 
@@ -255,50 +255,40 @@ export default function EditorWrapper({
             user?.isLoggedIn && (
               <>
                 <div className="my-4">
-                  {isInterview ? (
-                    <div>You not installed the Interview Editor</div>
+                  {React.isValidElement(children) ? (
+                    React.cloneElement(children, {
+                      canEdit,
+                      initialContent,
+                      postStatus,
+                      hasUnsavedChanges,
+                      isSaving: saving || creatingPost,
+                      saved: saved || created,
+                      slug,
+                      postId,
+                      postObject,
+                      toolContext: tool,
+                      updatePost,
+                      forceSave,
+                      refetchPost: refetch,
+                      updatePostSettings: user?.isAdmin
+                        ? updatePostSettings
+                        : false,
+                      ...childProps, // Spread custom props to override defaults
+                    })
                   ) : (
-                    //  <InterviewEditor
-                    //   canEdit={canEdit}
-                    //   toolContext={tool}
-                    //   initialContent={initialContent}
-                    //   postStatus={postStatus}
-                    //   //saving status
-                    //   hasUnsavedChanges={hasUnsavedChanges}
-                    //   isSaving={saving || creatingPost}
-                    //   saved={saved || created}
-                    //   //used for updating existing post
-                    //   slug={slug}
-                    //   postId={postId}
-                    //   postObject={postObject}
-                    //   //save and update content
-                    //   // savePost={debounceSave}
-                    //   updatePost={updatePost}
-                    //   forceSave={forceSave}
-                    //   //refetch post needed when the featured image is updated in post settings
-                    //   refetchPost={refetch}
-                    //   //update post settings
-                    //   updatePostSettings={user?.isAdmin?updatePostSettings:false}
-                    //  />
                     <Editor
                       canEdit={canEdit}
                       initialContent={initialContent}
                       postStatus={postStatus}
-                      //saving status
                       hasUnsavedChanges={hasUnsavedChanges}
                       isSaving={saving || creatingPost}
                       saved={saved || created}
-                      //used for updating existing post
                       slug={slug}
                       postId={postId}
                       postObject={postObject}
-                      //save and update content
-                      // savePost={debounceSave}
                       updatePost={updatePost}
                       forceSave={forceSave}
-                      //refetch post needed when the featured image is updated in post settings
                       refetchPost={refetch}
-                      //update post settings
                       updatePostSettings={
                         user?.isAdmin ? updatePostSettings : false
                       }
