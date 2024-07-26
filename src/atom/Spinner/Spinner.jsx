@@ -1,6 +1,6 @@
+import React from 'react';
 import { DetailedHTMLProps, forwardRef, HTMLAttributes } from "react";
 import clsx from "classnames";
-import React from 'react';
 
 const getSize = (size) => {
   switch (size) {

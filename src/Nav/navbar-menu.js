@@ -17,7 +17,7 @@ import { useState, useEffect } from "react";
 //   ssr: true,
 // });
 
-import { useIntl } from "react-intl";
+// import { useIntl } from "react-intl";
 import UserMenu from "./UserMenu";
 
 const StyledMenu = styled(NavigationMenuPrimitive.Root, {
@@ -122,8 +122,8 @@ export const NavigationMenuDemo = ({
   showSponsorButton,
   showJobsButton,
 }) => {
-  const intl = useIntl();
-  const title3 = intl.formatMessage({ id: "navbar.menu.title3" });
+  // const intl = useIntl();
+  // const title3 = intl.formatMessage({ id: "navbar.menu.title3" });
   const [clientMounted, setClientMounted] = useState(false);
   useEffect(() => {
     setClientMounted(true);

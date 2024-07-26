@@ -41,7 +41,7 @@ const LinkMenu = ({ editor, isSelecting }) => {
       <>
         <BubbleMenu 
         style={{pointerEvents:'none'}}
-          pluginKey={'TextMenu'}
+          pluginKey={'LinkMenu'}
         tippyOptions={{
           arrow:roundArrow,
           popperOptions:{modifiers:[{ name: 'eventListeners', options: { scroll: false }}]},

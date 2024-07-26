@@ -1,14 +1,17 @@
-import React from "react";
+"use client";
+
+import React, { useCallback, useEffect } from "react";
 
 import dynamic from "next/dynamic";
 
-import { useCallback, useEffect } from "react";
 import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
 
-const Editor = dynamic(() => import("./Editor"), {
-  ssr: false,
-});
-const Spinner = dynamic(() => import("./atom/Spinner/Spinner"));
+// const Editor = dynamic(() => import("./Editor"), {
+//   ssr: false,
+// });
+import Editor from "./Editor";
+import Spinner from "./atom/Spinner/Spinner";
+// const Spinner = dynamic(() => import("./atom/Spinner/Spinner"));
 
 import useLoad from "./editorHooks/useLoad";
 import useCreate from "./editorHooks/useCreate";
@@ -19,7 +22,7 @@ import EditorNav from "./EditorNav";
 import { useConfirmTabClose } from "./useConfirmTabClose";
 import { debounce } from "lodash";
 
-import "../dist/styles.css";
+// import "../dist/styles.css";
 
 // Rest of your component code
 const saveDebounceDelay = 3000;

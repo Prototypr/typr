@@ -30,7 +30,7 @@ const VideoMenu = ({ editor, isSelecting }) => {
     <>
       <BubbleMenu
         style={{ pointerEvents: "none" }}
-        pluginKey={"TextMenu"}
+        pluginKey={"VideoMenu"}
         tippyOptions={{
         //   arrow: roundArrow,
           arrow: false,

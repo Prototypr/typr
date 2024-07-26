@@ -21,7 +21,7 @@ const ImageMenu = ({ editor, isSelecting }) => {
     <>
       <BubbleMenu
         style={{ pointerEvents: "none" }}
-        pluginKey={"TextMenu"}
+        pluginKey={"ImageMenu"}
         tippyOptions={{
           // arrow: roundArrow,
           flipBehavior:['top-start'],

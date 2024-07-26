@@ -1,6 +1,9 @@
-import React from 'react';
+"use client";
 
-import dynamic from "next/dynamic";
+import React, { useState, useEffect } from 'react';
+
+
+// import dynamic from "next/dynamic";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import {
   Dialog,
@@ -11,13 +14,13 @@ import {
   DialogClose,
   IconButton,
 } from "./Primitives/Dialog";
-import { useState, useEffect } from "react";
 import Button from "./Primitives/Button";
-const Spinner = dynamic(() => import("./atom/Spinner/Spinner"));
+import Spinner from "./atom/Spinner/Spinner";
+// const Spinner = dynamic(() => import("./atom/Spinner/Spinner"));
 
 export const PublishDialogButton = ({ onSave, canPublish, postObject }) => {
-  const [submitting, setSubmitting] = useState(null);
-  const [submitOpen, setSubmitOpen] = useState(null);
+  const [submitting, setSubmitting] = useState();
+  const [submitOpen, setSubmitOpen] = useState();
 
   const onSubmit = async () => {
     setSubmitting(true);

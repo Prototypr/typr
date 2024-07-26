@@ -12,7 +12,7 @@ const ProfileBadge = dynamic(() => import("./ProfileBadge"));
 //   ssr: true,
 // });
 
-import { useIntl } from "react-intl";
+// import { useIntl } from "react-intl";
 
 const StyledMenu = styled(NavigationMenuPrimitive.Root, {
   position: "relative",
@@ -132,8 +132,8 @@ export const NavigationMenuDemo = ({
   userLoading,
   userLoggedInCookie,
 }) => {
-  const intl = useIntl();
-  const title3 = intl.formatMessage({ id: "navbar.menu.title3" });
+  // const intl = useIntl();
+  // const title3 = intl.formatMessage({ id: "navbar.menu.title3" });
 
   return (
     <NavigationMenu className="sm:hidden">
@@ -196,9 +196,9 @@ export const NavigationMenuDemo = ({
           ) : (
             <NavigationMenuButton href="/newsletter">
               <div className="flex">
-              hi
+              {/* his */}
               <div>
-              {intl.formatMessage({ id: "navbar.menu.title4" })}
+              {/* {intl.formatMessage({ id: "navbar.menu.title4" })} */}
               </div>
               </div>
             </NavigationMenuButton>
