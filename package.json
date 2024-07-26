@@ -1,6 +1,6 @@
 {
   "name": "@prototypr/typr",
-  "version": "0.0.592",
+  "version": "0.0.593",
   "description": "Prototypr Editor",
   "main": "index.js",
   "files": [
@@ -47,7 +47,6 @@
     "@radix-ui/react-toggle": "^1.0.1",
     "@radix-ui/react-toggle-group": "^1.0.1",
     "@radix-ui/react-tooltip": "^1.0.2",
-    "@sentry/nextjs": "^7.37.2",
     "@stitches/react": "^1.2.8",
     "@tippyjs/react": "^4.2.6",
     "@tiptap/extension-blockquote": "^2.4.0",

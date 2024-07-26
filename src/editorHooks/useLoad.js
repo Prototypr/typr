@@ -1,7 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import * as Sentry from "@sentry/nextjs";
 import { getInterViewTemplate } from "./libs/templates/interviewTemplate";
 
 // @todo make this easier (passed in as prop):
@@ -88,9 +87,6 @@ const useLoad = ({ user, interview, productName,
       const post = data.userPostId;
 
       const userHasPermission = checkPermissions(post);
-      Sentry.captureMessage(`#33 80 getUserArticle: ${post?.id}`, {
-        extra: data,
-      });
 
       if (userHasPermission) {
         setPostObject(post);
