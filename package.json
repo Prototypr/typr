@@ -1,15 +1,15 @@
 {
-  "name": "tiptypr",
-  "version": "0.0.596",
+  "name": "@prototypr/typr",
+  "version": "0.0.598",
   "description": "Prototypr Editor",
   "main": "index.js",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "webpack --mode production && tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify",
+    "build": "babel src --out-dir dist --copy-files && tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify",
     "prepublishOnly": "npm run build",
-    "watch": "webpack --watch --mode development & tailwindcss -i ./src/styles.css -o ./dist/styles.css --watch",
+    "watch": "babel src --out-dir dist --copy-files --watch",
     "clean": "rm -rf node_modules",
     "reinstall": "npm run clean && npm install"
   },
@@ -18,9 +18,7 @@
     "url": "git+https://github.com/Prototypr/typr.git"
   },
   "keywords": [
-    "tiptap",
-    "prototypr",
-    "prosemirror"
+    "tiptap"
   ],
   "author": "Graeme Fulton",
   "license": "none yet",
@@ -49,6 +47,7 @@
     "@radix-ui/react-toggle": "^1.0.1",
     "@radix-ui/react-toggle-group": "^1.0.1",
     "@radix-ui/react-tooltip": "^1.0.2",
+    "@sentry/nextjs": "^7.37.2",
     "@stitches/react": "^1.2.8",
     "@tippyjs/react": "^4.2.6",
     "@tiptap/extension-blockquote": "^2.4.0",
@@ -114,17 +113,7 @@
     "@babel/preset-react": "^7.x.x",
     "@babel/preset-typescript": "^7.24.7",
     "autoprefixer": "^10.4.19",
-    "browserify-zlib": "^0.2.0",
-    "crypto-browserify": "^3.12.0",
-    "css-loader": "^7.1.2",
-    "https-browserify": "^1.0.0",
-    "mini-css-extract-plugin": "^2.9.0",
-    "path-browserify": "^1.0.1",
     "postcss": "^8.4.40",
-    "stream-browserify": "^3.0.0",
-    "stream-http": "^3.2.0",
-    "style-loader": "^4.0.0",
-    "tailwindcss": "^3.4.6",
-    "webpack-cli": "^5.1.4"
+    "tailwindcss": "^3.4.6"
   }
 }
