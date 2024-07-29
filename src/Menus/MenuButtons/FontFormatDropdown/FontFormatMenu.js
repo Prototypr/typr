@@ -3,7 +3,6 @@ import {motion} from 'framer-motion'
 import ReactDOM from 'react-dom'
 
 import {roundArrow} from 'tippy.js';
-import 'tippy.js/dist/svg-arrow.css';
 
 import Tippy from '@tippyjs/react/headless'; // different import path!
 

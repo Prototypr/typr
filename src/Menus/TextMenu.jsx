@@ -8,9 +8,6 @@ import { blackA, slate } from '@radix-ui/colors';
 import React from 'react';
 
 import {roundArrow} from 'tippy.js';
-import 'tippy.js/dist/svg-arrow.css';
-
-import 'tippy.js/animations/scale-subtle.css';
 
 const switchBlockQuote = (editor) =>{
   // editor.chain().focus().updateAttributes('blockquote',{ class: 'wp-block-quote' }).run();

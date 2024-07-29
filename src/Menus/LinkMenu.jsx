@@ -8,9 +8,6 @@ import { styled } from '@stitches/react';
 import { blackA, slate } from '@radix-ui/colors';
 
 import {roundArrow} from 'tippy.js';
-import 'tippy.js/dist/svg-arrow.css';
-
-import 'tippy.js/animations/scale-subtle.css';
 
 
 const IconButton = styled('button', {

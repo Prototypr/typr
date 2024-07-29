@@ -4,10 +4,6 @@ import ImagePopoverButton from "./MenuButtons/ImagePopoverButton/ImagePopoverBut
 import { useState } from "react";
 import React from 'react';
 
-import "tippy.js/dist/svg-arrow.css";
-
-import "tippy.js/animations/scale-subtle.css";
-
 const ImageMenu = ({ editor, isSelecting }) => {
   if (!editor) {
     return null;

@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect } from "react";
 
-import dynamic from "next/dynamic";
+// import dynamic from "next/dynamic";
 
 import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
 

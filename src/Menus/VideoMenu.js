@@ -12,10 +12,6 @@ import { useState } from "react";
 import React from 'react';
 
 // import { roundArrow } from "tippy.js";
-import "tippy.js/dist/svg-arrow.css";
-
-import "tippy.js/animations/scale-subtle.css";
-
 
 const VideoMenu = ({ editor, isSelecting }) => {
   if (!editor) {

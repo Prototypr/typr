@@ -6,14 +6,9 @@ import { checkImage } from "./ImageParts/imageCheck";
 import ImageLoadingSpinner from './ImageParts/ImageLoadingSpinner'
 import { ImageDecorationKey } from "../Figure";
 
-import "tippy.js/animations/scale-subtle.css";
-
 import OutgoingImageLink from "./ImageParts/OutgoingImageLinkRadix";
 // import ImageUpload from "./ImageParts/ImageUploadRadix";
 import {roundArrow} from 'tippy.js';
-import 'tippy.js/dist/svg-arrow.css';
-
-import 'tippy.js/animations/scale-subtle.css';
 import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 export default (props) => {
 
