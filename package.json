@@ -1,6 +1,6 @@
 {
-  "name": "@prototypr/typr",
-  "version": "0.0.598",
+  "name": "tiptypr",
+  "version": "0.0.599",
   "description": "Prototypr Editor",
   "main": "index.js",
   "files": [

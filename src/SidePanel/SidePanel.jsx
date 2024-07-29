@@ -9,8 +9,6 @@ import { slate, indigo } from "@radix-ui/colors";
 
 import ReactDatePicker from "react-datepicker";
 
-import "react-datepicker/dist/react-datepicker.css";
-
 const Input = styled("input", {
   all: "unset",
   flex: "1 0 auto",
