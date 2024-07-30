@@ -295,6 +295,7 @@ export default function EditorWrapper({
                       updatePostSettings={
                         user?.isAdmin ? updatePostSettings : false
                       }
+                      user={user}
                     />
                   )}
                 </div>

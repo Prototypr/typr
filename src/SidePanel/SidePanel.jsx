@@ -32,7 +32,6 @@ const SidePanel = ({
   user,
   updatePostSettings,
 }) => {
-
   
 
   const [rootElement] = useState(() => document.querySelector(`body`));
