@@ -276,6 +276,7 @@ export default function EditorWrapper({
                       updatePostSettings: user?.isAdmin
                         ? updatePostSettings
                         : false,
+                      user,
                       ...childProps, // Spread custom props to override defaults
                     })
                   ) : (
