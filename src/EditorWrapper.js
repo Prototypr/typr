@@ -39,7 +39,9 @@ export default function EditorWrapper({
   isInterview = false,
   tool = false,
   user,
-  mutateUser,
+  navLogo=null,
+  primaryColor="",
+  mutateUser = false,
   // @todo api stuff usable:
   getUserArticle,
   getSlugFromArticleId,
@@ -230,6 +232,8 @@ export default function EditorWrapper({
   return (
     <>
       <EditorNav
+        navLogo={navLogo}
+        primaryColor={primaryColor}
         isInterview={isInterview}
         tool={tool}
         post={postObject}
@@ -277,6 +281,7 @@ export default function EditorWrapper({
                         ? updatePostSettings
                         : false,
                       user,
+                      primaryColor,
                       ...childProps, // Spread custom props to override defaults
                     })
                   ) : (
@@ -293,6 +298,7 @@ export default function EditorWrapper({
                       updatePost={updatePost}
                       forceSave={forceSave}
                       refetchPost={refetch}
+                      primaryColor={primaryColor}
                       updatePostSettings={
                         user?.isAdmin ? updatePostSettings : false
                       }

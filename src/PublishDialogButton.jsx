@@ -18,7 +18,7 @@ import Button from "./Primitives/Button";
 import Spinner from "./atom/Spinner/Spinner";
 // const Spinner = dynamic(() => import("./atom/Spinner/Spinner"));
 
-export const PublishDialogButton = ({ onSave, canPublish, postObject }) => {
+export const PublishDialogButton = ({ onSave, canPublish, postObject, primaryColor }) => {
   const [submitting, setSubmitting] = useState();
   const [submitOpen, setSubmitOpen] = useState();
 
@@ -43,7 +43,7 @@ export const PublishDialogButton = ({ onSave, canPublish, postObject }) => {
   return (
     <Dialog onOpenChange={toggleSubmitOpen} open={submitOpen}>
       <DialogTrigger asChild>
-        <Button
+        <button
           disabled={
             !canPublish ||
            ( (
@@ -61,7 +61,7 @@ export const PublishDialogButton = ({ onSave, canPublish, postObject }) => {
                         postObject?.title == postObject?.draft_title))))
           }
           variant="confirmRounded"
-          className="!text-[13px] !font-normal !h-[25px] !px-2 !outline !outline-blue-600 !outline-1 !py-0 !mr-1 !my-auto"
+          className={`!text-[13px] !font-normal rounded-full ${primaryColor?primaryColor:'bg-blue-600 hover:bg-blue-500 !outline-blue-600'}  text-white !h-[25px] !px-2 !outline !outline-1 !py-0 !mr-1 !my-auto`}
         >
           {
             // if there's a draft version different from the content, and post is not published
@@ -71,7 +71,7 @@ export const PublishDialogButton = ({ onSave, canPublish, postObject }) => {
                 ? "Publish changes"
                 : "Submit"
           }
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContentLarge variant="big">
         <div>

@@ -66,6 +66,7 @@ const Editor = ({
   forceSave = false,
   updatePostSettings = false,
   setInitialEditorContent = false,
+  primaryColor='',
   user,
 }) => {
   // const { user } = useUser({
@@ -291,6 +292,7 @@ const Editor = ({
               saved={saved}
               canEdit={canEdit}
               editor={editor}
+              primaryColor={primaryColor}
               //for settings panel
               postObject={postObject}
               updatePostSettings={updatePostSettings}

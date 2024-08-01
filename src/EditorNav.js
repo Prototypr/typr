@@ -13,7 +13,7 @@ const NavigationMenuMobile = dynamic(() => import("./Nav/navbar-menu-mobile"), {
   ssr: false,
 });
 
-export default function EditorNav({ activeNav, postStatus, tool, post, isInterview, user, mutateUser }) {
+export default function EditorNav({ activeNav, postStatus,navLogo, tool, post, isInterview, user, mutateUser, primaryColor }) {
   // const { user, isLoading } = useUser({
   //   redirectIfFound: false,
   // });
@@ -93,18 +93,33 @@ export default function EditorNav({ activeNav, postStatus, tool, post, isIntervi
               </button>
             </div>
             <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-              <Link href="/" as="/">
+              {navLogo?<Link href="/" as="/">
                 <div
                   className={`flex-shrink-0  flex items-center cursor-pointer transition transition-all duration-300 ease-in-out`}
                 >
                   <img
                     className="lg:block h-8 w-auto"
                     data-gumlet="false"
-                    src={`/static/images/logo-small.svg`}
+                    src={navLogo}
                     alt="Prototypr Logo"
                   />
                 </div>
-              </Link>
+              </Link>:<svg className="h-6 my-auto mr-2 w-auto" width="164" height="164" viewBox="0 0 164 164" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_1_12)">
+<rect width="164" height="164" fill="white"/>
+<rect x="6" y="6" width="152" height="152" rx="6" stroke="black" stroke-width="12"/>
+<path d="M111.138 45.058L89.022 45.446V121.688L104.736 124.986C104.736 128.995 103.637 131 101.438 131L82.62 129.836L63.414 131C60.9567 131 59.728 128.995 59.728 124.986L75.442 121.688V45.446L53.52 45.058L51.58 58.638C51.58 60.578 48.9933 61.548 43.82 61.548L41.88 38.656C42.1387 36.9747 44.0787 36.134 47.7 36.134L82.62 36.91L116.958 36.134C120.579 36.134 122.519 36.9747 122.778 38.656L120.838 61.548C115.665 61.548 113.078 60.578 113.078 58.638L111.138 45.058Z" fill="black"/>
+</g>
+<defs>
+<clipPath id="clip0_1_12">
+<rect width="164" height="164" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+
+
+
+}
               {tool ? (
                 <div className="my-auto ml-3">
                   <div className="p-2 py-0.5 text-xs bg-pink-100 text-pink-900 rounded-full border border-pink-200">

@@ -21,6 +21,7 @@ const EditorNavButtons = ({
   refetchPost,
   postObject,
   updatePostSettings,
+  primaryColor,
 }) => {
   return (
     <>
@@ -48,6 +49,7 @@ const EditorNavButtons = ({
           //for /write (new post), it creates a new post
           //for /p/[slug] (existing post), it updates the existing post
           onSave={onSave}
+          primaryColor={primaryColor}
         />:null}
 
       {/* show side panel trigger if updatePostSettings is defined (in /p/[slug]) */}
