@@ -179,16 +179,22 @@ export default function EditorWrapper({
         return true;
       } else {
         // Creating a new post
-        if (!routerPostId) {
+        if (!routerPostId && typeof savePost === 'function') {
           const postInfo = await createPostFromHook({ user, editor, forReview, create: createPost });
           // Set the new slug
           localStorage.removeItem("wipContent");
 
-          onPostCreated({id:postInfo?.id,postInfo})
+          if(postInfo?.id){
+            onPostCreated({id:postInfo?.id,postInfo})
+          }
 
           refetch();
           return true;
-        } else {
+        } 
+        if(!routerPostId && typeof savePost !== 'function'){
+          return false
+        }
+        else {
           return false;
         }
       }
