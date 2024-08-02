@@ -1,6 +1,6 @@
 {
   "name": "tiptypr",
-  "version": "0.0.63",
+  "version": "0.0.64",
   "description": "Prototypr Editor",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
