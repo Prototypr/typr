@@ -1,18 +1,12 @@
 import React from "react";
-import dynamic from "next/dynamic";
 import { styled } from "./stitches.config";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { indigo, gray } from "@radix-ui/colors";
 import Link from "next/link";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 
-const ProfileBadge = dynamic(() => import("./ProfileBadge"));
+import ProfileBadge from "./ProfileBadge";
 
-// const LocaleSwitcher = dynamic(() => import("./Locale/LocaleSwitcher"), {
-//   ssr: true,
-// });
-
-// import { useIntl } from "react-intl";
 
 const StyledMenu = styled(NavigationMenuPrimitive.Root, {
   position: "relative",
@@ -78,8 +72,8 @@ const StyledButton = styled(NavigationMenuPrimitive.Link, {
 });
 
 const NextLink = ({ children, ...props }) => {
-  const router = useRouter();
-  const isActive = Boolean(router.asPath == props.href);
+  // const router = useRouter();
+  const isActive = Boolean(props.router?.asPath == props.href);
   return (
     <Link href={props.href} passHref>
       <StyledLink asChild>
@@ -99,8 +93,8 @@ const NextLink = ({ children, ...props }) => {
   );
 };
 const NextButton = ({ children, ...props }) => {
-  const router = useRouter();
-  const isActive = Boolean(router.asPath == props.href);
+  // const router = useRouter();
+  const isActive = Boolean(props.router?.asPath == props.href);
   return (
     <Link href={props.href} passHref>
       <StyledButton asChild>
@@ -131,6 +125,7 @@ export const NavigationMenuDemo = ({
   user,
   userLoading,
   userLoggedInCookie,
+  router  
 }) => {
   // const intl = useIntl();
   // const title3 = intl.formatMessage({ id: "navbar.menu.title3" });
@@ -139,23 +134,23 @@ export const NavigationMenuDemo = ({
     <NavigationMenu className="sm:hidden">
       <NavigationMenuList>
         <NavigationMenuItem className="block flex py-2 flex-col justify-center">
-          <NavigationMenuLink href="/posts/accessibility">
+          <NavigationMenuLink router={router} href="/posts/accessibility">
             Accessibility
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem className="block flex py-2 flex-col justify-center">
-          <NavigationMenuLink href="/posts/interview">
+          <NavigationMenuLink router={router} href="/posts/interview">
             Interviews
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem className="block flex py-2 flex-col justify-center">
-          <NavigationMenuLink href="/posts/ux">UX Design</NavigationMenuLink>
+          <NavigationMenuLink router={router} href="/posts/ux">UX Design</NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem className="block flex py-2 flex-col justify-center">
-          <NavigationMenuLink href="/posts/ui">UI Design</NavigationMenuLink>
+          <NavigationMenuLink router={router} href="/posts/ui">UI Design</NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem className="block flex py-2 flex-col justify-center">
-          <NavigationMenuLink href="/toolbox">Toolbox</NavigationMenuLink>
+          <NavigationMenuLink router={router} href="/toolbox">Toolbox</NavigationMenuLink>
         </NavigationMenuItem>
 
         {/* <NavigationMenuItem className="block flex py-2 flex-col justify-center">
@@ -165,7 +160,7 @@ export const NavigationMenuDemo = ({
         </NavigationMenuItem> */}
 
         <NavigationMenuItem className="block flex py-2 flex-col justify-center">
-          <NavigationMenuLink href="/web-monetization">
+            <NavigationMenuLink router={router} href="/web-monetization">
             Web Monetization
           </NavigationMenuLink>
         </NavigationMenuItem>
@@ -177,6 +172,7 @@ export const NavigationMenuDemo = ({
                 {user && (
                   <ProfileBadge
                     user={user}
+                    router={router}
                     icon={
                       <img
                         className="hover:shadow border border-1 rounded-full my-auto w-8 h-8 cursor-pointer"
@@ -194,7 +190,7 @@ export const NavigationMenuDemo = ({
           ) : userLoading && userLoggedInCookie ? (
             <div className="bg-gray-200 hover:shadow border border-1 ml-2 rounded-full my-auto w-8 h-8 cursor-pointer"></div>
           ) : (
-            <NavigationMenuButton href="/newsletter">
+              <NavigationMenuButton router={router} href="/newsletter">
               <div className="flex">
               {/* his */}
               <div>

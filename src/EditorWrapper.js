@@ -2,27 +2,19 @@
 
 import React, { useCallback, useEffect } from "react";
 
-// import dynamic from "next/dynamic";
-
 import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
 
-// const Editor = dynamic(() => import("./Editor"), {
-//   ssr: false,
-// });
 import Editor from "./Editor";
-import Spinner from "./atom/Spinner/Spinner";
-// const Spinner = dynamic(() => import("./atom/Spinner/Spinner"));
+import Spinner from "./atom/Spinner/Spinner.js";
 
 import useLoad from "./editorHooks/useLoad";
 import useCreate from "./editorHooks/useCreate";
 import useUpdate from "./editorHooks/useUpdate";
 
-import { useRouter } from "next/router";
 import EditorNav from "./EditorNav";
 import { useConfirmTabClose } from "./useConfirmTabClose";
 import { debounce } from "lodash";
 
-// import "../dist/styles.css";
 
 // Rest of your component code
 const saveDebounceDelay = 3000;
@@ -40,21 +32,28 @@ export default function EditorWrapper({
   tool = false,
   user,
   navLogo=null,
+  navigate=(url)=>{
+    if (typeof window !== 'undefined' && typeof url === 'string') {
+      window.location.href = url;
+    }
+  },
   primaryColor="",
   mutateUser = false,
-  // @todo api stuff usable:
-  getUserArticle,
-  getSlugFromArticleId,
+  isLoggedIn,
+
+  //external api methods required
+  loadPost,
+  createPost,
+  savePost,
+
+  onPostCreated,
+
+  //post slug for saving
+  postId:routerPostId,
+
   children,
   childProps = {}, // Add this line to accept custom props
 }) {
-  const router = useRouter();
-
-  // const { user } = useUser({
-  //   // redirectTo: '/account',
-  //   redirectTo: "/onboard",
-  //   redirectIfFound: false,
-  // });
   /**
    * embed twitter widget if not already loaded
    */
@@ -75,15 +74,16 @@ export default function EditorWrapper({
     setPostObject,
   } = useLoad({
     user,
+    isLoggedIn,
+    routerPostId,
     interview: isInterview,
     productName: tool?.name ? tool.name : false,
     // @todo make this api stuff work for everyone
     //api calls
-    getUserArticle,
-    getSlugFromArticleId,
+    getUserArticle:loadPost
   });
   //create new post hook
-  const { createPost, creatingPost, created } = useCreate();
+  const { createPost:createPostFromHook, creatingPost, created } = useCreate();
 
   const {
     //update post content
@@ -95,7 +95,7 @@ export default function EditorWrapper({
     saving,
     setSaving,
     hasUnsavedChanges,
-  } = useUpdate();
+  } = useUpdate({savePost});
 
   useConfirmTabClose(hasUnsavedChanges);
 
@@ -125,7 +125,7 @@ export default function EditorWrapper({
    */
   const forceSave = ({ editor, json, forReview }) => {
     setSaving(false);
-    savePost({ editor, forReview });
+    _savePost({ editor, forReview });
   };
 
   /**
@@ -134,13 +134,13 @@ export default function EditorWrapper({
   const debounceSave = useCallback(
     debounce(async ({ editor, forReview }) => {
       setSaving(false);
-      savePost({ editor, forReview });
+      _savePost({ editor, forReview });
     }, saveDebounceDelay),
     [user, postId, postObject, postStatus]
   );
 
   /**
-   * savePost
+   * _savePost
    * when save button is clicked
    * save the post to the backend
    *
@@ -148,7 +148,7 @@ export default function EditorWrapper({
    * @param {*} param0
    * @returns
    */
-  const savePost = async ({ editor, forReview }) => {
+  const _savePost = async ({ editor, forReview }) => {
     //check if editor has any content
     // Updating an existing post
     if (
@@ -179,20 +179,12 @@ export default function EditorWrapper({
         return true;
       } else {
         // Creating a new post
-        if (!router.query.slug) {
-          const postInfo = await createPost({ user, editor, forReview });
+        if (!routerPostId) {
+          const postInfo = await createPostFromHook({ user, editor, forReview, create: createPost });
           // Set the new slug
           localStorage.removeItem("wipContent");
 
-          router.replace(
-            {
-              pathname: router.pathname,
-              query: { slug: postInfo?.id },
-              as: `/p/${postInfo?.id}`,
-            },
-            undefined,
-            { shallow: true }
-          );
+          onPostCreated({id:postInfo?.id,postInfo})
 
           refetch();
           return true;
@@ -232,6 +224,7 @@ export default function EditorWrapper({
   return (
     <>
       <EditorNav
+        navigate={navigate}
         navLogo={navLogo}
         primaryColor={primaryColor}
         isInterview={isInterview}
@@ -250,16 +243,17 @@ export default function EditorWrapper({
           {/* {!user && <Fallback />} */}
 
           {/* only load editor if initialContent is not null */}
-          {(user && !user?.isLoggedIn) || initialContent == null ? (
+          {(!isLoggedIn) || initialContent == null ? (
             // <Layout>
             <div className="my-auto h-screen flex flex-col justify-center text-center">
               <div className="mx-auto opacity-50">
                 <Spinner />
               </div>
+              {/* <h2>You need to be logged in.</h2> */}
             </div>
           ) : (
             // </Layout>
-            user?.isLoggedIn && (
+            (isLoggedIn) && (
               <>
                 <div className="my-4">
                   {React.isValidElement(children) ? (

@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 
 
-// import dynamic from "next/dynamic";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import {
   Dialog,
@@ -16,7 +15,6 @@ import {
 } from "./Primitives/Dialog";
 import Button from "./Primitives/Button";
 import Spinner from "./atom/Spinner/Spinner";
-// const Spinner = dynamic(() => import("./atom/Spinner/Spinner"));
 
 export const PublishDialogButton = ({ onSave, canPublish, postObject, primaryColor }) => {
   const [submitting, setSubmitting] = useState();

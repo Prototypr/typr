@@ -2,14 +2,20 @@
   "name": "tiptypr",
   "version": "0.0.63",
   "description": "Prototypr Editor",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
   "files": [
     "dist"
   ],
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
+  },
   "scripts": {
-    "build": "babel src --out-dir dist --copy-files && tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify",
+    "build": "rollup -c",
     "prepublishOnly": "npm run build",
-    "watch": "babel src --out-dir dist --copy-files --watch",
+    "watch": "rollup -c --watch",
     "clean": "rm -rf node_modules",
     "reinstall": "npm run clean && npm install"
   },
@@ -81,22 +87,18 @@
     "@tiptap/suggestion": "^2.5.4",
     "axios": "^0.19.2",
     "classnames": "2.3.1",
-    "formik": "^2.2.9",
+    "formik": "^2.4.6",
     "framer-motion": "^8.4.0",
+    "install": "^0.13.0",
     "js-cookie": "^2.2.1",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
-    "next": "latest",
-    "next-auth": "^4.2.1",
     "normalize-url": "^6.1.0",
-    "probe-image-size": "^7.2.3",
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.7.3",
     "prosemirror-view": "^1.31.7",
-    "react": "^18.3.1",
     "react-avatar-editor": "^13.0.2",
     "react-datepicker": "^4.8.0",
-    "react-dom": "^18.3.1",
     "react-hot-toast": "^2.2.0",
     "react-intl": "^5.24.8",
     "react-lazyload": "^3.2.0",
@@ -112,8 +114,27 @@
     "@babel/preset-env": "^7.x.x",
     "@babel/preset-react": "^7.x.x",
     "@babel/preset-typescript": "^7.24.7",
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
     "autoprefixer": "^10.4.19",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "mini-css-extract-plugin": "^2.9.0",
     "postcss": "^8.4.40",
-    "tailwindcss": "^3.4.6"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "rollup": "^4.19.2",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "tailwindcss": "^3.4.6",
+    "webpack-cli": "^5.1.4"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   }
 }

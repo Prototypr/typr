@@ -13,8 +13,6 @@ import { signOut } from "next-auth/react";
 import fetchJson from "../utils/fetchJson";
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-// import { useRouter } from "next/router";
-import { useRouter } from "next/navigation";
 import { UserCircle, Article, CircleWavyCheck } from "../icons/icons";
 
 const slideUpAndFade = keyframes({
@@ -173,14 +171,6 @@ export const DropdownMenuArrow = StyledArrow;
 // Your app...
 const Box = styled("div", {});
 
-// const RightSlot = styled('div', {
-//   marginLeft: 'auto',
-//   paddingLeft: 20,
-//   color: mauve.mauve11,
-//   ':focus > &': { color: 'white' },
-//   '[data-disabled] &': { color: mauve.mauve8 },
-// });
-
 const IconButton = styled("button", {
   all: "unset",
   fontFamily: "inherit",
@@ -198,16 +188,96 @@ const IconButton = styled("button", {
   "&:focus": { boxShadow: `0 0 0 2px ${blue.blue7}` },
 });
 
-// const signOutAPI = (mutateUser) =>{
-//     signOut()
-// }
+const renderMenuItems = (items, user, navigate) => {
+  return items.map((item, index) => {
+    if (item.separator) {
+      return <DropdownMenuSeparator key={`separator-${index}`} />;
+    }
 
-export const ProfileBadgeDropdown = ({ icon, user, mutateUser }) => {
-  const router = useRouter();
-  // const { mutateUser } = useUser({
-  //   redirectTo: "/",
-  //   redirectIfFound: false,
-  // });
+    if (item.condition && !item.condition(user)) {
+      return null;
+    }
+
+    if (item.items) {
+      return renderMenuItems(item.items, user, navigate);
+    }
+
+    return (
+      <DropdownMenuItem
+        key={item.label}
+        onSelect={() => {
+          if (typeof item.link === "function") {
+            navigate(item.link(user));
+          } else {
+            navigate(item.link);
+          }
+        }}
+      >
+        {item.icon}
+        {item.label}
+      </DropdownMenuItem>
+    );
+  });
+};
+
+export const ProfileBadgeDropdown = ({
+  icon,
+  user,
+  mutateUser,
+  navigate,
+  menuConfig = {
+    menuItems: [
+      {
+        link: user =>
+          user?.profile?.approved
+            ? `/people/${user?.profile?.slug}`
+            : `/account/profile`,
+        icon: <UserCircle size={26} className="opacity-80 mr-3" />,
+        label: "Profile",
+      },
+      { separator: true },
+      {
+        link: "/dashboard/drafts",
+        icon: <Article size={26} className="opacity-80 mr-3" />,
+        label: "Posts",
+      },
+      {
+        condition: user => user?.profile?.onboardComplete !== true,
+        items: [
+          { separator: true },
+          {
+            link: "/onboard?onboard=true",
+            icon: <CircleWavyCheck size={26} className="opacity-80 mr-3" />,
+            label: "Setup",
+          },
+        ],
+      },
+      { separator: true },
+      {
+        link: "/account",
+        label: "Edit profile",
+      },
+    ],
+    adminMenu: [
+      { separator: true },
+      {
+        link: "/admin/drafts",
+        label: "👩‍✈️ Admin",
+      },
+      {
+        link: "https://api.prototypr.io/admin/content-manager/collectionType/api::post.post?page=1&pageSize=10&sort=date:DESC&plugins[i18n][locale]=en",
+        label: "👾 Strapi",
+      },
+    ],
+    businessMenu: [
+      { separator: true },
+      {
+        link: "/dashboard/partner",
+        label: "Business hub",
+      },
+    ],
+  },
+}) => {
   return (
     <Box>
       <DropdownMenu>
@@ -230,43 +300,8 @@ export const ProfileBadgeDropdown = ({ icon, user, mutateUser }) => {
             avoidCollisions={true}
             // sideOffset={-36}
           >
-            <DropdownMenuItem
-              onSelect={() => {
-                if (user?.profile?.approved) {
-                  router.push(`/people/${user?.profile?.slug}`);
-                } else {
-                  router.push(`/account/profile`);
-                }
-              }}
-            >
-              <UserCircle size={26} className="opacity-80 mr-3" />
-              Profile
-            </DropdownMenuItem>
+            {renderMenuItems(menuConfig.menuItems, user, navigate)}
 
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem
-              onSelect={() => {
-                router.push("/dashboard/drafts");
-              }}
-            >
-              <Article size={26} className="opacity-80 mr-3" />
-              Posts
-            </DropdownMenuItem>
-
-            {user?.profile?.onboardComplete !== true ? (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={() => {
-                    router.push(`/onboard?onboard=true`);
-                  }}
-                >
-                  <CircleWavyCheck size={26} className="opacity-80 mr-3" />
-                  Setup
-                </DropdownMenuItem>
-              </>
-            ) : null}
             {/* <DropdownMenuSeparator /> */}
 
             {/* <DropdownMenuItemBanner
@@ -300,60 +335,13 @@ export const ProfileBadgeDropdown = ({ icon, user, mutateUser }) => {
               Write a Post
             </DropdownMenuItem>
             <DropdownMenuSeparator /> */}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onSelect={() => {
-                router.push("/account");
-              }}
-            >
-              Edit profile
-            </DropdownMenuItem>
-            {/* <DropdownMenuSeparator /> */}
-            {/* <DropdownMenuItem
-              onSelect={() => {
-                window.open(`https://help.prototypr.io`);
-              }}
-            >
-              Help
-            </DropdownMenuItem> */}
 
-            {user?.isAdmin ? (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={() => {
-                    router.push(`/admin/drafts`);
-                  }}
-                >
-                  👩‍✈️ Admin
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => {
-                    window.open(
-                      `https://api.prototypr.io/admin/content-manager/collectionType/api::post.post?page=1&pageSize=10&sort=date:DESC&plugins[i18n][locale]=en`
-                    );
-                  }}
-                >
-                  👾 Strapi
-                </DropdownMenuItem>
-              </>
-            ) : (
-              ""
-            )}
-            {user?.profile?.companies?.length ? (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={() => {
-                    router.push(`/dashboard/partner`);
-                  }}
-                >
-                  Business hub
-                </DropdownMenuItem>
-              </>
-            ) : (
-              ""
-            )}
+            {user?.isAdmin &&
+              renderMenuItems(menuConfig.adminMenu, user, navigate)}
+
+            {user?.profile?.companies?.length &&
+              renderMenuItems(menuConfig.businessMenu, user, navigate)}
+
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onSelect={async () => {

@@ -1,21 +1,11 @@
 import React from "react";
-// import dynamic from "next/dynamic";
 import { styled } from "./stitches.config";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import Button from "../Primitives/Button";
 
-import { indigo, gray } from "@radix-ui/colors";
-import Link from "next/link";
+import { CustomLink } from "../components/CustomLink";
 import { useState, useEffect } from "react";
 
-// const ProfileBadge = dynamic(() => import("./ProfileBadge"));
-
-// const LocaleSwitcher = dynamic(() => import("./Locale/LocaleSwitcher"), {
-//   ssr: true,
-// });
-// const NewsletterNav = dynamic(() => import("./NewsletterNav"), {
-//   ssr: true,
-// });
 
 // import { useIntl } from "react-intl";
 import UserMenu from "./UserMenu";
@@ -38,78 +28,10 @@ const StyledList = styled(NavigationMenuPrimitive.List, {
   listStyle: "none",
 });
 
-const itemStyles = {
-  padding: "8px 12px",
-  outline: "none",
-  userSelect: "none",
-  fontWeight: 400,
-  lineHeight: 1,
-  borderRadius: 4,
-  fontSize: 15,
-  //   color: indigo.indigo11,
-  "&:focus": { position: "relative", boxShadow: `0 0 0 2px ${indigo.indigo8}` },
-  "&:hover": { backgroundColor: indigo.indigo3, color: indigo.indigo11 },
-};
-const itemButtonStyles = {
-  padding: "8px 12px",
-  outline: "none",
-  userSelect: "none",
-  fontWeight: 500,
-  lineHeight: 1,
-  borderRadius: 4,
-  fontSize: 15,
-  marginLeft: "6px",
-  color: gray.gray1,
-  "&:focus": { position: "relative", boxShadow: `0 0 0 2px ${indigo.indigo8}` },
-  "&:hover": { backgroundColor: indigo.indigo9, color: gray.gray1 },
-};
-
-const StyledLink = styled(NavigationMenuPrimitive.Link, {
-  ...itemStyles,
-  display: "block",
-  textDecoration: "none",
-  fontSize: 15,
-  lineHeight: 1,
-});
-
-const StyledButton = styled(NavigationMenuPrimitive.Link, {
-  ...itemButtonStyles,
-  display: "block",
-  background: indigo.indigo10,
-  textDecoration: "none",
-  fontSize: 15,
-  lineHeight: 1,
-});
-
-const NextLink = ({ children, ...props }) => {
-  return (
-    <Link href={props.href} passHref>
-      <StyledLink asChild>
-        <span style={props.css} {...props}>
-          {children}
-        </span>
-      </StyledLink>
-    </Link>
-  );
-};
-const NextButton = ({ children, ...props }) => {
-  return (
-    <Link href={props.href} passHref>
-      <StyledButton asChild>
-        <span style={props.css} {...props}>
-          {children}
-        </span>
-      </StyledButton>
-    </Link>
-  );
-};
-
 // Exports
 const NavigationMenu = StyledMenu;
 const NavigationMenuList = StyledList;
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
-const NavigationMenuLink = NextLink;
-// const NavigationMenuButton = NextButton;
 
 export const NavigationMenuDemo = ({
   collapsed,
@@ -121,6 +43,7 @@ export const NavigationMenuDemo = ({
   showWriteButton,
   showSponsorButton,
   showJobsButton,
+  navigate
 }) => {
   // const intl = useIntl();
   // const title3 = intl.formatMessage({ id: "navbar.menu.title3" });
@@ -151,7 +74,7 @@ export const NavigationMenuDemo = ({
             <NavigationMenuItem
               className={`hidden mr-2 ml-4 md:block md:flex md:flex-col md:justify-center`}
             >
-              <Link href="/write">
+              <CustomLink href="/write">
                 <Button className="flex" type="" variant="confirmRounded">
                   <svg
                     className="w-4 h-4 mr-1"
@@ -168,7 +91,7 @@ export const NavigationMenuDemo = ({
                   </svg>
                   Write
                 </Button>
-              </Link>
+              </CustomLink>
             </NavigationMenuItem>
           )
         )}
@@ -176,7 +99,7 @@ export const NavigationMenuDemo = ({
           <NavigationMenuItem
             className={`hidden mr-2 ml-4 md:block md:flex md:flex-col md:justify-center`}
           >
-            <Link href="/sponsor">
+            <CustomLink href="/sponsor">
               <Button className="flex" type="" variant="confirmRounded">
                 <svg
                   className="w-4 h-4 mr-1"
@@ -193,14 +116,14 @@ export const NavigationMenuDemo = ({
                 </svg>
                 Create Ad
               </Button>
-            </Link>
+            </CustomLink>
           </NavigationMenuItem>
         )}
         {user && !editor && showJobsButton == true && (
           <NavigationMenuItem
             className={`hidden mr-2 ml-4 md:block md:flex md:flex-col md:justify-center`}
           >
-            <Link href="/sponsor">
+            <CustomLink href="/sponsor">
               <Button className="flex" type="" variant="confirmRounded">
                 <svg
                   className="w-4 h-4 mr-1"
@@ -217,7 +140,7 @@ export const NavigationMenuDemo = ({
                 </svg>
                 Post job
               </Button>
-            </Link>
+            </CustomLink>
           </NavigationMenuItem>
         )}
         {clientMounted ? (
@@ -225,7 +148,7 @@ export const NavigationMenuDemo = ({
             {user && user?.isLoggedIn ? (
               <div className="ml-2 w-8 relative">
                 {/* <Link href="/account"> */}
-                {user ? <UserMenu userLoading={false} user={user} /> : ""}
+                {user ? <UserMenu navigate={navigate} userLoading={false} user={user} /> : ""}
                 {/* {user && 
                   <ProfileBadge
                   user={user}

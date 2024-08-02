@@ -1,0 +1,67 @@
+
+.ProseMirror:focus {
+    outline: none;
+}
+
+.ProseMirror .is-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: #aeb4bb;
+    pointer-events: none;
+    height: 0;
+}
+
+.ProseMirror .is-empty:first-of-type::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #aeb4bb;
+  pointer-events: none;
+  height: 0;
+}
+
+.menu-open.ProseMirror p.is-empty:first-of-type::before {
+    opacity: 0!important;
+    color:#fff!important;
+}
+
+.tippy-svg-arrow{
+  fill:#111827!important;
+}
+
+.ProseMirror figure video{
+  pointer-events: none;
+}
+
+figure.ProseMirror-selectednode img{
+  outline:3px solid blue;
+}
+figure.ProseMirror-selectednode video 
+{
+  outline:3px solid blue;
+}
+
+figure.ProseMirror-selectednode figcaption::selection {
+      background: transparent!important;
+  }
+
+  img.ProseMirror-selectednode{
+    outline:3px solid blue;
+  }
+  
+  figcaption{
+    position:relative;
+  }
+  .editable_text.empty::after{
+    position:absolute;
+    pointer-events: none;
+    color:#b5bbc2;
+    width:100%; 
+    left:0;
+    top:0;
+    content: "Image Caption (Optional)";
+  }
+  figure.ProseMirror-selectednode .editable_text, figure.is-empty .editable_text{
+    opacity:1;
+    height:auto;
+    margin-top:16px!important;
+  }

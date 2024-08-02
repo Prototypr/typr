@@ -1,10 +1,6 @@
-import React from 'react';
+import React from "react";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { getInterViewTemplate } from "./libs/templates/interviewTemplate";
-
-// @todo make this easier (passed in as prop):
-// import { getUserArticle, getSlugFromArticleId } from "@/lib/api";
 
 /**
  * useLoad hook for loading post content
@@ -17,16 +13,20 @@ import { getInterViewTemplate } from "./libs/templates/interviewTemplate";
  * @param {string} params.productName - The product name
  * @returns {object} - The hook state and functions
  */
-const useLoad = ({ user, interview, productName,
-
-  getUserArticle, getSlugFromArticleId
- } = {}) => {
-  const router = useRouter();
+const useLoad = ({
+  user,
+  isLoggedIn,
+  interview,
+  productName,
+  getUserArticle,
+  routerPostId=false
+} = {}) => {
+  // const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [initialContent, setInitialContent] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
-  const [postId, setPostId] = useState(router.query?.slug);
+  const [postId, setPostId] = useState(routerPostId);
   const [slug, setSlug] = useState(null);
   const [postObject, setPostObject] = useState(false);
   const [title, setTitle] = useState(null);
@@ -34,37 +34,39 @@ const useLoad = ({ user, interview, productName,
 
   // Load content when user or postId changes
   useEffect(() => {
-    if (user && router.isReady) {
-      const { slug } = router.query;
-      if (slug) {
-        setPostId(slug);
+    if (isLoggedIn) {
+      if (routerPostId) {
+        setPostId(routerPostId);
       } else {
         refetch();
       }
-    }
-  }, [user, router.query.slug && router.isReady]);
-
-  useEffect(() => {
-    if (postId && user?.isLoggedIn) {
+    } else if (isLoggedIn) {
       refetch();
     }
-  }, [postId, user?.isLoggedIn]);
+  }, [routerPostId]);
+
+  useEffect(() => {
+    if (postId && isLoggedIn) {
+      refetch();
+    }
+  }, [postId, isLoggedIn]);
 
   // Refetch content
   const refetch = async () => {
     if (postId) {
-      await getCurrentPost();
+      await getPostFromDB();
       setLoading(false);
     } else {
+      //load local content
       setIsOwner(true);
       setCanEdit(true);
-      loadLocalContent();
+      getPostFromLocalStorage();
       setLoading(false);
     }
   };
 
   // Load local content for new posts
-  const loadLocalContent = () => {
+  const getPostFromLocalStorage = () => {
     let retrievedObject = localStorage.getItem("wipContent");
     if (interview) {
       retrievedObject = localStorage.getItem("wipInterview");
@@ -81,42 +83,22 @@ const useLoad = ({ user, interview, productName,
   };
 
   // Fetch current post from the backend
-  const getCurrentPost = async () => {
+  const getPostFromDB = async () => {
     try {
-      const data = await getUserArticle(user, postId);
-      const post = data.userPostId;
+      const post = await getUserArticle(user, postId);
 
-      const userHasPermission = checkPermissions(post);
-
-      if (userHasPermission) {
+      if (post) {
         setPostObject(post);
+        setIsOwner(true);
+        setCanEdit(true);
+        setSlug(post?.slug);
+      } else {
+        setInitialContent(false);
       }
     } catch (e) {
+      // setInitialContent(false);
       console.log(e);
     }
-  };
-
-  // Check user permissions for editing the post
-  const checkPermissions = post => {
-    let hasPermission = false;
-
-    if (user && post?.owner == user?.id && post?.type === "article") {
-      setIsOwner(true);
-      setCanEdit(true);
-      hasPermission = true;
-    }
-
-    if (user?.isAdmin && post?.id) {
-      setCanEdit(true);
-      hasPermission = true;
-    }
-
-    if (!post?.id) {
-      hasPermission = false;
-      setInitialContent(false);
-    }
-
-    return hasPermission;
   };
 
   /**
@@ -165,17 +147,6 @@ const useLoad = ({ user, interview, productName,
       setStatus(postObject?.status);
     }
   }, [postObject]);
-
-  // Fetch slug when user and postId are available
-  useEffect(() => {
-    const fetchData = async () => {
-      const { userPostId } = await getSlugFromArticleId(user, postId);
-      setSlug(userPostId?.slug);
-    };
-    if (user && postId) {
-      fetchData();
-    }
-  }, [postId, user]);
 
   return {
     loading,

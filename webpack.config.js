@@ -2,7 +2,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/EditorWrapper.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js',

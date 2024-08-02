@@ -11,7 +11,7 @@ import ImageMenu from "./Menus/ImageMenu";
 
 import Link from "@tiptap/extension-link";
 
-import NextLink from "next/link";
+import {CustomLink} from "./components/CustomLink";
 
 import Cite from "./CustomExtensions/Cite";
 
@@ -197,35 +197,6 @@ const Editor = ({
     },
   });
 
-  /**
-   * onSave
-   * when save button is clicked on the navbar!
-   *
-   * forReview is a flag for when publish button is clicked - it submits the post for review
-   *
-   * - not using autosave yet
-   * - remove onSave when switching to autosaving
-   */
-  // const onSave = async ({ forReview }) => {
-  //   setIsSaving(true);
-
-  //   try {
-  //     const saved = await savePost({
-  //       editor,
-  //       forReview: forReview ? true : false,
-  //     });
-  //     if (saved) {
-  //       setIsSaving(false);
-  //     } else {
-  //       console.log("Error saving");
-  //       setIsSaving(false);
-  //     }
-  //   } catch (e) {
-  //     console.log("Error saving");
-  //     setIsSaving(false);
-  //   }
-  // };
-
   if (!canEdit) {
     return (
       <div className="h-full w-full mx-auto  relative">
@@ -237,11 +208,11 @@ const Editor = ({
           <p className="text-gray-700">You are not owner of this post</p>
 
           <div className="mx-auto mt-4">
-            <NextLink href="/dashboard">
+            <CustomLink href="/dashboard">
               <button className="px-3 h-[35px] bg-blue-500 text-white font-semibold text-sm rounded-md w-fit hover:bg-blue-600">
                 Go to dashboard
               </button>
-            </NextLink>
+            </CustomLink>
           </div>
         </div>
       </div>
@@ -253,7 +224,7 @@ const Editor = ({
       <div className={`w-full relative ${postType == "article" ? "my-4" : ""}`}>
         {/* NAVIGATION, WITH BUTTONS EMBEDDED AS A PROP */}
         {user?.isAdmin && postType == "article" ? (
-          <div className="mt-16">
+          <div className="mt-16 hidden sm:block">
             <div className="fixed bottom-3 z-20 w-full">
               <div className="relative bg-gray-100/80 w-[500px] shadow-sm border border-gray-300/20 mx-auto rounded-xl p-3 text-sm backdrop-blur text-gray-800 flex flex-row justify-center items-center">
                 You're editing as admin.
@@ -282,6 +253,7 @@ const Editor = ({
 
         {showNavButtons !== false ? (
           <EditorButtonsNavPortal>
+            <div className="flex justify-end w-full sm:w-fit sm:justify-end">
             <EditorNavButtons
               user={user}
               onSave={({ forReview }) => {
@@ -298,6 +270,7 @@ const Editor = ({
               updatePostSettings={updatePostSettings}
               refetchPost={refetchPost}
             />
+            </div>
           </EditorButtonsNavPortal>
         ) : null}
 
@@ -307,7 +280,7 @@ const Editor = ({
             wrapperClass
               ? wrapperClass
               : postType == "article"
-                ? "my-4 pt-0 mt-[100px] max-w-[44rem] mx-auto relative pb-10 blog-content"
+                ? "my-4 pt-0 mt-[100px] max-w-[44rem] mx-auto relative pb-10 blog-content px-3 sm:px-0"
                 : ""
           }
         >

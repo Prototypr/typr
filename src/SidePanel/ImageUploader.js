@@ -4,8 +4,6 @@ import { styled } from "@stitches/react";
 import { indigo, slate } from "@radix-ui/colors";
 import toast from "react-hot-toast";
 
-const probe = require("probe-image-size");
-
 var axios = require("axios");
 
 var spinnerIcon = (
@@ -415,26 +413,14 @@ function dataURLtoFile(dataurl, filename) {
     return new File([u8arr], filename, {type:mime});
 }
 
-export const checkImage = async(imageUrl) =>{
-    try{
-        let imageInfo = await probe(
-          "https://req.prototypr.io/" + imageUrl
-        );
-        
-        if(imageInfo){
-          let bytelength = imageInfo.length
-          let mb = bytelength/1000000
-
-          if(mb>4){
-            alert('Image too large. Please use something less than 4mb.')
-
-            throw Error('Image size too big')
-          }
-        }
-        return imageInfo
-        
-      }catch(e){
-        console.log(e)
-        return false
-      }
-}
+export const checkImage = (imageUrl) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve({ width: img.width, height: img.height });
+    img.onerror = (error) => {
+      console.error('Error loading image:', error);
+      reject(error);
+    };
+    img.src = "https://req.prototypr.io/" + imageUrl;
+  });
+};

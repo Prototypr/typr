@@ -1,40 +1,26 @@
-import React from 'react';
+import React from "react";
 
-import dynamic from "next/dynamic";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
-import Link from "next/link";
+import { CustomLink } from "../components/CustomLink";
 import Button from "../Primitives/Button";
 import NewPostDialog from "./NewPostDialog";
-const ProfileBadge = dynamic(() => import("./ProfileBadge"));
-// const NewsletterNav = dynamic(() => import("../NewsletterNav"), {
-//   ssr: true,
-// });
+import ProfileBadge from "./ProfileBadge";
 // Exports
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
-const UserMenu = ({ user, userLoading, sessionUser }) => {
-
-  /**
-   * use the logged in true/false cookie
-   * so there is minimal flicker between subscribe and log in button
-   */
-  // const [userLoggedInCookie] = useState(() => {
-  //   let loggedInCookie = jsCookie.get("prototypr-loggedIn");
-  //   if (loggedInCookie == "true") {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // });
-
+const UserMenu = ({ user, userLoading, sessionUser, navigate }) => {
   return (
     <>
       {true ? (
-        <NavigationMenuItem className="flex flex-col justify-center" style={{zIndex:999}}>
-          {((user && user?.isLoggedIn )||sessionUser)? (
+        <NavigationMenuItem
+          className="flex flex-col justify-center"
+          style={{ zIndex: 999 }}
+        >
+          {(user && user?.isLoggedIn) || sessionUser ? (
             <div className="w-8 mt-[4px] mr-1.5">
               {(user || sessionUser) && (
                 <ProfileBadge
+                  navigate={navigate}
                   user={user}
                   icon={
                     <img
@@ -49,7 +35,7 @@ const UserMenu = ({ user, userLoading, sessionUser }) => {
                 />
               )}
             </div>
-          ) : (userLoading && !sessionUser) ? (
+          ) : userLoading && !sessionUser ? (
             <div className="bg-gray-200 hover:shadow border border-1 ml-2 rounded-full my-auto w-8 h-8 cursor-pointer"></div>
           ) : (
             <div className="hidden lg:flex">
@@ -58,19 +44,21 @@ const UserMenu = ({ user, userLoading, sessionUser }) => {
                   <div className="my-auto font-medium">Log in</div>
                 </div>
               </Link> */}
-              <Link href="/onboard">
-              <Button className="text-sm bg-blue-600 hover:bg-blue-500 rounded-xl" variant={"confirmRounded"}>
-              Sign in
-            </Button>
-            </Link>
+              <CustomLink href="/onboard">
+                <Button
+                  className="text-sm bg-blue-600 hover:bg-blue-500 rounded-xl"
+                  variant={"confirmRounded"}
+                >
+                  Sign in
+                </Button>
+              </CustomLink>
             </div>
             // <NewsletterNav collapsed={false} />
           )}
         </NavigationMenuItem>
       ) : (
-        
-        <NewPostDialog/>
-      ) }
+        <NewPostDialog />
+      )}
     </>
   );
 };

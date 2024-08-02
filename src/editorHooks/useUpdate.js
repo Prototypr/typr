@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 import toast from "react-hot-toast";
 import { useState } from "react";
@@ -22,7 +22,7 @@ const axios = require("axios");
  *
  * @returns
  */
-const useUpdate = () => {
+const useUpdate = ({ savePost }) => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(undefined);
@@ -56,28 +56,19 @@ const useUpdate = () => {
       return false;
     }
 
-    let publishPostEndpointConfig = {
-      method: "put",
-      url: `${process.env.NEXT_PUBLIC_API_URL}/api/posts/${postId}`,
-      headers: {
-        Authorization: `Bearer ${user?.jwt}`,
-      },
-      data: {
-        data: {
-          ...entry,
-        },
-      },
-    };
-
     setSaving(true);
-    setSaved(false)
-    const updateData = await axios(publishPostEndpointConfig)
-      .then(async function (response) {
+    setSaved(false);
+    let saveData = null
+    try {
+      saveData = await savePost({ entry, postId });
+      console.log(saveData)
+      if(saveData){
         setTimeout(() => {
           setSaving(false);
           setHasUnsavedChanges(false);
           setSaved(true);
         }, 1000);
+  
         if (forReview && postStatus !== "publish") {
           toast.success("Submitted for review!", {
             duration: 5000,
@@ -87,29 +78,34 @@ const useUpdate = () => {
           toast.success("Your post has been updated!", {
             duration: 5000,
           });
-
+  
           localStorage.removeItem("wipContent");
         } else {
           // toast.success("Your draft has been updated!", {
           //   duration: 5000,
           // });
-
+  
           localStorage.removeItem("wipContent");
         }
-        return response;
-      })
-      .catch(function (error) {
-        console.log(error);
+      }else{
         setSaving(false);
         setHasUnsavedChanges(true);
         toast.error("Your draft could not be saved!", {
           duration: 5000,
         });
+      }
+    } catch (e) {
+      setSaving(false);
+      setHasUnsavedChanges(true);
+      toast.error("Your draft could not be saved!", {
+        duration: 5000,
       });
+      console.log(e);
+    }
 
     //update the initial postobject with the updated data and return it
     const updatedObject = updatePostObject({
-      updatedObject: updateData?.data?.data?.attributes,
+      updatedObject: saveData?.data?.data?.attributes,
       existingObject: postObject,
     });
 
@@ -183,7 +179,7 @@ const useUpdate = () => {
     hasUnsavedChanges,
     setHasUnsavedChanges,
     setSaving,
-    saved
+    saved,
   };
 };
 
