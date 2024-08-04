@@ -22,7 +22,7 @@ const axios = require("axios");
  *
  * @returns
  */
-const useUpdate = ({ savePost }) => {
+const useUpdate = ({ save }) => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(undefined);
@@ -60,8 +60,8 @@ const useUpdate = ({ savePost }) => {
     setSaved(false);
     let saveData = null
     try {
-      saveData = await savePost({ entry, postId });
-      console.log(saveData)
+      saveData = await save({ entry, postId });
+      // console.log(saveData)
       if(saveData){
         setTimeout(() => {
           setSaving(false);

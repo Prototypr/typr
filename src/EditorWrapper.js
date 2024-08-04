@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 
 import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
 
@@ -15,9 +15,39 @@ import EditorNav from "./EditorNav";
 import { useConfirmTabClose } from "./useConfirmTabClose";
 import { debounce } from "lodash";
 
+import { defaultProps } from "./config/defaultProps";
 
-// Rest of your component code
+// Custom deep merge function
+function customDeepMerge(target, source) {
+  if (typeof source !== 'object' || source === null) {
+    return source;
+  }
+
+  const output = Array.isArray(target) ? [] : {};
+
+  if (Array.isArray(target) && Array.isArray(source)) {
+    return source;
+  }
+
+  Object.keys({ ...target, ...source }).forEach(key => {
+    if (key in target) {
+      if (typeof source[key] === 'object' && !React.isValidElement(source[key])) {
+        output[key] = customDeepMerge(target[key], source[key]);
+      } else if (source[key] !== undefined) {
+        output[key] = source[key];
+      } else {
+        output[key] = target[key];
+      }
+    } else if (source[key] !== undefined) {
+      output[key] = source[key];
+    }
+  });
+
+  return output;
+}
+
 const saveDebounceDelay = 3000;
+
 
 /**
  * Write
@@ -27,33 +57,31 @@ const saveDebounceDelay = 3000;
  *
  * @returns
  */
-export default function EditorWrapper({
-  isInterview = false,
-  tool = false,
-  user,
-  navLogo=null,
-  navigate=(url)=>{
-    if (typeof window !== 'undefined' && typeof url === 'string') {
-      window.location.href = url;
+export default function EditorWrapper(props) {
+  const mergedProps = React.useMemo(() => {
+    try {
+      return customDeepMerge(defaultProps, props);
+    } catch (error) {
+      console.error("Error merging props:", error);
+      return { ...defaultProps, ...props };
     }
-  },
-  primaryColor="",
-  mutateUser = false,
-  isLoggedIn,
+  }, [props]);
+  const {
+    theme,
+    components,
+    user,
+    postId: routerPostId,
+    postOperations,
+    hooks,
+    router,
+    children,
+    childProps,
 
-  //external api methods required
-  loadPost,
-  createPost,
-  savePost,
+    requireLogin,
 
-  onPostCreated,
-
-  //post slug for saving
-  postId:routerPostId,
-
-  children,
-  childProps = {}, // Add this line to accept custom props
-}) {
+    tool,
+    isInterview,
+  } = mergedProps;
   /**
    * embed twitter widget if not already loaded
    */
@@ -72,18 +100,19 @@ export default function EditorWrapper({
     postId,
     refetch,
     setPostObject,
+    setPostId,
   } = useLoad({
     user,
-    isLoggedIn,
     routerPostId,
+    requireLogin,
     interview: isInterview,
     productName: tool?.name ? tool.name : false,
     // @todo make this api stuff work for everyone
     //api calls
-    getUserArticle:loadPost
+    getUserArticle: postOperations.load,
   });
   //create new post hook
-  const { createPost:createPostFromHook, creatingPost, created } = useCreate();
+  const { createPost: createPostFromHook, creatingPost, created } = useCreate();
 
   const {
     //update post content
@@ -95,7 +124,7 @@ export default function EditorWrapper({
     saving,
     setSaving,
     hasUnsavedChanges,
-  } = useUpdate({savePost});
+  } = useUpdate({ save: postOperations.save });
 
   useConfirmTabClose(hasUnsavedChanges);
 
@@ -136,8 +165,45 @@ export default function EditorWrapper({
       setSaving(false);
       _savePost({ editor, forReview });
     }, saveDebounceDelay),
-    [user, postId, postObject, postStatus]
+    [user, postId, postObject, postStatus, routerPostId]
   );
+
+  const postIdRef = useRef(postId);
+  const routerPostIdRef = useRef(routerPostId);
+
+  useEffect(() => {
+    postIdRef.current = postId;
+    routerPostIdRef.current = routerPostId;
+  }, [postId, routerPostId]);
+
+  const userRef = useRef(user);
+  const postStatusRef = useRef(postStatus);
+  const postObjectRef = useRef(postObject);
+  const createPostFromHookRef = useRef(createPostFromHook);
+  const refetchRef = useRef(refetch);
+  const onPostCreatedRef = useRef(hooks.onPostCreated);
+  const updatePostByIdRef = useRef(updatePostById);
+  const savePostRef = useRef(postOperations.save);
+
+  useEffect(() => {
+    userRef.current = user;
+    postStatusRef.current = postStatus;
+    postObjectRef.current = postObject;
+    createPostFromHookRef.current = createPostFromHook;
+    refetchRef.current = refetch;
+    onPostCreatedRef.current = hooks.onPostCreated;
+    updatePostByIdRef.current = updatePostById;
+    savePostRef.current = postOperations.save;
+  }, [
+    user,
+    postStatus,
+    postObject,
+    createPostFromHook,
+    refetch,
+    hooks.onPostCreated,
+    updatePostById,
+    postOperations.save,
+  ]);
 
   /**
    * _savePost
@@ -148,9 +214,11 @@ export default function EditorWrapper({
    * @param {*} param0
    * @returns
    */
-  const _savePost = async ({ editor, forReview }) => {
+  const _savePost = useCallback(async ({ editor, forReview }) => {
+    const currentPostId = postIdRef.current;
+    const currentRouterPostId = routerPostIdRef.current;
+
     //check if editor has any content
-    // Updating an existing post
     if (
       editor.state.doc.textContent.trim() === "" &&
       editor.state.doc.childCount <= 2
@@ -159,15 +227,15 @@ export default function EditorWrapper({
     }
 
     try {
-      if (postId) {
+      if (currentPostId) {
         // Updating an existing post
-        const updatedPostObject = await updatePostById({
+        const updatedPostObject = await updatePostByIdRef.current({
           editor: editor,
-          postId: postId,
-          user: user,
+          postId: currentPostId,
+          user: userRef.current,
           forReview: forReview,
-          postStatus: postStatus,
-          postObject: postObject,
+          postStatus: postStatusRef.current,
+          postObject: postObjectRef.current,
         });
 
         // Update the postObject from useLoad hook
@@ -179,22 +247,32 @@ export default function EditorWrapper({
         return true;
       } else {
         // Creating a new post
-        if (!routerPostId && typeof savePost === 'function') {
-          const postInfo = await createPostFromHook({ user, editor, forReview, create: createPost });
+        if (!currentRouterPostId && typeof savePostRef.current === "function") {
+          //check if post content is empty
+          if (editor.state.doc.textContent.trim() === "") {
+            return false;
+          }
+
+          const postInfo = await createPostFromHookRef.current({
+            user: userRef.current,
+            editor,
+            forReview,
+            create: savePostRef.current,
+          });
           // Set the new slug
           localStorage.removeItem("wipContent");
 
-          if(postInfo?.id){
-            onPostCreated({id:postInfo?.id,postInfo})
+          if (postInfo?.id) {
+            setPostId(postInfo?.id);
+            onPostCreatedRef.current({ id: postInfo?.id, postInfo });
           }
 
-          refetch();
+          refetchRef.current();
           return true;
-        } 
-        if(!routerPostId && typeof savePost !== 'function'){
-          return false
         }
-        else {
+        if (!currentRouterPostId && typeof savePostRef.current !== "function") {
+          return false;
+        } else {
           return false;
         }
       }
@@ -202,7 +280,7 @@ export default function EditorWrapper({
       console.log(e);
       return false;
     }
-  };
+  }, []);
 
   /**
    * updateSettings
@@ -229,27 +307,32 @@ export default function EditorWrapper({
 
   return (
     <>
-      <EditorNav
-        navigate={navigate}
-        navLogo={navLogo}
-        primaryColor={primaryColor}
+      {components.nav.show && <EditorNav
+        router={router}
+        primaryColor={theme.primaryColor}
         isInterview={isInterview}
         tool={tool}
         post={postObject}
         postStatus={postStatus}
         user={user}
-        mutateUser={mutateUser}
-      />
+        mutateUser={user.mutate}
+        settings={{
+          userBadge: components.nav.userBadge,
+          nav: components.nav,
+        }}
+      />}
 
       <div
-        className={`w-full ${isInterview ? "h-screen overflow-y-auto" : "h-full"}`}
+        className={`w-full ${
+          isInterview ? "h-screen overflow-y-auto" : "h-full"
+        }`}
         id="editor-container"
       >
         <div className="w-full h-full mx-auto  relative">
           {/* {!user && <Fallback />} */}
 
           {/* only load editor if initialContent is not null */}
-          {(!isLoggedIn) || initialContent == null ? (
+          {(requireLogin==true && !user?.isLoggedIn) || initialContent == null ? (
             // <Layout>
             <div className="my-auto h-screen flex flex-col justify-center text-center">
               <div className="mx-auto opacity-50">
@@ -259,7 +342,7 @@ export default function EditorWrapper({
             </div>
           ) : (
             // </Layout>
-            (isLoggedIn) && (
+            ((requireLogin==true && user?.isLoggedIn) || requireLogin==false) && (
               <>
                 <div className="my-4">
                   {React.isValidElement(children) ? (
@@ -281,7 +364,7 @@ export default function EditorWrapper({
                         ? updatePostSettings
                         : false,
                       user,
-                      primaryColor,
+                      primaryColor: theme.primaryColor,
                       ...childProps, // Spread custom props to override defaults
                     })
                   ) : (
@@ -298,7 +381,7 @@ export default function EditorWrapper({
                       updatePost={updatePost}
                       forceSave={forceSave}
                       refetchPost={refetch}
-                      primaryColor={primaryColor}
+                      primaryColor={theme.primaryColor}
                       updatePostSettings={
                         user?.isAdmin ? updatePostSettings : false
                       }

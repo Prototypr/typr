@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 // import * as Yup from 'yup';
 import React,{ useEffect,useState } from 'react';
 import normalizeUrl from 'normalize-url';
-import { TextSelection } from "prosemirror-state";
+import { TextSelection } from "@tiptap/pm/state";
 
 
   const Fieldset = styled('fieldset', {

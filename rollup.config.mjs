@@ -20,7 +20,8 @@ export default [
     },
     output: [
       // { dir:'dist', format:'cjs' },
-      { dir:'dist', format:'es', exports:"named", preserveModules:false }
+      
+      {strict:false, dir:'dist', format:'es', exports:"named", preserveModules:false }
     ],
     plugins: [
         postcss({
@@ -47,6 +48,6 @@ export default [
         resolve(),
         json(),
         terser()
-    ]
+    ],
   },
 ];

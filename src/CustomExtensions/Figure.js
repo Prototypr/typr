@@ -7,8 +7,8 @@ import {
 } from '@tiptap/core'
 // import { ReactNodeViewRenderer } from "@tiptap/react";
 // import FigureComponent from './Figure/FigureComponent';
-import { PluginKey , Plugin} from "prosemirror-state";
-import {Decoration, DecorationSet} from "prosemirror-view"
+import { PluginKey , Plugin} from "@tiptap/pm/state";
+import {Decoration, DecorationSet} from "@tiptap/pm/view"
 
 export const inputRegex = /!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/
 export const ImageDecorationKey = new PluginKey('image-decoration');

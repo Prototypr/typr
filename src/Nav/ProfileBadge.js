@@ -3,17 +3,10 @@ import React from "react";
 import { keyframes } from "@stitches/react";
 import { styled } from "./stitches.config";
 import { blue, mauve, blackA, gray, green } from "@radix-ui/colors";
-// import {
-//   HamburgerMenuIcon,
-//   DotFilledIcon,
-//   CheckIcon,
-//   ChevronRightIcon,
-// } from '@radix-ui/react-icons';
 import { signOut } from "next-auth/react";
 import fetchJson from "../utils/fetchJson";
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import { UserCircle, Article, CircleWavyCheck } from "../icons/icons";
 
 const slideUpAndFade = keyframes({
   "0%": { opacity: 0, transform: "translateY(2px)" },
@@ -177,18 +170,14 @@ const IconButton = styled("button", {
   borderRadius: "100%",
   height: 35,
   width: 35,
-  // display: "inline-flex",
-  // alignItems: "center",
-  // justifyContent: "center",
   color: blue.blue11,
   backgroundColor: "white",
   border: `1px solid ${gray.gray3}`,
-  //   boxShadow: `0 2px 10px ${blackA.blackA7}`,
   "&:hover": { backgroundColor: blue.blue3 },
   "&:focus": { boxShadow: `0 0 0 2px ${blue.blue7}` },
 });
 
-const renderMenuItems = (items, user, navigate) => {
+const renderMenuItems = (items, user, router) => {
   return items.map((item, index) => {
     if (item.separator) {
       return <DropdownMenuSeparator key={`separator-${index}`} />;
@@ -199,7 +188,7 @@ const renderMenuItems = (items, user, navigate) => {
     }
 
     if (item.items) {
-      return renderMenuItems(item.items, user, navigate);
+      return renderMenuItems(item.items, user, router);
     }
 
     return (
@@ -207,9 +196,9 @@ const renderMenuItems = (items, user, navigate) => {
         key={item.label}
         onSelect={() => {
           if (typeof item.link === "function") {
-            navigate(item.link(user));
+            router.push(item.link(user));
           } else {
-            navigate(item.link);
+            router.push(item.link);
           }
         }}
       >
@@ -224,59 +213,8 @@ export const ProfileBadgeDropdown = ({
   icon,
   user,
   mutateUser,
-  navigate,
-  menuConfig = {
-    menuItems: [
-      {
-        link: user =>
-          user?.profile?.approved
-            ? `/people/${user?.profile?.slug}`
-            : `/account/profile`,
-        icon: <UserCircle size={26} className="opacity-80 mr-3" />,
-        label: "Profile",
-      },
-      { separator: true },
-      {
-        link: "/dashboard/drafts",
-        icon: <Article size={26} className="opacity-80 mr-3" />,
-        label: "Posts",
-      },
-      {
-        condition: user => user?.profile?.onboardComplete !== true,
-        items: [
-          { separator: true },
-          {
-            link: "/onboard?onboard=true",
-            icon: <CircleWavyCheck size={26} className="opacity-80 mr-3" />,
-            label: "Setup",
-          },
-        ],
-      },
-      { separator: true },
-      {
-        link: "/account",
-        label: "Edit profile",
-      },
-    ],
-    adminMenu: [
-      { separator: true },
-      {
-        link: "/admin/drafts",
-        label: "👩‍✈️ Admin",
-      },
-      {
-        link: "https://api.prototypr.io/admin/content-manager/collectionType/api::post.post?page=1&pageSize=10&sort=date:DESC&plugins[i18n][locale]=en",
-        label: "👾 Strapi",
-      },
-    ],
-    businessMenu: [
-      { separator: true },
-      {
-        link: "/dashboard/partner",
-        label: "Business hub",
-      },
-    ],
-  },
+  router,
+  settings
 }) => {
   return (
     <Box>
@@ -300,7 +238,7 @@ export const ProfileBadgeDropdown = ({
             avoidCollisions={true}
             // sideOffset={-36}
           >
-            {renderMenuItems(menuConfig.menuItems, user, navigate)}
+            {user?.isLoggedIn ? renderMenuItems(settings.loggedInMenu.items, user, router) : renderMenuItems(settings.loggedOutMenu.items, user, router)}
 
             {/* <DropdownMenuSeparator /> */}
 
@@ -336,14 +274,14 @@ export const ProfileBadgeDropdown = ({
             </DropdownMenuItem>
             <DropdownMenuSeparator /> */}
 
-            {user?.isAdmin &&
-              renderMenuItems(menuConfig.adminMenu, user, navigate)}
+            {(user?.isLoggedIn && user?.isAdmin) &&
+              renderMenuItems(settings.loggedInMenu.adminMenu, user, router)}
 
-            {user?.profile?.companies?.length &&
-              renderMenuItems(menuConfig.businessMenu, user, navigate)}
+            {(user?.isLoggedIn && user?.profile?.companies?.length) &&
+              renderMenuItems(settings.loggedInMenu.businessMenu, user, router)}
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem
+            {(user?.isLoggedIn) ? <DropdownMenuItem
               onSelect={async () => {
                 await signOut({ redirect: false });
                 mutateUser(
@@ -353,7 +291,15 @@ export const ProfileBadgeDropdown = ({
               }}
             >
               Sign out
+            </DropdownMenuItem>:
+            <DropdownMenuItem
+              onSelect={() => {
+                router.push("/login");
+              }}
+            >
+              Sign in
             </DropdownMenuItem>
+            }
 
             <DropdownMenuArrow offset={12} />
           </DropdownMenuContent>

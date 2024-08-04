@@ -5,20 +5,16 @@ import {
   Tracker,
   mergeAttributes,
 } from "@tiptap/core";
-//   import { JSONContent } from '@tiptap/react';
-import { TextSelection } from "prosemirror-state";
-import { PluginKey, Plugin } from "prosemirror-state";
-//   import {Decoration, DecorationSet} from "prosemirror-view"
+import { TextSelection } from "@tiptap/pm/state";
+import { PluginKey, Plugin } from "@tiptap/pm/state";
 
-//   export const ImageDecorationKey = new PluginKey('image-decoration');
+// Add this line to create a PluginKey
+export const FigurePluginKey = new PluginKey('figure-plugin');
 
 export const inputRegex = /!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\)/;
 
 const Figure = Node.create({
   name: "figure",
-  // defaultOptions: {
-  //   HTMLAttributes: {},
-  // },
   group: "block",
   content: "image?video?figcaption?",
   draggable: true,
@@ -98,6 +94,8 @@ const Figure = Node.create({
     const editor = this.editor;
     return [
       new Plugin({
+        key: FigurePluginKey, // Add this line to use the PluginKey
+        
         props: {
           handleDOMEvents: (view, e) => {
             console.log(e);
@@ -131,12 +129,6 @@ const Figure = Node.create({
                     .chain()
                     .focus()
                     .setNodeSelection(returnPos)
-                    // .insertContentAt(pos+1, '<p></p>', {
-                    //   updateSelection: false,
-                    //   parseOptions: {
-                    //     preserveWhitespace: 'full',
-                    //   }
-                    // })
                     .run();
                 }
               } else {
@@ -168,7 +160,6 @@ const Figure = Node.create({
                       .chain()
                       // Go through the image.
                       .insertContentAt($pos.pos + 2, "<figcaption></ficaption>")
-                      //   .setTextSelection($pos.pos + 1)
                       .scrollIntoView()
                       .run()
                   );
@@ -179,8 +170,6 @@ const Figure = Node.create({
                 ) {
                   this.editor
                     .chain()
-                    // Go through the image.
-                    // .insertContentAt($pos.pos+1,'<figcaption></ficaption>')
                     .setTextSelection($pos.pos + 3)
                     .scrollIntoView()
                     .run();
@@ -190,7 +179,6 @@ const Figure = Node.create({
           },
         },
         filterTransaction: (transaction, state) => {
-          // console.log(transaction)
           let result = true; // true for keep, false for stop transaction
           if (transaction?.curSelection?.node?.type.name == "image") {
             result = false;
@@ -222,71 +210,8 @@ const Figure = Node.create({
               }
             }
           }
-          // if(transaction?.curSelection?.$anchor?.parent?.type.name=='figcaption'){
-          //     //check the key pressed
-
-          //     if(transaction?.curSelection?.$anchor?.parentOffset==0){
-          //         if(transaction?.curSelection?.$anchor?.parent.textContent?.length>0){
-          //                 if(transaction?.curSelection?.$anchor?.path?.length){
-          //                     console.log('tr',transaction)
-          //                     var path = transaction?.curSelection?.$anchor?.path
-          //                     console.log(path)
-          //                     for (var i = path.length - 1; i >= 0; i--) {
-          //                         if(path[i]?.type?.name=='figure'){
-          //                             let fignode = path[i]
-          //                             console.log('insidecount',fignode.childCount)
-          //                             childcount=fignode.childCount
-          //                             if(fignode.childCount==1){
-          //                                 result = false
-          //                             }
-          //                         }
-          //                     }
-          //                 }
-          //         }
-          //     }
-          //     console.log('fig',transaction)
-          // }
           return result;
         },
-        // appendTransaction:(transactions, oldState, newState)=>{
-        //     const tr = newState.tr;
-        //     let modified = false;
-
-        //     if (!transactions[0].docChanged) {
-        //         return tr;
-        //     }
-
-        //     let oldFigureHadImage = false
-        //     if(oldState?.selection?.$anchor?.path?.length){
-        //         var path = oldState?.selection?.$anchor?.path
-        //         for (var i = path.length - 1; i >= 0; i--) {
-        //             if(path[i]?.type?.name=='figure'){
-        //                 let fignode = path[i]
-        //                 if(fignode.childCount==2){
-        //                     oldFigureHadImage=true
-        //                 }
-        //             }
-        //         }
-        //     }
-
-        //     let newStateHasImage = false
-        //     if(newState?.selection?.$anchor?.path?.length){
-        //         var path = newState?.selection?.$anchor?.path
-        //         for (var i = path.length - 1; i >= 0; i--) {
-        //             if(path[i]?.type?.name=='figure'){
-        //                 let fignode = path[i]
-        //                 if(fignode.childCount==1){
-        //                     newStateHasImage=false
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     if(oldFigureHadImage==true && newStateHasImage == false){
-        //         console.log('hey stop!')
-        //         return false
-        //     }
-
-        // }
       }),
     ];
   },
@@ -312,9 +237,6 @@ const Figure = Node.create({
           if (attrs.figureType == "image") {
             const content = [{ type: "image", attrs }];
 
-            // if (caption) {
-            //   content.push({ type: 'figcaption', text: caption });
-            // }
             content.push({ type: "figcaption", text: "" });
 
             return (
@@ -343,9 +265,6 @@ const Figure = Node.create({
           } else if (attrs.figureType == "video") {
             const content = [{ type: "video", attrs }];
 
-            // if (caption) {
-            //   content.push({ type: 'figcaption', text: caption });
-            // }
             content.push({ type: "figcaption", text: "" });
 
             return (
@@ -495,21 +414,6 @@ const Figure = Node.create({
 
         return true;
       }
-      // else if (selectedNode.type.name === 'figcaption'){
-      //     let $pos = this.editor.view.state.doc.resolve(from-1)
-      //     console.log($pos)
-      //     if($pos?.parent?.type?.name=='figure'){
-      //         // alert('stop it')
-      //         const { tr } = this.editor.state;
-      //         tr.replaceRangeWith(
-      //             from - 1,
-      //             from + selectedNode.nodeSize - 1,
-      //             this.editor.state.schema.nodes.paragraph.create(),
-      //           )
-      //         // return false
-      //     }
-
-      // }
     };
 
     const moveCursorToCaption = () => {

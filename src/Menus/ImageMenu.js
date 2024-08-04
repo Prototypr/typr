@@ -1,5 +1,5 @@
 import { BubbleMenu } from "@tiptap/react";
-import { TextSelection } from "prosemirror-state";
+import { TextSelection } from "@tiptap/pm/state";
 import ImagePopoverButton from "./MenuButtons/ImagePopoverButton/ImagePopoverButton";
 import { useState } from "react";
 import React from 'react';

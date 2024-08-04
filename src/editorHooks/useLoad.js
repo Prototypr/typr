@@ -15,41 +15,48 @@ import { getInterViewTemplate } from "./libs/templates/interviewTemplate";
  */
 const useLoad = ({
   user,
-  isLoggedIn,
   interview,
   productName,
   getUserArticle,
-  routerPostId=false
+  routerPostId=false,
+  requireLogin
 } = {}) => {
   // const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [initialContent, setInitialContent] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
-  const [postId, setPostId] = useState(routerPostId);
+  const [postId, setPostId] = useState(()=>{
+   if( routerPostId){
+    return routerPostId
+   }
+  });
   const [slug, setSlug] = useState(null);
   const [postObject, setPostObject] = useState(false);
   const [title, setTitle] = useState(null);
   const [postStatus, setStatus] = useState("draft");
 
+  // New function to check user access
+  const hasUserAccess = () => {
+    return (requireLogin === true && user.isLoggedIn) || requireLogin === false;
+  };
+
   // Load content when user or postId changes
   useEffect(() => {
-    if (isLoggedIn) {
+    if (hasUserAccess()) {
       if (routerPostId) {
         setPostId(routerPostId);
       } else {
         refetch();
       }
-    } else if (isLoggedIn) {
-      refetch();
     }
-  }, [routerPostId]);
+  }, [routerPostId, user]);
 
   useEffect(() => {
-    if (postId && isLoggedIn) {
+    if (postId && hasUserAccess()) {
       refetch();
     }
-  }, [postId, isLoggedIn]);
+  }, [postId, user.isLoggedIn]);
 
   // Refetch content
   const refetch = async () => {
@@ -160,6 +167,7 @@ const useLoad = ({
     canEdit,
     refetch,
     setPostObject,
+    setPostId
   };
 };
 

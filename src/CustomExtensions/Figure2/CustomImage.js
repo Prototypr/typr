@@ -5,8 +5,8 @@ import {
     Node,
     nodeInputRule,
   } from '@tiptap/core'
-  import { PluginKey , Plugin} from "prosemirror-state";
-import {Decoration, DecorationSet} from "prosemirror-view"
+  import { PluginKey , Plugin} from "@tiptap/pm/state";
+import {Decoration, DecorationSet} from "@tiptap/pm/view"
 // import ImageNodeView from './ImageNodeView/ImageNodeView';
 
 export const ImageDecorationKey = new PluginKey('image-decoration');
@@ -16,6 +16,7 @@ export const ImageDecorationKey = new PluginKey('image-decoration');
   
   export const Image = Node.create({
     name: 'image',
+    pluginKey:new PluginKey('imagefigure'),
     // selectable:false,
   
     addOptions() {

@@ -1,5 +1,5 @@
 import { Node } from '@tiptap/core';
-import { TextSelection } from 'prosemirror-state';
+import { TextSelection } from '@tiptap/pm/state';
 
 const Figcaption = Node.create({
   name: 'figcaption',

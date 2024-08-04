@@ -37,29 +37,29 @@ export const PublishDialogButton = ({ onSave, canPublish, postObject, primaryCol
     }
   }, [submitOpen]);
 
+  const disabled = !canPublish ||
+  ( (
+     (postObject.status == "pending" ||
+     postObject.status == "publish") &&
+     (postObject?.draft_content?.length == 0 ||
+       (postObject?.draft_content?.length > 0 &&
+         postObject?.content == postObject?.draft_content))) 
+         &&
+         
+         ((postObject.status == "pending" ||
+           postObject.status == "publish") &&
+           (postObject?.draft_title?.length == 0 ||
+             (postObject?.draft_title?.length > 0 &&
+               postObject?.title == postObject?.draft_title))))
+
 
   return (
     <Dialog onOpenChange={toggleSubmitOpen} open={submitOpen}>
       <DialogTrigger asChild>
         <button
-          disabled={
-            !canPublish ||
-           ( (
-              (postObject.status == "pending" ||
-              postObject.status == "publish") &&
-              (postObject?.draft_content?.length == 0 ||
-                (postObject?.draft_content?.length > 0 &&
-                  postObject?.content == postObject?.draft_content))) 
-                  &&
-                  
-                  ((postObject.status == "pending" ||
-                    postObject.status == "publish") &&
-                    (postObject?.draft_title?.length == 0 ||
-                      (postObject?.draft_title?.length > 0 &&
-                        postObject?.title == postObject?.draft_title))))
-          }
+          disabled={disabled}
           variant="confirmRounded"
-          className={`!text-[13px] !font-normal rounded-full ${primaryColor?primaryColor:'bg-blue-600 hover:bg-blue-500 !outline-blue-600'}  text-white !h-[25px] !px-2 !outline !outline-1 !py-0 !mr-1 !my-auto`}
+          className={`!text-[13px] !font-normal rounded-full ${primaryColor?primaryColor:'bg-blue-600 hover:bg-blue-500 !outline-blue-600'}  text-white !h-[25px] !px-2 !outline !outline-1 !py-0 !mr-1 !my-auto ${disabled?'opacity-50 cursor-not-allowed':''}`}
         >
           {
             // if there's a draft version different from the content, and post is not published

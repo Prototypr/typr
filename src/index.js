@@ -6,12 +6,14 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./page-styles.scss";
  
 import EditorWrapper from './EditorWrapper';
+
 import MenuFloating from './Menus/FloatingMenu';
 import ImageMenu from './Menus/ImageMenu';
 import Cite from './CustomExtensions/Cite'
 import Iframe from './CustomExtensions/Iframe/Iframe'
 import { Blockquote } from './CustomExtensions/CustomBlockquote';
-import {Image} from './CustomExtensions/Figure2/CustomImage'
+import { Image } from "./CustomExtensions/Figure2/CustomImage";
+
 import Figure from './CustomExtensions/Figure2/Figure'
 import FigCaption from './CustomExtensions/Figure2/Figcaption';
 import {PasteFilter} from './CustomExtensions/PasteFilter'
@@ -27,10 +29,12 @@ import LinkInput from './Menus/MenuButtons/LinkDropdown/LinkButtonRadix';
 
 export default EditorWrapper;
 
-export {
+export const plugins = {
+  //custom plugins
   MenuFloating,
   ImageMenu,
   VideoMenu,
+
   Cite,
   Iframe,
   Blockquote,
@@ -41,8 +45,10 @@ export {
   Tweet,
   LinkEmbed,
   Video,
+
   addTwitterScript,
   UndoRedoButtons,
   EditorNavButtons,
   LinkInput
+  
 };

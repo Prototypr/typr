@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect,useRef,useState } from "react";
 import ReactDOM from "react-dom";
 
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -72,6 +72,8 @@ const Editor = ({
   // const { user } = useUser({
   //   redirectIfFound: false,
   // });
+
+  const isFirstMount = useRef(true);
 
   const [saveForReview, setForReview] = useState(false);
 
@@ -164,6 +166,12 @@ const Editor = ({
        * when the editor is created
        * set the content to the initial content
        */
+      if (isFirstMount.current) {
+        isFirstMount.current = false;
+        return;
+      }
+
+
       editor
         ?.chain()
         .setContent(initialContent)
@@ -174,7 +182,15 @@ const Editor = ({
       if (editor.state.doc.textContent.trim() === "") {
         editor.commands.clearContent();
         setTimeout(() => {
-          editor.chain().focus().setTextSelection(0).enter().run();
+          const json = editor.getJSON();
+      
+          if(json.content?.length > 0){
+            // Count the number of paragraphs
+            const paragraphCount = json.content.filter(node => node.type === 'paragraph').length;
+            if(paragraphCount == 0){
+              editor.chain().focus().setTextSelection(0).enter().run();
+            }
+          }
         }, 100);
       }
 

@@ -20,7 +20,8 @@ export default function EditorNav({
   user,
   mutateUser,
   primaryColor,
-  navigate,
+  router,
+  settings
 }) {
   // const { user, isLoading } = useUser({
   //   redirectIfFound: false,
@@ -32,26 +33,6 @@ export default function EditorNav({
     setMobileNavOpen(!mobileNavOpen);
   };
 
-  /**
-   * use the logged in true/false cookie
-   * so there is minimal flicker between subscribe and log in button
-   */
-  const [userLoggedInCookie] = useState(() => {
-    let loggedInCookie = jsCookie.get("prototypr-loggedIn");
-    if (loggedInCookie == "true") {
-      return true;
-    } else {
-      return false;
-    }
-  });
-
-  useEffect(() => {
-    if (user?.email) {
-      jsCookie.set("prototypr-loggedIn", true);
-    } else {
-      jsCookie.set("prototypr-loggedIn", false);
-    }
-  }, [user?.email]);
 
   const [statusComponent, setStatusComponent] = useState(null);
   useEffect(() => {
@@ -107,22 +88,22 @@ export default function EditorNav({
               </button>
             </div> */}
             <div className="flex-1 flex items-center justify-start sm:items-stretch sm:justify-start">
-              {navLogo ? (
-                <CustomLink href="/" as="/">
+              {settings?.nav?.logo?.image && settings?.nav?.logo?.show ? (
+                <CustomLink href={settings?.nav?.logo?.url} as={settings?.nav?.logo?.url}>
                   <div
                     className={`flex-shrink-0  flex items-center cursor-pointer transition transition-all duration-300 ease-in-out`}
                   >
                     <img
                       className="lg:block h-8 w-auto"
                       data-gumlet="false"
-                      src={navLogo}
+                      src={settings?.nav?.logo?.image}
                       alt="Prototypr Logo"
                     />
                   </div>
                 </CustomLink>
               ) : (
                 <svg
-                  className="h-6 my-auto mr-2 w-auto"
+                  className={`${settings?.nav?.logo?.show ? 'h-6 my-auto mr-2 w-auto' : 'hidden'}`}
                   width="164"
                   height="164"
                   viewBox="0 0 164 164"
@@ -159,16 +140,16 @@ export default function EditorNav({
                   </div>
                 </div>
               ) : null}
-              <div className="my-auto ml-3">{statusComponent}</div>
+              {settings.nav.postStatus.show && <div className="my-auto ml-3">{statusComponent}</div>}
               {/* Undo/redo */}
-              <div id="undoredo-container"></div>
+              <div className={`${settings.nav.undoRedoButtons.show ? 'block' : 'hidden'}`} id="undoredo-container"></div>
             </div>
             <div
               className={`relative block sm:ml-6 transition transition-all duration-500 ease-in-out`}
             >
               <div className="flex ">
                 <div
-                  className="my-auto flex mr-3 fixed bottom-0 left-0 p-3 w-full bg-white/90 backdrop-blur-xs sm:bg-none sm:w-fit sm:relative"
+                  className="my-auto flex fixed bottom-0 left-0 p-3 w-full bg-white/90 backdrop-blur-xs sm:bg-none sm:w-fit sm:relative"
                   id="editor-nav-buttons"
                 ></div>
 
@@ -179,10 +160,10 @@ export default function EditorNav({
                   hideLocaleSwitcher={true}
                   user={user}
                   userLoading={false}
-                  userLoggedInCookie={userLoggedInCookie}
                   activeNav={activeNav}
                   editor={true}
-                  navigate={navigate}
+                  router={router}
+                  settings={settings}
                 />
               </div>
             </div>

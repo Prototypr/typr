@@ -1,6 +1,6 @@
 import { Node } from '@tiptap/core';
-import { Decoration, DecorationSet } from 'prosemirror-view';
-import { Plugin } from 'prosemirror-state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import { Plugin } from '@tiptap/pm/state';
 
 
 const Placeholder = Node.create({

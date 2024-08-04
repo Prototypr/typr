@@ -4,7 +4,7 @@ import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import Button from "../Primitives/Button";
 
 import { CustomLink } from "../components/CustomLink";
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 
 
 // import { useIntl } from "react-intl";
@@ -37,20 +37,16 @@ export const NavigationMenuDemo = ({
   collapsed,
   user,
   userLoading,
-  userLoggedInCookie,
   hideLocaleSwitcher,
   editor,
   showWriteButton,
   showSponsorButton,
   showJobsButton,
-  navigate
+  router,
+  settings
 }) => {
   // const intl = useIntl();
   // const title3 = intl.formatMessage({ id: "navbar.menu.title3" });
-  const [clientMounted, setClientMounted] = useState(false);
-  useEffect(() => {
-    setClientMounted(true);
-  }, []);
 
   return (
     <NavigationMenu>
@@ -143,43 +139,15 @@ export const NavigationMenuDemo = ({
             </CustomLink>
           </NavigationMenuItem>
         )}
-        {clientMounted ? (
-          <NavigationMenuItem className="flex flex-col justify-center">
-            {user && user?.isLoggedIn ? (
-              <div className="ml-2 w-8 relative">
-                {/* <Link href="/account"> */}
-                {user ? <UserMenu navigate={navigate} userLoading={false} user={user} /> : ""}
-                {/* {user && 
-                  <ProfileBadge
-                  user={user}
-                    icon={
-                      <img
-                        className="hover:shadow border border-1 rounded-full my-auto w-8 h-8 cursor-pointer object-cover"
-                        src={user?.avatar?.url?user.avatar.url:'https://s3-us-west-1.amazonaws.com/tinify-bucket/%2Fprototypr%2Ftemp%2F1595435549331-1595435549330.png'}
-                      />
-                    }
-                  />} */}
-                {/* </Link> */}
-              </div>
-            ) : userLoading && userLoggedInCookie ? (
+          {settings.nav.userBadge.show ? <NavigationMenuItem className="flex flex-col justify-center">
+            {user ? (
+                <UserMenu router={router} user={user} settings={settings?.nav.userBadge} /> 
+            ) : userLoading ? (
               <div className="bg-gray-200 hover:shadow border border-1 ml-2 rounded-full my-auto w-8 h-8 cursor-pointer"></div>
             ) : (
-              // <NavigationMenuButton href="/newsletter">
-              //   {intl.formatMessage({ id: "navbar.menu.title4" })}
-              // </NavigationMenuButton>
-              // <NewsletterNav collapsed={collapsed} />
               null
             )}
-          </NavigationMenuItem>
-        ) : userLoggedInCookie ? (
-          <NavigationMenuItem className="flex flex-col justify-center">
-            <div className="bg-gray-200 hover:shadow border border-1 ml-2 rounded-full my-auto w-8 h-8 cursor-pointer"></div>
-          </NavigationMenuItem>
-        ) : (
-          <NavigationMenuItem className="flex flex-col justify-center">
-            {/* <NewsletterNav collapsed={collapsed} /> */}
-          </NavigationMenuItem>
-        )}
+          </NavigationMenuItem>:null}
       </NavigationMenuList>
     </NavigationMenu>
   );

@@ -1,5 +1,4 @@
-import { Plugin, PluginKey } from 'prosemirror-state'
-// import {ReplaceStep} from 'prosemirror-transform'
+import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { Extension } from '@tiptap/core'
 // import {filterHtml} from './htmlFilter'
 

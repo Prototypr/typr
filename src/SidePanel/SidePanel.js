@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Portal } from "react-portal";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import ImageUploader from "./ImageUploader";
+import * as Tabs from '@radix-ui/react-tabs';
 
 import { styled } from "@stitches/react";
 import { slate, indigo } from "@radix-ui/colors";
@@ -23,6 +24,37 @@ const Input = styled("input", {
   "&:focus": { boxShadow: `0 0 0 2px ${slate.slate8}` },
 });
 
+const FormField = ({ type, label, value, onChange, description }) => {
+  switch (type) {
+    case 'input':
+      return (
+        <div className="border border-gray-100 p-4 rounded-md my-3">
+          <h2 className="font-medium text-md mb-4 font-secondary">{label}</h2>
+          <Input
+            onChange={onChange}
+            value={value}
+          />
+          {description && <p className="mt-3 text-xs text-gray-400">{description}</p>}
+        </div>
+      );
+    case 'date':
+      return (
+        <div className="border border-gray-100 p-4 rounded-md my-3">
+          <h2 className="font-medium text-md mb-2 font-secondary">{label}</h2>
+          <p className="text-sm mb-4">{description}</p>
+          <ReactDatePicker
+            className="text-gray-900 border bg-white border-gray-300"
+            selected={value}
+            onChange={onChange}
+          />
+        </div>
+      );
+    // Add more cases for other field types as needed
+    default:
+      return null;
+  }
+};
+
 const SidePanel = ({
   isOpen,
   close,
@@ -37,7 +69,7 @@ const SidePanel = ({
   const [rootElement] = useState(() => document.querySelector(`body`));
 
   return (
-    <ContentImportSidebarInner
+    <SidebarInner
       isOpen={isOpen}
       postObject={postObject}
       close={close}
@@ -54,7 +86,7 @@ const SidePanel = ({
 export default React.memo(SidePanel);
 // export default SidePanel
 
-const ContentImportSidebarInner = ({
+const SidebarInner = ({
   isOpen,
   close,
   rootElement,
@@ -134,6 +166,54 @@ const ContentImportSidebarInner = ({
     }
   };
 
+  const formFields = [
+    {
+      type: 'input',
+      label: 'Url slug',
+      value: slug,
+      onChange: (e) => setSlug(e.target.value),
+      description: '(If slug is taken, it will just give error)',
+    },
+    {
+      type: 'date',
+      label: 'Publish Date',
+      value: timestamp,
+      onChange: handleDateChange,
+      description: 'Set a date to make it publish. Clear the date field to unpublish.',
+    },
+    {
+      type: 'input',
+      label: 'Post Status',
+      value: postStatus,
+      onChange: (e) => setPostStatus(e.target.value),
+      description: '(draft, pending, or publish - todo: turn into dropdown)',
+    },
+    {
+      type: 'input',
+      label: 'Tier',
+      value: tier,
+      onChange: (e) => setTier(e.target.value),
+      description: '(1-5 for quality ranking - todo: turn into number input)',
+    },
+  ];
+
+  const seoFields = [
+    {
+      type: 'input',
+      label: 'Meta Title',
+      value: postObject?.metaTitle || '',
+      onChange: (e) => updatePostObject({ metaTitle: e.target.value }),
+      description: 'SEO title for the post (max 60 characters)',
+    },
+    {
+      type: 'input',
+      label: 'Meta Description',
+      value: postObject?.metaDescription || '',
+      onChange: (e) => updatePostObject({ metaDescription: e.target.value }),
+      description: 'SEO description for the post (max 160 characters)',
+    },
+  ];
+
   return (
     <Portal node={rootElement}>
       <motion.div
@@ -151,10 +231,10 @@ const ContentImportSidebarInner = ({
         className="fixed z-[99] top-0"
       >
         <div
-          className="h-screen flex flex-col pt-6 bg-white shadow-xl"
+          className="h-screen flex flex-col pt-4 bg-white shadow-xl"
           style={{ willChange: "transform" }}
         >
-          <div className="px-4 sm:px-6 flex justify-between">
+          <div className="px-4 sm:px-6 pb-3 flex justify-between">
             <div className="flex">
               <h2
                 id="slide-over-heading"
@@ -176,27 +256,28 @@ const ContentImportSidebarInner = ({
               <Cross2Icon />
             </div>
           </div>
-          <div className="mt-6 h-full relative">
-            {/* Replace with your content */}
-            <div className="inset-0 flex justify-between flex-col h-full overflow-auto pb-32">
-              <div>
+          <Tabs.Root className="flex flex-col h-full" defaultValue="settings">
+            <Tabs.List className="flex border-b border-t border-gray-200">
+              <Tabs.Trigger 
+                className="flex-1 bg-gray-50/80 px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-900 focus:outline-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-white data-[state=active]:text-gray-900 transition-all" 
+                value="settings"
+              >
+                Settings
+              </Tabs.Trigger>
+              <Tabs.Trigger 
+                className="flex-1 bg-gray-50/80 px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-900 focus:outline-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-white data-[state=active]:text-gray-900 transition-all" 
+                value="seo"
+              >
+                SEO
+              </Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content className="flex-grow overflow-auto" value="settings">
+              <div className="mt-6 px-4 sm:px-6">
                 {isAdmin && (
-                  <div className="bg-white px-5 mx-auto mb-5 border-gray-100">
-                    <div className="border border-gray-100 p-4 rounded-md my-3">
-                      <h2 className="font-medium text-md mb-4 font-secondary">
-                        Url slug
-                      </h2>
-                      <Input
-                        style={{ width: "86%" }}
-                        onChange={e => {
-                          setSlug(e.target.value);
-                        }}
-                        value={slug}
-                      />
-                      <p className="mt-3 text-xs text-gray-400">
-                        (If slug is taken, it will just give error)
-                      </p>
-                    </div>
+                  <div className="bg-white mb-5 border-gray-100">
+                    {formFields.map((field, index) => (
+                      <FormField key={index} {...field} />
+                    ))}
                     <div className="border border-gray-100 p-4 rounded-md my-3">
                       <h2 className="font-medium text-md mb-4 font-secondary">
                         Featured Image
@@ -212,7 +293,7 @@ const ContentImportSidebarInner = ({
                               ? postObject?.featuredImage
                               : coverImage
                                 ? coverImage
-                                : "https://req.prototypr.io/https://s3-us-west-1.amazonaws.com/tinify-bucket/%2Fprototypr%2Ftemp%2F1580577924294-Group+74.png"
+                                : "https://s3-us-west-1.amazonaws.com/tinify-bucket/%2Fprototypr%2Ftemp%2F1580577924294-Group+74.png"
                           }
                           height={400}
                           width={400}
@@ -254,82 +335,38 @@ const ContentImportSidebarInner = ({
                         </div>
                       )}
                     </div>
-                    {user?.isAdmin ? (
-                      <div className="border border-gray-100 p-4 rounded-md my-3">
-                        <h2 className="font-medium text-md mb-2 font-secondary">
-                          Publish Date
-                        </h2>
-                        <p className="text-sm mb-4">
-                          Set a date to make it publish. Clear the date field to
-                          unpublish.
-                        </p>
-                        <ReactDatePicker
-                          className="text-gray-900 border bg-white border-gray-300"
-                          selected={timestamp}
-                          onChange={date => handleDateChange(date)}
-                        />
-                      </div>
-                    ) : null}
-                    {user?.isAdmin ? (
-                      <div className="border border-gray-100 p-4 rounded-md my-3">
-                        <h2 className="font-medium text-md mb-4 font-secondary">
-                          Post Status
-                        </h2>
-                        <Input
-                          onChange={e => {
-                            setPostStatus(e.target.value);
-                          }}
-                          value={postStatus}
-                        />
-                        <p className="mt-3 text-xs text-gray-400">
-                          (draft, pending, or publish - todo: turn into
-                          dropdown)
-                        </p>
-                      </div>
-                    ) : null}
-                    {user?.isAdmin ? (
-                      <div className="border border-gray-100 p-4 rounded-md my-3">
-                        <h2 className="font-medium text-md mb-4 font-secondary">
-                          Tier
-                        </h2>
-                        <Input
-                          onChange={e => {
-                            setTier(e.target.value);
-                          }}
-                          value={tier}
-                        />
-                        <p className="mt-3 text-xs text-gray-400">
-                          (1-5 for quality ranking - todo: turn into number
-                          input)
-                        </p>
-                      </div>
-                    ) : null}
                   </div>
                 )}
                 {/* ADMIN SETTINGS END */}
               </div>
-              <div className="px-5 flex fixed w-full bg-white -mt-20 bottom-0 justify-start border-t py-3 gap-3 border-gray-300">
-                {postObject?.published_at && (
-                  <button
-                    className="w-fit px-4 h-[40px] bg-gray-50 hover:bg-gray-100 outline outline-gray-400 outline-1 text-gray-500 font-semibold rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
-                    variant={"ghostBlue"}
-                    onClick={() => {
-                      window.open(`/post/${postObject.slug}`);
-                    }}
-                  >
-                    View
-                  </button>
-                )}
-                <button
-                  disabled={saving}
-                  className={`w-fit px-4 h-[40px] bg-blue-600 hover:bg-blue-500 text-white outline outline-blue-500 outline-1 font-semibold rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed`}
-                  onClick={updatePost}
-                >
-                  Save Settings
-                </button>
+            </Tabs.Content>
+            <Tabs.Content className="flex-grow overflow-auto" value="seo">
+              <div className="mt-6 px-4 sm:px-6">
+                {seoFields.map((field, index) => (
+                  <FormField key={index} {...field} />
+                ))}
               </div>
-            </div>
-            {/* /End replace */}
+            </Tabs.Content>
+          </Tabs.Root>
+          <div className="px-5 flex fixed w-full bg-white bottom-0 justify-start border-t py-3 gap-3 border-gray-300">
+            {postObject?.published_at && (
+              <button
+                className="w-fit px-4 h-[40px] bg-gray-50 hover:bg-gray-100 outline outline-gray-400 outline-1 text-gray-500 font-semibold rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
+                variant={"ghostBlue"}
+                onClick={() => {
+                  window.open(`/post/${postObject.slug}`);
+                }}
+              >
+                View
+              </button>
+            )}
+            <button
+              disabled={saving}
+              className={`w-fit px-4 h-[40px] bg-blue-600 hover:bg-blue-500 text-white outline outline-blue-500 outline-1 font-semibold rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed`}
+              onClick={updatePost}
+            >
+              Save Settings
+            </button>
           </div>
         </div>
       </motion.div>

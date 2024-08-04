@@ -1,6 +1,6 @@
 import { Node, mergeAttributes, nodePasteRule } from '@tiptap/core';
 import axios from 'axios'
-import {NodeSelection} from 'prosemirror-state'
+import {NodeSelection} from '@tiptap/pm/state'
 
 export const TWITTER_REG_G =
   /^https?:\/\/(?:twitter|x)\.com\/(?:#!\/)?(\w+)\/status(es)?\/(.+)?$/g;
