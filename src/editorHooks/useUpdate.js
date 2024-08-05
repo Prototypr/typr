@@ -138,7 +138,7 @@ const useUpdate = ({ save }) => {
 
 
     if(!postId){
-      toast.error("Post ID is required to update settings!", {
+      toast.error("Post ID is required to update settings.", {
         duration: 5000,
       });
       return false

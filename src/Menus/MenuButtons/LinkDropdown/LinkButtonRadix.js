@@ -8,6 +8,7 @@ import LinkField from './LinkField/LinkField'
 
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../../Primitives/Collabsible';
 import { useEffect } from 'react';
+import { LinkIcon2Bold } from '../../../icons/icons';
 
 const slideUpAndFade = keyframes({
   '0%': { opacity: 0, transform: 'translateY(2px)' },
@@ -151,16 +152,16 @@ const togglePopup =()=>{
 }
 
 return(
-  <Collapsible open={open}>
+  <Collapsible className='flex flex-col justify-center' open={open}>
     <CollapsibleTrigger  
     // onClick={togglePopup}
      asChild>
       {/* <IconButton className={open?'bg-gray-800':' hover:bg-gray-800 hover:text-white'} aria-label="Update link"> */}
-      <IconButton id="link-btn" className={`
+      <IconButton id="link-btn" className={`my-auto 
        ${editor.isActive("link")?'bg-gray-800':'bg-gray-900'}
        ${editor.isActive("link")?'text-blue-400':'text-gray-200'}
        hover:cursor-pointer`} aria-label="Update link">
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.364 15.536L16.95 14.12l1.414-1.414a5 5 0 1 0-7.071-7.071L9.879 7.05 8.464 5.636 9.88 4.222a7 7 0 0 1 9.9 9.9l-1.415 1.414zm-2.828 2.828l-1.415 1.414a7 7 0 0 1-9.9-9.9l1.415-1.414L7.05 9.88l-1.414 1.414a5 5 0 1 0 7.071 7.071l1.414-1.414 1.415 1.414zm-.708-10.607l1.415 1.415-7.071 7.07-1.415-1.414 7.071-7.07z" fill="currentColor"/></svg>
+        <LinkIcon2Bold size={22} />
       </IconButton>
     </CollapsibleTrigger>
     <CollapsibleContent 
@@ -174,7 +175,7 @@ return(
         editor={editor}
         closePopup={closePopup}
         />
-         <Cross2Icon style={{margin:'auto 6px', cursor:'pointer'}} onClick={closePopup} />
+         <Cross2Icon style={{margin:'10px 6px', cursor:'pointer'}} onClick={closePopup} />
       </Flex>
       {/* <PopoverClose  onClick={togglePopup} aria-label="Close">
        

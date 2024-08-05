@@ -4,14 +4,17 @@ import toast from "react-hot-toast";
 import { styled, keyframes } from "@stitches/react";
 import { violet, mauve, blackA } from "@radix-ui/colors";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
+
 import {
-  CodeIcon,
-  PlusIcon,
   ImageIcon,
-  DividerHorizontalIcon,
-  TwitterLogoIcon,
-  VideoIcon,
-} from "@radix-ui/react-icons";
+  DividerIcon,
+  PlusIcon,
+  MinusIcon,
+  YouTubeIcon,
+  XIcon,
+  CodeIcon,
+} from "../icons/icons";
+
 
 import { ImageDecorationKey } from "../CustomExtensions/Figure2/CustomImage";
 
@@ -40,7 +43,7 @@ const StyledContent = styled(PopoverPrimitive.Content, {
   display: "flex",
   flexDirection: "row",
   padding: 5,
-  paddingLeft: 20,
+  paddingLeft: 5,
   background: "transparent",
   width: 1000,
   outline: "none",
@@ -319,8 +322,8 @@ const IconButton = styled("button", {
   all: "unset",
   fontFamily: "inherit",
   borderRadius: "100%",
-  height: 35,
-  width: 35,
+  height: 32,
+  width: 32,
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
@@ -390,8 +393,7 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
     >
       <div
         id="menu-trigger-container"
-        className="relative z-20"
-        style={{ marginLeft: -72 }}
+        className="relative z-20 w-[50px] -ml-[72px]"
       >
         <Popover open={open}>
           {/* <Popover > */}
@@ -403,10 +405,10 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
                 // e.target.parentElement.click()
                 // tcontent.click()
               }}
-              className="hover:cursor-pointer"
-              aria-label="Update dimensions"
+              className="hover:cursor-pointer border-gray-900 text-black-900"
+              aria-label="Menu"
             >
-              <PlusIcon />
+              <PlusIcon size={22} />
             </IconButton>
           </PopoverTrigger>
           <PopoverContent
@@ -426,7 +428,7 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
             side="right"
             sideOffset={5}
           >
-            <Flex css={{ flexDirection: "row", gap: 10 }}>
+            <Flex css={{ flexDirection: "row", gap: 3 }}>
               <DropdownMenuItem>
                 <IconButton className="menu-item">
                   <>
@@ -434,7 +436,7 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
                       for="img-upload"
                       className="w-full h-full flex cursor-pointer custom-file-upload"
                     >
-                      <ImageIcon className="my-auto mx-auto" />
+                      <ImageIcon size={22} className="my-auto mx-auto" />
                     </label>
                     <input
                       type="file"
@@ -461,7 +463,7 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
                   className="hover:cursor-pointer menu-item"
                   aria-label="Insert Code Block"
                 >
-                  <TwitterLogoIcon />
+                  <XIcon size={22} />
                 </IconButton>
               </DropdownMenuItem>
               <DropdownMenuItem>
@@ -496,7 +498,7 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
                   className="hover:cursor-pointer menu-item"
                   aria-label="Insert Code Block"
                 >
-                  <VideoIcon />
+                  <YouTubeIcon size={22} />
                 </IconButton>
               </DropdownMenuItem>
               <DropdownMenuItem>
@@ -507,7 +509,7 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
                   className="hover:cursor-pointer menu-item"
                   aria-label="Insert Code Block"
                 >
-                  <CodeIcon />
+                  <CodeIcon size={22} />
                 </IconButton>
               </DropdownMenuItem>
 
@@ -527,7 +529,7 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
                   className="hover:cursor-pointer menu-item"
                   aria-label="Insert Divider"
                 >
-                  <DividerHorizontalIcon />
+                  <MinusIcon size={22} />
                 </IconButton>
               </DropdownMenuItem>
             </Flex>
