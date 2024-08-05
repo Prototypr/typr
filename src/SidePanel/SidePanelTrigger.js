@@ -6,7 +6,10 @@ export const SidePanelTrigger = ({
   postObject,
   user,
   updatePostSettings,
-  refetchPost
+  refetchPost,
+  settingsPanelSettings,
+  settingsOptions,
+  theme
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -43,6 +46,9 @@ export const SidePanelTrigger = ({
         close={toggleOpen}
         updatePostSettings={updatePostSettings}
         refetchPost={refetchPost}
+        settingsPanelSettings={settingsPanelSettings}
+        settingsOptions={settingsOptions}
+        theme={theme}
       />
     </>
   );

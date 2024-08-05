@@ -116,12 +116,35 @@ const useUpdate = ({ save }) => {
    * updatePostSettings
    */
   const updatePostSettings = async ({ postId, user, settings, postObject }) => {
-    //create the entry object with the new settings
-    const entry = {
-      type: "article",
-      ...settings,
+    // Deep merge function to handle nested objects
+    const deepMerge = (target, source) => {
+      for (const key in source) {
+        if (source.hasOwnProperty(key)) {
+          if (source[key] && typeof source[key] === 'object') {
+            target[key] = deepMerge(target[key] || {}, source[key]);
+          } else {
+            target[key] = source[key];
+          }
+        }
+      }
+      return target;
     };
 
+    // Merge the new settings with the existing postObject
+    const mergedEntry = deepMerge({
+      type: "article",
+      ...postObject
+    }, settings);
+
+
+    if(!postId){
+      toast.error("Post ID is required to update settings!", {
+        duration: 5000,
+      });
+      return false
+    }
+      
+  
     //check if session expired
     //check if jwt is expired
     const sessionExpired = checkSessionExpired(user?.jwt);
@@ -130,44 +153,36 @@ const useUpdate = ({ save }) => {
       return false;
     }
 
-    let publishPostEndpointConfig = {
-      method: "put",
-      url: `${process.env.NEXT_PUBLIC_API_URL}/api/posts/${postId}`,
-      headers: {
-        Authorization: `Bearer ${user?.jwt}`,
-      },
-      data: {
-        data: {
-          ...entry,
-        },
-      },
-    };
-
     setSaving(true);
-
-    const updateData = await axios(publishPostEndpointConfig)
-      .then(async function (response) {
-        setSaving(false);
-        setHasUnsavedChanges(false);
-        toast.success("Article settings updated!", {
-          duration: 5000,
-        });
-        return response;
-      })
-      .catch(function (error) {
-        console.log(error);
-        setSaving(false);
-        setHasUnsavedChanges(true);
-        toast.error("Settings could not be saved!", {
-          duration: 5000,
-        });
+    setSaved(false);
+    let saveData = null
+    try {
+      saveData = await save({ entry:mergedEntry, postId });
+      if(saveData){
+        setTimeout(() => {
+          setSaving(false);
+          setHasUnsavedChanges(false);
+          setSaved(true);
+        }, 1000);
+      }
+      toast.success("Article settings updated!", {
+        duration: 5000,
       });
+    } catch (e) {
+      setSaving(false);
+      setHasUnsavedChanges(true);
+      toast.error("Settings could not be saved!", {
+        duration: 5000,
+      });
+      console.log(e);
+    }
 
     //update the initial postobject with the updated data and return it
     const updatedObject = updatePostObject({
-      updatedObject: updateData?.data?.data?.attributes,
+      updatedObject: saveData?.data?.data?.attributes,
       existingObject: postObject,
     });
+
     return updatedObject;
   };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 
 import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
 
@@ -12,6 +12,7 @@ import useCreate from "./editorHooks/useCreate";
 import useUpdate from "./editorHooks/useUpdate";
 
 import EditorNav from "./EditorNav";
+import Toast from "./toast/Toast";
 import { useConfirmTabClose } from "./useConfirmTabClose";
 import { debounce } from "lodash";
 
@@ -78,10 +79,16 @@ export default function EditorWrapper(props) {
     childProps,
 
     requireLogin,
-
+    
     tool,
     isInterview,
   } = mergedProps;
+
+  //merge the settings menus so we can save them as a single object
+  const [settingsOptions, setSettingsOptions] = useState({
+    general: components?.settingsPanel?.generalTab?.menu || [],
+    seo: components?.settingsPanel?.seoTab?.menu || []
+  });
   /**
    * embed twitter widget if not already loaded
    */
@@ -206,6 +213,33 @@ export default function EditorWrapper(props) {
   ]);
 
   /**
+   * when the post object loads, 
+   * set the fields in the settings menu
+   */
+  useEffect(() => {
+    if (postObject) {
+      const getNestedValue = (obj, path) => {
+        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+      };
+
+      const updateSettingsArray = (array) => 
+        array.map(option => ({
+          ...option,
+          initialValue: option.field
+            ? (getNestedValue(postObject, option.field) ?? option.initialValue)
+            : option.initialValue
+        }));
+
+      setSettingsOptions({
+        general: updateSettingsArray(settingsOptions.general),
+        seo: updateSettingsArray(settingsOptions.seo)
+      });
+    }
+  }, [postObject]);
+
+
+  
+  /**
    * _savePost
    * when save button is clicked
    * save the post to the backend
@@ -296,9 +330,10 @@ export default function EditorWrapper(props) {
 
       if (updatedPostObject) {
         setPostObject(updatedPostObject);
+        return true
+      }else{
+        return false
       }
-
-      return true;
     } catch (e) {
       console.log(e);
       return false;
@@ -309,7 +344,6 @@ export default function EditorWrapper(props) {
     <>
       {components.nav.show && <EditorNav
         router={router}
-        primaryColor={theme.primaryColor}
         isInterview={isInterview}
         tool={tool}
         post={postObject}
@@ -320,6 +354,7 @@ export default function EditorWrapper(props) {
           userBadge: components.nav.userBadge,
           nav: components.nav,
         }}
+        theme={theme}
       />}
 
       <div
@@ -360,11 +395,10 @@ export default function EditorWrapper(props) {
                       updatePost,
                       forceSave,
                       refetchPost: refetch,
-                      updatePostSettings: user?.isAdmin
-                        ? updatePostSettings
-                        : false,
+                      settingsPanelSettings: components.settingsPanel,
+                      settingsOptions,
                       user,
-                      primaryColor: theme.primaryColor,
+                      theme,
                       ...childProps, // Spread custom props to override defaults
                     })
                   ) : (
@@ -381,11 +415,13 @@ export default function EditorWrapper(props) {
                       updatePost={updatePost}
                       forceSave={forceSave}
                       refetchPost={refetch}
-                      primaryColor={theme.primaryColor}
                       updatePostSettings={
-                        user?.isAdmin ? updatePostSettings : false
+                        components.settingsPanel?.show ? updatePostSettings : false
                       }
+                      settingsPanelSettings={components.settingsPanel}
+                      settingsOptions={settingsOptions}
                       user={user}
+                      theme={theme}
                     />
                   )}
                 </div>
@@ -394,6 +430,7 @@ export default function EditorWrapper(props) {
           )}
         </div>
       </div>
+      <Toast />
     </>
   );
 }

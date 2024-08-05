@@ -66,7 +66,9 @@ const Editor = ({
   forceSave = false,
   updatePostSettings = false,
   setInitialEditorContent = false,
-  primaryColor='',
+  settingsPanelSettings,
+  settingsOptions,
+  theme,
   user,
 }) => {
   // const { user } = useUser({
@@ -225,7 +227,7 @@ const Editor = ({
 
           <div className="mx-auto mt-4">
             <CustomLink href="/dashboard">
-              <button className="px-3 h-[35px] bg-blue-500 text-white font-semibold text-sm rounded-md w-fit hover:bg-blue-600">
+              <button className={`px-3 h-[35px] ${theme=='blue'?'bg-blue-500 text-white font-semibold text-sm rounded-md w-fit hover:bg-blue-600':'bg-gray-500 text-white font-semibold text-sm rounded-md w-fit hover:bg-gray-600'}`}>
                 Go to dashboard
               </button>
             </CustomLink>
@@ -271,6 +273,7 @@ const Editor = ({
           <EditorButtonsNavPortal>
             <div className="flex justify-end w-full sm:w-fit sm:justify-end">
             <EditorNavButtons
+              theme={theme}
               user={user}
               onSave={({ forReview }) => {
                 setForReview(forReview);
@@ -280,11 +283,13 @@ const Editor = ({
               saved={saved}
               canEdit={canEdit}
               editor={editor}
-              primaryColor={primaryColor}
               //for settings panel
               postObject={postObject}
               updatePostSettings={updatePostSettings}
               refetchPost={refetchPost}
+
+              settingsPanelSettings={settingsPanelSettings}
+              settingsOptions={settingsOptions}
             />
             </div>
           </EditorButtonsNavPortal>
@@ -300,11 +305,11 @@ const Editor = ({
                 : ""
           }
         >
-          {editor && <MenuFloating editor={editor} user={user} />}
-          <TextMenu editor={editor} />
+          {editor && <MenuFloating  editor={editor} user={user} theme={theme} />}
+          <TextMenu  editor={editor} theme={theme} />
           {/* <LinkMenu editor={editor} /> */}
-          <ImageMenu editor={editor} />
-          <VideoMenu editor={editor} />
+          <ImageMenu editor={editor} theme={theme} />
+          <VideoMenu editor={editor} theme={theme} />
 
           <EditorContent editor={editor} />
           <div className="popup-modal mb-6 relative bg-white p-6 pt-3 rounded-lg w-full"></div>

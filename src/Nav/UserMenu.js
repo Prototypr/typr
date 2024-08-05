@@ -23,7 +23,7 @@ const UserMenu = ({ user, router, settings }) => {
                   user={user}
                   icon={
                     <img
-                      className="hover:shadow border border-1 !rounded-full my-auto w-full h-full cursor-pointer object-cover"
+                      className="hover:shadow border border-1 !rounded-full my-auto w-full h-full cursor-pointer object-contain"
                       src={
                         user?.avatar
                           ? user.avatar

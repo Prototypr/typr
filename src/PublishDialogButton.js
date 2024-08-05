@@ -16,7 +16,7 @@ import {
 import Button from "./Primitives/Button";
 import Spinner from "./atom/Spinner/Spinner";
 
-export const PublishDialogButton = ({ onSave, canPublish, postObject, primaryColor }) => {
+export const PublishDialogButton = ({ onSave, canPublish, postObject,theme }) => {
   const [submitting, setSubmitting] = useState();
   const [submitOpen, setSubmitOpen] = useState();
 
@@ -59,7 +59,7 @@ export const PublishDialogButton = ({ onSave, canPublish, postObject, primaryCol
         <button
           disabled={disabled}
           variant="confirmRounded"
-          className={`!text-[13px] !font-normal rounded-full ${primaryColor?primaryColor:'bg-blue-600 hover:bg-blue-500 !outline-blue-600'}  text-white !h-[25px] !px-2 !outline !outline-1 !py-0 !mr-1 !my-auto ${disabled?'opacity-50 cursor-not-allowed':''}`}
+          className={`!text-[13px] !font-normal rounded-full ${theme=='blue'?'bg-blue-600 hover:bg-blue-500 !outline-blue-600':'bg-gray-600 hover:bg-gray-500 !outline-gray-600'}  text-white !h-[25px] !px-2 !outline !outline-1 !py-0 !mr-2 !my-auto ${disabled?'opacity-50 cursor-not-allowed':''}`}
         >
           {
             // if there's a draft version different from the content, and post is not published

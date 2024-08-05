@@ -20,8 +20,12 @@ const EditorNavButtons = ({
   //for updating existing post
   refetchPost,
   postObject,
+
+  settingsPanelSettings,
+  settingsOptions,
+
   updatePostSettings,
-  primaryColor,
+  theme
 }) => {
   return (
     <>
@@ -49,16 +53,19 @@ const EditorNavButtons = ({
           //for /write (new post), it creates a new post
           //for /p/[slug] (existing post), it updates the existing post
           onSave={onSave}
-          primaryColor={primaryColor}
+          theme={theme}
         />:null}
 
       {/* show side panel trigger if updatePostSettings is defined (in /p/[slug]) */}
-      {editor && updatePostSettings !== false ? (
+      {editor && settingsPanelSettings?.show == true ? (
         <SidePanelTrigger
+          theme={theme}
           user={user}
           editor={editor}
           postObject={postObject}
           updatePostSettings={updatePostSettings}
+          settingsPanelSettings={settingsPanelSettings}
+          settingsOptions={settingsOptions}
           refetchPost={refetchPost}
         />
       ) : null}

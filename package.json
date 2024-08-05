@@ -14,8 +14,9 @@
   },
   "scripts": {
     "build": "rollup -c",
+    "build-dev": "rollup --config rollup-dev.config.mjs",
     "prepublishOnly": "npm run build",
-    "watch": "rollup -c --watch",
+    "watch": "rollup --config rollup-dev.config.mjs --watch",
     "clean": "rm -rf node_modules",
     "reinstall": "npm run clean && npm install"
   },

@@ -43,7 +43,8 @@ export const NavigationMenuDemo = ({
   showSponsorButton,
   showJobsButton,
   router,
-  settings
+  settings,
+  theme
 }) => {
   // const intl = useIntl();
   // const title3 = intl.formatMessage({ id: "navbar.menu.title3" });
@@ -53,17 +54,7 @@ export const NavigationMenuDemo = ({
       <NavigationMenuList>
         {/* {!hideLocaleSwitcher && <LocaleSwitcher collapsed={collapsed} />} */}
 
-        {!user || !user?.isLoggedIn ? (
-          <NavigationMenuItem
-            className={`hidden mr-3 md:block ${
-              !collapsed ? "md:opacity-0 md:flex md:invisible" : "md:flex"
-            } md:flex-col md:justify-center`}
-          >
-            {/* {!hideLocaleSwitcher &&  <NavigationMenuLink href="/post/write-for-us">
-            {title3}
-          </NavigationMenuLink>} */}
-          </NavigationMenuItem>
-        ) : (
+        {(
           user &&
           !editor &&
           showWriteButton !== false && (

@@ -19,9 +19,9 @@ export default function EditorNav({
   isInterview,
   user,
   mutateUser,
-  primaryColor,
   router,
-  settings
+  settings,
+  theme
 }) {
   // const { user, isLoading } = useUser({
   //   redirectIfFound: false,
@@ -164,6 +164,7 @@ export default function EditorNav({
                   editor={true}
                   router={router}
                   settings={settings}
+                  theme={theme}s
                 />
               </div>
             </div>

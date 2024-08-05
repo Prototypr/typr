@@ -207,7 +207,7 @@ const toggleModal = () =>{
       <div className="flex">
     <DialogTrigger asChild>
 
-      <IconButton onClick={()=>setModal('alt')} className={'text-sm hover:bg-gray-800 hover:text-white'} aria-label="Update link">
+      <IconButton onClick={()=>setModal('alt')} className={'!text-sm hover:bg-gray-800 hover:text-white'} aria-label="Update link">
           ALT
         </IconButton>
     </DialogTrigger>

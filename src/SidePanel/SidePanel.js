@@ -3,57 +3,8 @@ import { motion } from "framer-motion";
 import { Portal } from "react-portal";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import ImageUploader from "./ImageUploader";
-import * as Tabs from '@radix-ui/react-tabs';
-
-import { styled } from "@stitches/react";
-import { slate, indigo } from "@radix-ui/colors";
-
-import ReactDatePicker from "react-datepicker";
-
-const Input = styled("input", {
-  all: "unset",
-  flex: "1 0 auto",
-  borderRadius: 4,
-  padding: "0 10px",
-  fontSize: 15,
-  lineHeight: 1,
-  color: slate.slate12,
-  boxShadow: `0 0 0 1px ${slate.slate8}`,
-  backgroundColor: indigo.indogo9,
-  height: 35,
-  "&:focus": { boxShadow: `0 0 0 2px ${slate.slate8}` },
-});
-
-const FormField = ({ type, label, value, onChange, description }) => {
-  switch (type) {
-    case 'input':
-      return (
-        <div className="border border-gray-100 p-4 rounded-md my-3">
-          <h2 className="font-medium text-md mb-4 font-secondary">{label}</h2>
-          <Input
-            onChange={onChange}
-            value={value}
-          />
-          {description && <p className="mt-3 text-xs text-gray-400">{description}</p>}
-        </div>
-      );
-    case 'date':
-      return (
-        <div className="border border-gray-100 p-4 rounded-md my-3">
-          <h2 className="font-medium text-md mb-2 font-secondary">{label}</h2>
-          <p className="text-sm mb-4">{description}</p>
-          <ReactDatePicker
-            className="text-gray-900 border bg-white border-gray-300"
-            selected={value}
-            onChange={onChange}
-          />
-        </div>
-      );
-    // Add more cases for other field types as needed
-    default:
-      return null;
-  }
-};
+import * as Tabs from "@radix-ui/react-tabs";
+import FormField from "./FormField/FormField";
 
 const SidePanel = ({
   isOpen,
@@ -63,9 +14,10 @@ const SidePanel = ({
   refetchPost,
   user,
   updatePostSettings,
+  settingsPanelSettings,
+  settingsOptions,
+  theme,
 }) => {
-  
-
   const [rootElement] = useState(() => document.querySelector(`body`));
 
   return (
@@ -79,6 +31,9 @@ const SidePanel = ({
       editor={editor}
       refetchPost={refetchPost}
       updatePostSettings={updatePostSettings}
+      settingsPanelSettings={settingsPanelSettings}
+      settingsOptions={settingsOptions}
+      theme={theme}
     />
   );
 };
@@ -96,31 +51,55 @@ const SidebarInner = ({
   user,
   refetchPost,
   updatePostSettings,
+  settingsPanelSettings,
+  settingsOptions,
+  theme,
 }) => {
-  const [postStatus, setPostStatus] = useState(postObject?.status);
-  const [tier, setTier] = useState(postObject?.tier);
-  const [timestamp, setTimestamp] = useState(null);
   const [coverImage, setCoverImage] = useState(null);
-  const [slug, setSlug] = useState(postObject?.slug);
-
+  
   const [saving, setSaving] = useState(false);
 
-  const handleDateChange = input => {
-    setTimestamp(input);
+  const [activeTab, setActiveTab] = useState("seo");
+
+  const [showSeoPanel, setShowSeoPanel] = useState(true);
+  const [showGeneralPanel, setShowGeneralPanel] = useState(true);
+
+  const [updatedSettingsOptions, setUpdatedSettingsOptions] = useState(settingsOptions);
+
+  const [hasChanges, setHasChanges] = useState(false);
+
+  const handleFieldChange = (tabName, fieldIndex, newValue) => {
+    setUpdatedSettingsOptions(prevOptions => {
+      const newOptions = {
+        ...prevOptions,
+        [tabName]: prevOptions[tabName].map((field, index) =>
+          index === fieldIndex ? { ...field, initialValue: newValue } : field
+        )
+      };
+      
+      // Check if there are any changes
+      const hasAnyChanges = Object.keys(newOptions).some(tab =>
+        newOptions[tab].some((field, index) => 
+          field.initialValue !== settingsOptions[tab][index].initialValue
+        )
+      );
+      
+      setHasChanges(hasAnyChanges);
+      return newOptions;
+    });
   };
 
   useEffect(() => {
-    setPostStatus(postObject?.status);
-    setTier(postObject?.tier);
-    setSlug(postObject?.slug);
+    const isAllAdminOnly = (options) => options.every(option => option.adminOnly);
 
-    if (postObject?.published_at) {
-      let dateObj = new Date(postObject.published_at);
-      if (dateObj) {
-        setTimestamp(dateObj);
-      }
+    if (!user?.isAdmin) {
+      const seoOptions = settingsOptions?.seo || [];
+      const generalOptions = settingsOptions?.general || [];
+
+      setShowSeoPanel(!isAllAdminOnly(seoOptions));
+      setShowGeneralPanel(!isAllAdminOnly(generalOptions));
     }
-  }, [postObject]);
+  }, [settingsOptions, user]);
 
   useEffect(() => {
     if (postObject?.featuredImage) {
@@ -139,80 +118,62 @@ const SidebarInner = ({
     setSaving(true);
     const settings = {};
 
-    if (slug) {
-      settings.slug = slug;
-    }
+    Object.keys(updatedSettingsOptions).forEach(tabName => {
+      updatedSettingsOptions[tabName].forEach((field, index) => {
+        const originalField = settingsOptions[tabName][index];
+        if (originalField && field.initialValue !== originalField.initialValue) {
+          // Handle dot notation in field names
+          const fieldParts = field.field.split('.');
+          let currentObj = settings;
+          
+          fieldParts.forEach((part, i) => {
+            if (i === fieldParts.length - 1) {
+              currentObj[part] = field.initialValue;
+            } else {
+              currentObj[part] = currentObj[part] || {};
+              currentObj = currentObj[part];
+            }
+          });
+        }
+      });
+    });
 
-    //only admin allowed (also filtered in the backend)
-    if (user?.isAdmin) {
-      if (timestamp) {
-        settings.publishedAt = timestamp;
-      } else {
-        settings.publishedAt = null;
-      }
-      if (tier) {
-        settings.tier = parseInt(tier);
-      }
-      if (postStatus) {
-        settings.status = postStatus;
-      }
-    }
-
-    // if settings object isn't empty
     if (Object.keys(settings).length > 0) {
-      // handle the case when settings object has no properties
-      const updated = await updatePostSettings({ settings });
-      setSaving(false)
+      try {
+       let updatedData = await updatePostSettings({ settings });
+        if(!updatedData){
+          throw new Error("Failed to update settings. Please try again.");
+        }
+        const updatedPost = await refetchPost(); // Assume this returns the updated post data
+        
+        // Update the local state with the new settings from the refetched post
+        setUpdatedSettingsOptions(prevOptions => {
+          const newOptions = { ...prevOptions };
+          Object.keys(newOptions).forEach(tabName => {
+            newOptions[tabName] = newOptions[tabName].map(field => {
+              const fieldParts = field.field.split('.');
+              let value = updatedPost;
+              for (const part of fieldParts) {
+                value = value?.[part];
+                if (value === undefined) break;
+              }
+              return { ...field, initialValue: value !== undefined ? value : field.initialValue };
+            });
+          });
+          return newOptions;
+        });
+
+        setHasChanges(false);
+      } catch (error) {
+        console.error("Error updating post settings:", error);
+        // Re-enable the save button by setting hasChanges back to true
+        setHasChanges(true);
+        // Optionally, show an error message to the user
+        // For example: setErrorMessage("Failed to update settings. Please try again.");
+      }
     }
+    setSaving(false);
   };
-
-  const formFields = [
-    {
-      type: 'input',
-      label: 'Url slug',
-      value: slug,
-      onChange: (e) => setSlug(e.target.value),
-      description: '(If slug is taken, it will just give error)',
-    },
-    {
-      type: 'date',
-      label: 'Publish Date',
-      value: timestamp,
-      onChange: handleDateChange,
-      description: 'Set a date to make it publish. Clear the date field to unpublish.',
-    },
-    {
-      type: 'input',
-      label: 'Post Status',
-      value: postStatus,
-      onChange: (e) => setPostStatus(e.target.value),
-      description: '(draft, pending, or publish - todo: turn into dropdown)',
-    },
-    {
-      type: 'input',
-      label: 'Tier',
-      value: tier,
-      onChange: (e) => setTier(e.target.value),
-      description: '(1-5 for quality ranking - todo: turn into number input)',
-    },
-  ];
-
-  const seoFields = [
-    {
-      type: 'input',
-      label: 'Meta Title',
-      value: postObject?.metaTitle || '',
-      onChange: (e) => updatePostObject({ metaTitle: e.target.value }),
-      description: 'SEO title for the post (max 60 characters)',
-    },
-    {
-      type: 'input',
-      label: 'Meta Description',
-      value: postObject?.metaDescription || '',
-      onChange: (e) => updatePostObject({ metaDescription: e.target.value }),
-      description: 'SEO description for the post (max 160 characters)',
-    },
-  ];
 
   return (
     <Portal node={rootElement}>
@@ -240,13 +201,12 @@ const SidebarInner = ({
                 id="slide-over-heading"
                 className="text-gray-900 text-lg font-semibold"
               >
-                Story Settings
+                {showSeoPanel && showGeneralPanel
+                  ? "Story Settings"
+                  : showSeoPanel
+                  ? "SEO Settings"
+                  : "General Settings"}
               </h2>
-              <div className="flex items-center">
-                <span className="bg-blue-500 text-white text-xs font-medium px-2 py-0.5 rounded-full ml-2">
-                  Beta
-                </span>
-              </div>
             </div>
 
             <div
@@ -256,98 +216,226 @@ const SidebarInner = ({
               <Cross2Icon />
             </div>
           </div>
-          <Tabs.Root className="flex flex-col h-full" defaultValue="settings">
-            <Tabs.List className="flex border-b border-t border-gray-200">
-              <Tabs.Trigger 
-                className="flex-1 bg-gray-50/80 px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-900 focus:outline-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-white data-[state=active]:text-gray-900 transition-all" 
-                value="settings"
-              >
-                Settings
-              </Tabs.Trigger>
-              <Tabs.Trigger 
-                className="flex-1 bg-gray-50/80 px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-900 focus:outline-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-white data-[state=active]:text-gray-900 transition-all" 
-                value="seo"
-              >
-                SEO
-              </Tabs.Trigger>
-            </Tabs.List>
-            <Tabs.Content className="flex-grow overflow-auto" value="settings">
-              <div className="mt-6 px-4 sm:px-6">
-                {isAdmin && (
-                  <div className="bg-white mb-5 border-gray-100">
-                    {formFields.map((field, index) => (
-                      <FormField key={index} {...field} />
+          
+          {showSeoPanel && showGeneralPanel ? (
+            <Tabs.Root
+              className="flex flex-col h-full"
+              defaultValue={showSeoPanel ? "seo" : "general"}
+              onValueChange={value => setActiveTab(value)}
+            >
+              <Tabs.List className="flex border-b border-t border-gray-200">
+                {showSeoPanel && (
+                  <Tabs.Trigger
+                    className={`flex-1 bg-gray-50/80 px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-900 focus:outline-none border-b-2 border-transparent ${
+                      theme == "blue"
+                        ? "data-[state=active]:border-blue-500"
+                        : "data-[state=active]:border-gray-500"
+                    } data-[state=active]:bg-white data-[state=active]:text-gray-900 transition-all`}
+                    value="seo"
+                  >
+                    SEO
+                  </Tabs.Trigger>
+                )}
+                {showGeneralPanel && (
+                  <Tabs.Trigger
+                    className={`flex-1 bg-gray-50/80 px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-900 focus:outline-none border-b-2 border-transparent ${
+                      theme == "blue"
+                        ? "data-[state=active]:border-blue-500"
+                        : "data-[state=active]:border-gray-500"
+                    } data-[state=active]:bg-white data-[state=active]:text-gray-900 transition-all`}
+                    value="general"
+                  >
+                    General
+                  </Tabs.Trigger>
+                )}
+              </Tabs.List>
+              {showSeoPanel && (
+                <Tabs.Content className="flex-grow overflow-auto" value="seo">
+                  <div className="mt-6 px-4 sm:px-6">
+                    {updatedSettingsOptions?.seo?.map((field, index) => (
+                      <FormField
+                        key={index}
+                        {...field}
+                        onValueChange={(newValue) => handleFieldChange('seo', index, newValue)}
+                      />
                     ))}
-                    <div className="border border-gray-100 p-4 rounded-md my-3">
-                      <h2 className="font-medium text-md mb-4 font-secondary">
-                        Featured Image
-                      </h2>
-                      {postObject?.slug ? (
-                        <ImageUploader
-                          key={coverImage}
-                          borderRadius={6}
-                          disallowScale={true}
-                          uploadOnInsert={true}
-                          placeholderImg={
-                            postObject?.featuredImage
-                              ? postObject?.featuredImage
-                              : coverImage
-                                ? coverImage
-                                : "https://s3-us-west-1.amazonaws.com/tinify-bucket/%2Fprototypr%2Ftemp%2F1580577924294-Group+74.png"
-                          }
-                          height={400}
-                          width={400}
-                          adaptable={true}
-                          postObject={postObject}
-                          imageUrl={
-                            postObject?.featuredImage
-                              ? postObject?.featuredImage
-                              : coverImage
-                                ? coverImage
-                                : null
-                          }
-                          setLogoUploadLink={() => {
-                            return true;
-                          }}
-                          center={false}
-                          uploadImageAPI={"/api/aws/uploadPublicationLogo"}
-                          uploadAPI={`/api/publication/updatePublication`}
-                          fieldName="logo"
-                          uploadButtonText={"Browse"}
-                          filename={`ftImage_${postObject?.id}`}
-                          user={user}
-                          refetchPost={refetchPost}
-                        />
-                      ) : (
-                        <div className="text-sm text-gray-700">
-                          <p className="mb-3">
-                            Dear admin, you can only upload a featured image to
-                            a post that has already been saved as a draft.
-                          </p>
-                          <p className="mb-3">
-                            Press 'Save Draft', and then come back here to
-                            attach a featured image.
-                          </p>
-                          <p className="mb-3 text-xs text-purple-500">
-                            (Todo: make this work for non drafts where the post
-                            has not been created yet.)
-                          </p>
+                  </div>
+                </Tabs.Content>
+              )}
+              {showGeneralPanel && (
+                <Tabs.Content
+                  className="flex-grow overflow-auto pb-[140px]"
+                  value="general"
+                >
+                  <div className="mt-6 px-4 sm:px-6">
+                    <div className="bg-white mb-5 border-gray-100">
+                      {updatedSettingsOptions?.general?.map(
+                        (field, index) => (
+                          <FormField
+                            key={index}
+                            {...field}
+                            onValueChange={(newValue) => handleFieldChange('general', index, newValue)}
+                          />
+                        )
+                      )}
+                      {settingsPanelSettings.featuredImage?.show == true && (
+                        <div className="border border-gray-100 p-4 rounded-md my-3">
+                          <h2 className="font-medium text-md mb-4 font-secondary">
+                            Featured Image
+                          </h2>
+                          {postObject?.slug ? (
+                            <ImageUploader
+                              key={coverImage}
+                              borderRadius={6}
+                              disallowScale={true}
+                              uploadOnInsert={true}
+                              placeholderImg={
+                                postObject?.featuredImage
+                                  ? postObject?.featuredImage
+                                  : coverImage
+                                  ? coverImage
+                                  : "https://s3-us-west-1.amazonaws.com/tinify-bucket/%2Fprototypr%2Ftemp%2F1580577924294-Group+74.png"
+                              }
+                              height={400}
+                              width={400}
+                              adaptable={true}
+                              postObject={postObject}
+                              imageUrl={
+                                postObject?.featuredImage
+                                  ? postObject?.featuredImage
+                                  : coverImage
+                                  ? coverImage
+                                  : null
+                              }
+                              setLogoUploadLink={() => {
+                                return true;
+                              }}
+                              center={false}
+                              uploadImageAPI={"/api/aws/uploadPublicationLogo"}
+                              uploadAPI={`/api/publication/updatePublication`}
+                              fieldName="logo"
+                              uploadButtonText={"Browse"}
+                              filename={`ftImage_${postObject?.id}`}
+                              user={user}
+                              refetchPost={refetchPost}
+                            />
+                          ) : (
+                            <div className="text-sm text-gray-700">
+                              <p className="mb-3">
+                                Dear admin, you can only upload a featured image to
+                                a post that has already been saved as a draft.
+                              </p>
+                              <p className="mb-3">
+                                Press 'Save Draft', and then come back here to
+                                attach a featured image.
+                              </p>
+                              <p className="mb-3 text-xs text-purple-500">
+                                (Todo: make this work for non drafts where the post
+                                has not been created yet.)
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
                   </div>
-                )}
-                {/* ADMIN SETTINGS END */}
+                </Tabs.Content>
+              )}
+            </Tabs.Root>
+          ) : (
+            <div className="flex flex-col h-full">
+              <div className="flex-grow overflow-auto pb-[140px]">
+                <div className="mt-6 px-4 sm:px-6">
+                  {showSeoPanel && (
+                    <>
+                      {updatedSettingsOptions?.seo?.map((field, index) => (
+                        <FormField
+                          key={index}
+                          {...field}
+                          onValueChange={(newValue) => handleFieldChange('seo', index, newValue)}
+                        />
+                      ))}
+                    </>
+                  )}
+                  {showGeneralPanel && (
+                    <>
+                      <div className="bg-white mb-5 border-gray-100">
+                        {updatedSettingsOptions?.general?.map(
+                          (field, index) => (
+                            <FormField
+                              key={index}
+                              {...field}
+                              onValueChange={(newValue) => handleFieldChange('general', index, newValue)}
+                            />
+                          )
+                        )}
+                        {settingsPanelSettings.featuredImage?.show == true && (
+                          <div className="border border-gray-100 p-4 rounded-md my-3">
+                            <h2 className="font-medium text-md mb-4 font-secondary">
+                              Featured Image
+                            </h2>
+                            {postObject?.slug ? (
+                              <ImageUploader
+                                key={coverImage}
+                                borderRadius={6}
+                                disallowScale={true}
+                                uploadOnInsert={true}
+                                placeholderImg={
+                                  postObject?.featuredImage
+                                    ? postObject?.featuredImage
+                                    : coverImage
+                                    ? coverImage
+                                    : "https://s3-us-west-1.amazonaws.com/tinify-bucket/%2Fprototypr%2Ftemp%2F1580577924294-Group+74.png"
+                                }
+                                height={400}
+                                width={400}
+                                adaptable={true}
+                                postObject={postObject}
+                                imageUrl={
+                                  postObject?.featuredImage
+                                    ? postObject?.featuredImage
+                                    : coverImage
+                                    ? coverImage
+                                    : null
+                                }
+                                setLogoUploadLink={() => {
+                                  return true;
+                                }}
+                                center={false}
+                                uploadImageAPI={"/api/aws/uploadPublicationLogo"}
+                                uploadAPI={`/api/publication/updatePublication`}
+                                fieldName="logo"
+                                uploadButtonText={"Browse"}
+                                filename={`ftImage_${postObject?.id}`}
+                                user={user}
+                                refetchPost={refetchPost}
+                              />
+                            ) : (
+                              <div className="text-sm text-gray-700">
+                                <p className="mb-3">
+                                  Dear admin, you can only upload a featured image to
+                                  a post that has already been saved as a draft.
+                                </p>
+                                <p className="mb-3">
+                                  Press 'Save Draft', and then come back here to
+                                  attach a featured image.
+                                </p>
+                                <p className="mb-3 text-xs text-purple-500">
+                                  (Todo: make this work for non drafts where the post
+                                  has not been created yet.)
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
-            </Tabs.Content>
-            <Tabs.Content className="flex-grow overflow-auto" value="seo">
-              <div className="mt-6 px-4 sm:px-6">
-                {seoFields.map((field, index) => (
-                  <FormField key={index} {...field} />
-                ))}
-              </div>
-            </Tabs.Content>
-          </Tabs.Root>
+            </div>
+          )}
+          
           <div className="px-5 flex fixed w-full bg-white bottom-0 justify-start border-t py-3 gap-3 border-gray-300">
             {postObject?.published_at && (
               <button
@@ -361,11 +449,15 @@ const SidebarInner = ({
               </button>
             )}
             <button
-              disabled={saving}
-              className={`w-fit px-4 h-[40px] bg-blue-600 hover:bg-blue-500 text-white outline outline-blue-500 outline-1 font-semibold rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed`}
+              disabled={saving || !hasChanges}
+              className={`w-fit px-4 h-[40px] ${
+                theme == "blue"
+                  ? "bg-blue-600 hover:bg-blue-500  outline-blue-500"
+                  : "bg-gray-600 hover:bg-gray-500  outline-gray-500"
+              } text-white outline outline-1 font-semibold rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed`}
               onClick={updatePost}
             >
-              Save Settings
+              Save all
             </button>
           </div>
         </div>
