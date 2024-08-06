@@ -119,7 +119,7 @@ export default function EditorWrapper(props) {
     loadPostOperation: postOperations.load,
   });
   //create new post hook
-  const { createPost: createPostFromHook, creatingPost, created } = useCreate();
+  const { createPost, creatingPost, created } = useCreate();
 
   const {
     //update post content
@@ -186,30 +186,33 @@ export default function EditorWrapper(props) {
   const userRef = useRef(user);
   const postStatusRef = useRef(postStatus);
   const postObjectRef = useRef(postObject);
-  const createPostFromHookRef = useRef(createPostFromHook);
+  const createPostRef = useRef(createPost);
   const refetchRef = useRef(refetch);
   const onPostCreatedRef = useRef(hooks.onPostCreated);
   const updatePostByIdRef = useRef(updatePostById);
   const savePostRef = useRef(postOperations.save);
+  const createPostOperationRef = useRef(postOperations.create);
 
   useEffect(() => {
     userRef.current = user;
     postStatusRef.current = postStatus;
     postObjectRef.current = postObject;
-    createPostFromHookRef.current = createPostFromHook;
+    createPost.current = createPost;
     refetchRef.current = refetch;
     onPostCreatedRef.current = hooks.onPostCreated;
     updatePostByIdRef.current = updatePostById;
     savePostRef.current = postOperations.save;
+    createPostOperationRef.current = postOperations.create;
   }, [
     user,
     postStatus,
     postObject,
-    createPostFromHook,
+    createPost,
     refetch,
     hooks.onPostCreated,
     updatePostById,
     postOperations.save,
+    postOperations.create,
   ]);
 
   /**
@@ -279,17 +282,16 @@ export default function EditorWrapper(props) {
         return true;
       } else {
         // Creating a new post
-        if (!currentRouterPostId && typeof savePostRef.current === "function") {
+        if (!currentRouterPostId && typeof createPostOperationRef.current === "function") {
           //check if post content is empty
           if (editor.state.doc.textContent.trim() === "") {
             return false;
           }
 
-          const postInfo = await createPostFromHookRef.current({
+          const postInfo = await createPostRef.current({
             user: userRef.current,
             editor,
-            forReview,
-            create: savePostRef.current,
+            createPostOperation: createPostOperationRef.current,
           });
           // Set the new slug
           localStorage.removeItem("wipContent");

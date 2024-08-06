@@ -7,21 +7,22 @@ const useCreate = () => {
   const [creatingPost, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
 
-  const createPost = async ({ user, editor, forReview, relatedPost, create }) => {
+  const createPost = async ({ user, postObject, editor, forReview, relatedPost, createPostOperation }) => {
     setCreating(true);
     if (created) {
       throw new Error("Post already created");
     }
     const { entry } = getCreatePostData({
-      user,
       editor,
-      forReview,
+      postObject,
+      user,
       relatedPost,
+      forReview,
     });
 
     try {
 
-     let postResult = await create({entry})
+     let postResult = await createPostOperation({entry})
       console.log('postResult', postResult)
      if(postResult){
       setCreated(true);
@@ -30,9 +31,12 @@ const useCreate = () => {
       }, 1000);
     }else{
       setCreating(false);
-      toast.error("Error creating draft! Please contact support for help.", {
+      toast.error("Error creating draft! No post ID returned.", {
         duration: 5000,
       });
+      // toast.error("Error creating draft! Please contact support for help.", {
+      //   duration: 5000,
+      // });
     }
 
       return postResult;

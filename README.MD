@@ -1,51 +1,173 @@
-# Prototypr Editor
+# Typr Editor
 
-This is the editor from the core prototypr-frontend package.
+Typr is a Medium-like editor (for react.js) built with Tiptap for [Prototypr](https://prototypr.io) (so the npm package is called 'tiptypr').
 
-I just started splitting it out, so there's still work to do before it becomes usable.
+Install with `npm install tiptypr`
 
-The goal is to make it easy to drop into any React project.
+It's currently live in use on [Prototypr](https://prototypr.io), a platform built with Strapi and Next.js, but it can be used with any Content Management System:
 
-install with
-`npm install --legacy-peer-deps`
+## Built for any CMS
+
+Typr editor is designed to seamlessly integrate with React projects (e.g. Next.js applications).
+The editor is built to work with any CMS backend, allowing users to publish content to various systems such as WordPress, Strapi, or your custom CMS solution.
+It's a headless editor that lets users publish to your CMS without requiring direct access to your backend admin dashboard.
+
+If you need assistance adapting Typr to work better with your CMS, consider [sponsoring the project](https://github.com/sponsors/Prototypr). Your support can help drive further development and customization.
+
+### Key Features
+
+- React Editor: Easily embed Typr in your React or Next.js projects.
+- Universal CMS Compatibility: Works with any CMS backend such a Strapi, Wordpress and custom CMS solutions.
+- Publish Workflow: Configurable draft/pending/publish workflow (useful for publishers who want to review content before publishing):
+  - Save as draft/pending/publish
+  - If post status is publish or pending, require confirmation before overwriting published version
+- Customizable UI: Offers a customizable user menu dropdown and editor navigation to match your application's design.
+- Configurable Fields: You can configure the settings panel to work with any fields in your CMS.
+- Admin only fields: You can hide fields from the settings panel, and the editor, if you want to use Typr as a content manager.
 
 ## Example usage
 
-It is not yet ready for use in other projects, as the data fetching is still kind of hardcoded to work with Prototypr!
-
-At the moment, I am importing the `EditorWrapper` component (ssr: false):
+Install the package, then import it along with the styles to your project:
 
 ```
-const EditorWrapper = dynamic(() => import("tiptypr/dist/EditorWrapper"), {
-  ssr: false
-});
+import Tiptypr from "tiptypr";
+import "tiptypr/dist/styles.css";
 ```
 
-Then importing it to the react project with hooks specific to Prototypr:
+If you already have tailwind installed on your project, you can also add the following to your tailwind config instead of importing the styles:
 
-```
-<EditorWrapper
-    user={user}
-    userLoading={isLoading}
-    mutateUser={mutateUser}
-    getUserArticle={getUserArticle}
-    getSlugFromArticleId={getSlugFromArticleId}
-    />
-```
-
-The CSS compiles, and you could import it like this:
-```
-import 'tiptypr/dist/styles.css';
-```
-but if you already have tailwind installed, it's better to use your own tailwind config to import the styles:
 ```
   content: [
     "./node_modules/tiptypr/dist/**/*.{js,ts,jsx,tsx}",
   ],
 ```
 
-Next job is to remove the hardcoded dependencies on how data is loaded and saved.
-Maybe make it so it can all just work using localStorage.
+Then add the component to your app with the props you need to customise. Here is an example:
+⚠️ Docs in progress - I need to add all the available props and explain how to use them.
+
+```
+<Tiptypr
+    components={
+          {
+            nav:{
+              show:true,
+              logo:{image:`/static/images/logo-small.svg`, url:'/', show:true},
+              userMenu:{
+                avatarPlaceholder:'https://prototypr-media.sfo2.digitaloceanspaces.com/strapi/4f9713374ad556ff3b8ca33e241f6c43.png?updated_at=2022-12-14T10:55:38.818Z',
+              }
+            },
+          }
+        }
+        theme={'blue'}
+        user={{
+          id:user?.id,
+          avatar:user?.profile?.avatar?.url,
+          isLoggedIn:user?.isLoggedIn,
+          isAdmin:user?.isAdmin
+        }}
+        postId={router?.isReady && (router.query.slug || router.query.id)}
+        postOperations={{
+          load: getUserArticle,
+          save: async ({ entry, postId }) => {
+            const saved = await savePost({ entry, postId, user });
+            return saved;
+          }
+        }}
+    />
+```
+
+## Required Props
+
+If you're saving, loading, and creating posts in a CMS, you'll need to pass the following props:
+
+- postId
+- user
+- postOperations
+  - load (must return `title` and `content`)
+  - save
+  - create
+- router (push command)
+
+The way you get these depends on your own setup, here's each one:
+
+### postId
+
+Usually when you're editing a post, you'll have the ID in the URL. For a next app, you can just use `router.query.id` or `router.query.slug`. For example:
+
+`postId={router?.isReady && (router.query.slug || router.query.id)}`
+
+### user
+
+user is the current user object. For Prototypr, I have a `useUser` hook within the component I am importing the Typr editor, and pass that as the prop.
+
+The user object should include the following attributes:
+
+- id
+- avatar (url)
+- isLoggedIn
+- isAdmin
+
+### postOperations
+
+postOperations is an object that includes the following functions:
+
+- load
+- save
+- create
+
+#### postOperations.load
+
+This is where you load the post from your CMS. It must return `title` and `content` for the editor, plus any other attributes you want to use.
+I just add an imported function to it:
+
+```
+postOperations={{
+          load: getUserArticle
+        }}
+```
+
+Which loads the article from my Strapi backend and returns the entire post object, including the required title and content -e.g.
+
+```
+postObject = {
+  title: 'My first post',
+  content: '<p>This is my first post</p>',
+  published: true,
+  publishedAt: '2022-01-01',
+  author: 'John Doe',
+  slug: 'my-first-post',
+  id: '123',
+  status: 'published',
+  publishedAt: '2022-01-01',
+  updatedAt: '2022-01-01',
+}
+```
+
+#### postOperations.save
+
+This is where you save your post to your CMS. This function is called by Typr when autosaving.
+
+It will call your save function with the following arguments:
+- entry
+- postId
+
+Your function should return the saved post, or false if the save failed.
+
+```
+save: async ({ entry, postId }) => {
+            const saved = await savePost({ entry, postId, user });
+            return saved;
+          }
+```
+
+#### postOperations.create
+
+This is where you create a new post in your CMS.
+
+## ⚠️ Docs in progress!
+
+This is where I'm up to, I need to add how to configure the editor, how the hooks work and stuff.
+Back soon!
 
 ## Local development
 

@@ -97,6 +97,17 @@ const useLoad = ({
         return false
       }
       const post = await loadPostOperation(user, postId);
+      
+      if(post?.title === undefined){
+        toast.error('Post title required.');
+        setInitialContent(false);
+        return false
+      }
+      if(post?.content === undefined){
+        toast.error('Post content required.');
+        setInitialContent(false);
+        return false
+      }
 
       if (post) {
         setPostObject(post);

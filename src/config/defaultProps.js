@@ -75,6 +75,7 @@ export const defaultProps = {
   hooks: {
     onPostCreated: ({ id }) => {
       console.log(`Post created with id: ${id}`);
+      alert(`Post created with id: ${id}, but no redirect present. Please update the onPostCreated hook to redirect to the created post.`)
     },
   },
   router: {
