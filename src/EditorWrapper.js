@@ -116,7 +116,7 @@ export default function EditorWrapper(props) {
     productName: tool?.name ? tool.name : false,
     // @todo make this api stuff work for everyone
     //api calls
-    getUserArticle: postOperations.load,
+    loadPostOperation: postOperations.load,
   });
   //create new post hook
   const { createPost: createPostFromHook, creatingPost, created } = useCreate();
@@ -131,7 +131,7 @@ export default function EditorWrapper(props) {
     saving,
     setSaving,
     hasUnsavedChanges,
-  } = useUpdate({ save: postOperations.save });
+  } = useUpdate({ savePostOperation: postOperations.save });
 
   useConfirmTabClose(hasUnsavedChanges);
 
@@ -237,8 +237,6 @@ export default function EditorWrapper(props) {
     }
   }, [postObject]);
 
-
-  
   /**
    * _savePost
    * when save button is clicked

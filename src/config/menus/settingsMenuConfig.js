@@ -1,7 +1,7 @@
 export const settingsMenu = [
   {
     type: 'date',
-    field:'published_at',
+    field:'date',
     label: 'Publish Date',
     initialValue: null,
     onValueChange: (value) => {

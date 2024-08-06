@@ -17,7 +17,7 @@ const useLoad = ({
   user,
   interview,
   productName,
-  getUserArticle,
+  loadPostOperation,
   routerPostId=false,
   requireLogin
 } = {}) => {
@@ -92,7 +92,11 @@ const useLoad = ({
   // Fetch current post from the backend
   const getPostFromDB = async () => {
     try {
-      const post = await getUserArticle(user, postId);
+      if(!postId){
+        setInitialContent(false);
+        return false
+      }
+      const post = await loadPostOperation(user, postId);
 
       if (post) {
         setPostObject(post);

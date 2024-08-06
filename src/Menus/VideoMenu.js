@@ -106,7 +106,7 @@ const VideoMenu = ({ editor, isSelecting }) => {
       >
         {/* bold */}
         <div
-          className={`${isSelecting ? "" : "pointer-events-all"} p-2 w-fit -mt-[52px] ml-[102%] duration-300 rounded-xl shadow-md bg-gray-900 flex text-gray-100`}
+          className={`${isSelecting ? "" : "pointer-events-all"} p-2 w-fit -mt-[52px] ml-[102%] duration-300 rounded-md shadow-md bg-gray-900 flex text-gray-100`}
           >
           <div
             className={`${isSelecting ? "pointer-events-none" : "pointer-events-all"} flex`}

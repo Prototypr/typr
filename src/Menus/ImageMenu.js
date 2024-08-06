@@ -96,7 +96,7 @@ const ImageMenu = ({ editor, isSelecting }) => {
         editor={editor}
       >
         <div
-          className={`${isSelecting ? "" : "pointer-events-all"} p-2 w-fit -mt-[58px] ml-[102%] duration-300 rounded-xl shadow-md bg-gray-900 flex text-gray-100`}
+          className={`${isSelecting ? "" : "pointer-events-all"} p-2 w-fit -mt-[58px] ml-[102%] duration-300 rounded-md shadow-md bg-gray-900 flex text-gray-100`}
         >
           <div
             className={`${isSelecting ? "pointer-events-none" : "pointer-events-all"} flex`}

@@ -56,7 +56,7 @@ const LinkMenu = ({ editor, isSelecting }) => {
         element={document.getElementById('editor-container')}
         editor={editor}>
               {/* bold */}
-              <div className={`${isSelecting?'':'pointer-events-all'} p-2 duration-300 rounded-xl shadow-md bg-gray-900 flex text-gray-100`}>
+              <div className={`${isSelecting?'':'pointer-events-all'} p-2 duration-300 rounded-md shadow-md bg-gray-900 flex text-gray-100`}>
               
 
 

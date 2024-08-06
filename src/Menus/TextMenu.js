@@ -4,7 +4,7 @@ import LinkInput from "./MenuButtons/LinkDropdown/LinkButtonRadix";
 // import MergeTagsButton from "./MenuButtons/MergeTags/MergeTagsButton";
 import { TextSelection } from "@tiptap/pm/state";
 import { styled } from "@stitches/react";
-import { blackA, slate } from "@radix-ui/colors";
+import { blackA } from "@radix-ui/colors";
 import React from "react";
 
 import { roundArrow } from "tippy.js";

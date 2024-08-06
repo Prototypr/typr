@@ -10,24 +10,25 @@ export const updatePostObject = ({updatedObject, existingObject}) => {
     const newFields={
         content: updatedObject.content,
         draft_content: updatedObject.draft_content,
+        title: updatedObject.title,
         draft_title: updatedObject.draft_title,
 
-        date: updatedObject.date,
-        title: updatedObject.title,
-        type: updatedObject.type,
-
-        featuredImage: updatedObject.featuredImage?.data?.attributes?.url,
-        seo:updatedObject.seo,
-        legacyFeaturedImage: updatedObject.legacyFeaturedImage?.mediaItemUrl || updatedObject.legacyAttributes?.imgUrl,
-        
-        seo: updatedObject.seo,
-        published_at: updatedObject.publishedAt,
-        
-        status: updatedObject.status,
-        tier: updatedObject.tier,
-        slug:updatedObject.slug,
-
         excerpt: updatedObject.excerpt,
+        
+        //focus here on content, the below are saved in the settings panel
+        // date: updatedObject.date,
+        // type: updatedObject.type,
+        // featuredImage: updatedObject.featuredImage?.data?.attributes?.url,
+        // seo:updatedObject.seo,
+        // legacyFeaturedImage: updatedObject.legacyFeaturedImage?.mediaItemUrl || updatedObject.legacyAttributes?.imgUrl,
+        
+        // seo: updatedObject.seo,
+        // published_at: updatedObject.publishedAt,
+        
+        // status: updatedObject.status,
+        // tier: updatedObject.tier,
+        // slug:updatedObject.slug,
+
     }
 
     const updatedFields = {

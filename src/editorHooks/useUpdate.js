@@ -5,7 +5,6 @@ import { useState } from "react";
 import { checkSessionExpired } from "../utils/checkSessionExpired";
 import { getEditPostData } from "./libs/getEditPostData";
 import { updatePostObject } from "./libs/helpers/updatePostObjectWithUpdateResults";
-const axios = require("axios");
 
 /**
  * updates a post based on its postId
@@ -22,7 +21,7 @@ const axios = require("axios");
  *
  * @returns
  */
-const useUpdate = ({ save }) => {
+const useUpdate = ({ savePostOperation }) => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(undefined);
@@ -59,8 +58,9 @@ const useUpdate = ({ save }) => {
     setSaving(true);
     setSaved(false);
     let saveData = null
+    
     try {
-      saveData = await save({ entry, postId });
+      saveData = await savePostOperation({ entry, postId });
       // console.log(saveData)
       if(saveData){
         setTimeout(() => {
@@ -118,24 +118,28 @@ const useUpdate = ({ save }) => {
   const updatePostSettings = async ({ postId, user, settings, postObject }) => {
     // Deep merge function to handle nested objects
     const deepMerge = (target, source) => {
+      const result = { ...target };
       for (const key in source) {
         if (source.hasOwnProperty(key)) {
-          if (source[key] && typeof source[key] === 'object') {
-            target[key] = deepMerge(target[key] || {}, source[key]);
+          if (typeof source[key] === 'object' && source[key] !== null) {
+            result[key] = deepMerge(target[key] || {}, source[key]);
           } else {
-            target[key] = source[key];
+            result[key] = source[key];
           }
         }
       }
-      return target;
+      return result;
     };
 
-    // Merge the new settings with the existing postObject
-    const mergedEntry = deepMerge({
-      type: "article",
-      ...postObject
-    }, settings);
+    // Merge properties from settings
+    const mergedEntry = deepMerge({}, settings);
 
+    // For nested objects, merge with existing postObject data
+    for (const key in mergedEntry) {
+      if (typeof mergedEntry[key] === 'object' && mergedEntry[key] !== null && postObject[key]) {
+        mergedEntry[key] = deepMerge(postObject[key], mergedEntry[key]);
+      }
+    }
 
     if(!postId){
       toast.error("Post ID is required to update settings.", {
@@ -157,23 +161,27 @@ const useUpdate = ({ save }) => {
     setSaved(false);
     let saveData = null
     try {
-      saveData = await save({ entry:mergedEntry, postId });
+
+      saveData = await savePostOperation({ entry:mergedEntry, postId });
       if(saveData){
         setTimeout(() => {
           setSaving(false);
           setHasUnsavedChanges(false);
           setSaved(true);
         }, 1000);
+        toast.success("Article settings updated!", {
+          duration: 5000,
+        });
+      }else{
+        console.log('saveData', saveData)
+        toast.error("Settings could not be saved!", {
+          duration: 5000,
+        });
       }
-      toast.success("Article settings updated!", {
-        duration: 5000,
-      });
+
     } catch (e) {
       setSaving(false);
       setHasUnsavedChanges(true);
-      toast.error("Settings could not be saved!", {
-        duration: 5000,
-      });
       console.log(e);
     }
 

@@ -6,7 +6,7 @@ import { styled } from "@stitches/react";
 import { slate, indigo } from "@radix-ui/colors";
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { CheckIcon } from '@radix-ui/react-icons';
-import { parseISO } from 'date-fns';
+import { parseISO, isValid } from 'date-fns';
 
 const inputStyles = {
   all: "unset",
@@ -36,8 +36,13 @@ const FormField = ({ type, label, initialValue, onValueChange, description, opti
     const [value, setValue] = useState(initialValue);
   
     useEffect(() => {
-      setValue(initialValue);
-    }, [initialValue]);
+      if (type === 'date' && initialValue) {
+        const parsedDate = parseISO(initialValue);
+        setValue(isValid(parsedDate) ? initialValue : null);
+      } else {
+        setValue(initialValue);
+      }
+    }, [initialValue, type]);
   
     const handleChange = (newValue) => {
       setValue(newValue);
@@ -85,7 +90,7 @@ const FormField = ({ type, label, initialValue, onValueChange, description, opti
           <div className="border border-gray-100 p-4 rounded-md my-3">
             <h2 className="font-medium text-md mb-4 font-secondary">{label}</h2>
             <ReactDatePicker
-              selected={value ? parseISO(value) : null}
+              selected={value && isValid(parseISO(value)) ? parseISO(value) : null}
               onChange={(date) => handleChange(date)}
               customInput={<Input />}
             />
