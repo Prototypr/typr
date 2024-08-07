@@ -114,6 +114,27 @@ const SidebarInner = ({
     }
   }, [isOpen && editor]);
 
+  // Add this new useEffect hook
+  useEffect(() => {
+    if (postObject) {
+      setUpdatedSettingsOptions(prevOptions => {
+        const newOptions = { ...prevOptions };
+        Object.keys(newOptions).forEach(tabName => {
+          newOptions[tabName] = newOptions[tabName].map(field => {
+            const fieldParts = field.field.split('.');
+            let value = postObject;
+            for (const part of fieldParts) {
+              value = value?.[part];
+              if (value === undefined) break;
+            }
+            return { ...field, initialValue: value !== undefined ? value : field.initialValue };
+          });
+        });
+        return newOptions;
+      });
+    }
+  }, [postObject]);
+
   const updatePost = async () => {
     setSaving(true);
     const settings = {};
@@ -146,22 +167,23 @@ const SidebarInner = ({
         }
         const updatedPost = await refetchPost(); // Assume this returns the updated post data
         
+        //this is done in the hook above instead
         // Update the local state with the new settings from the refetched post
-        setUpdatedSettingsOptions(prevOptions => {
-          const newOptions = { ...prevOptions };
-          Object.keys(newOptions).forEach(tabName => {
-            newOptions[tabName] = newOptions[tabName].map(field => {
-              const fieldParts = field.field.split('.');
-              let value = updatedPost;
-              for (const part of fieldParts) {
-                value = value?.[part];
-                if (value === undefined) break;
-              }
-              return { ...field, initialValue: value !== undefined ? value : field.initialValue };
-            });
-          });
-          return newOptions;
-        });
+        // setUpdatedSettingsOptions(prevOptions => {
+        //   const newOptions = { ...prevOptions };
+        //   Object.keys(newOptions).forEach(tabName => {
+        //     newOptions[tabName] = newOptions[tabName].map(field => {
+        //       const fieldParts = field.field.split('.');
+        //       let value = updatedPost;
+        //       for (const part of fieldParts) {
+        //         value = value?.[part];
+        //         if (value === undefined) break;
+        //       }
+        //       return { ...field, initialValue: value !== undefined ? value : field.initialValue };
+        //     });
+        //   });
+        //   return newOptions;
+        // });
 
         setHasChanges(false);
       } catch (error) {

@@ -19,7 +19,9 @@ const useLoad = ({
   productName,
   loadPostOperation,
   routerPostId=false,
-  requireLogin
+  requireLogin,
+  enablePublishingFlow,
+  POST_STATUSES
 } = {}) => {
   // const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ const useLoad = ({
   const [slug, setSlug] = useState(null);
   const [postObject, setPostObject] = useState(false);
   const [title, setTitle] = useState(null);
-  const [postStatus, setStatus] = useState("draft");
+  const [postStatus, setPostStatus] = useState(POST_STATUSES.DRAFT);
 
   // New function to check user access
   const hasUserAccess = () => {
@@ -60,10 +62,23 @@ const useLoad = ({
 
   // Refetch content
   const refetch = async () => {
-    if (postId) {
+    if (postId && enablePublishingFlow!==false) {
       await getPostFromDB();
       setLoading(false);
-    } else {
+    } else if(postId && enablePublishingFlow === false){
+      //load local content by id - check local storage first:
+      let localContent = localStorage.getItem("wipContent_"+postId);
+      if(localContent){
+        setIsOwner(true);
+        setCanEdit(true);
+        await getPostFromDB(localContent);
+        setLoading(false);
+      }else{
+        //no content found, try to load from database with postid
+        await getPostFromDB();
+        setLoading(false);
+      }
+    }else {
       //load local content
       setIsOwner(true);
       setCanEdit(true);
@@ -90,35 +105,47 @@ const useLoad = ({
   };
 
   // Fetch current post from the backend
-  const getPostFromDB = async () => {
+  const getPostFromDB = async (localContent) => {
     try {
       if(!postId){
-        setInitialContent(false);
+        if(!localContent) {
+          setInitialContent(false);
+        }
         return false
       }
-      const post = await loadPostOperation(user, postId);
+      const post = await loadPostOperation({user, postId:postId});
       
       if(post?.title === undefined){
         toast.error('Post title required.');
-        setInitialContent(false);
+        if(!localContent){
+          setInitialContent(false);
+        }
         return false
       }
       if(post?.content === undefined){
         toast.error('Post content required.');
-        setInitialContent(false);
+        if(!localContent){
+          setInitialContent(false);
+        }
         return false
       }
 
       if (post) {
         setPostObject(post);
+        // if(localContent){
+        //   setInitialContent(JSON.parse(localContent));
+        // }
         setIsOwner(true);
         setCanEdit(true);
         setSlug(post?.slug);
       } else {
-        setInitialContent(false);
+        setPostObject(null);
+        if(!localContent){
+          setInitialContent(false);
+        }
       }
     } catch (e) {
-      // setInitialContent(false);
+      setPostObject(null);
       console.log(e);
     }
   };
@@ -161,12 +188,23 @@ const useLoad = ({
       }
       //if title isn't part of body, add it in
       if (content) {
-        setInitialContent(content);
+        if(enablePublishingFlow==false){
+          //get content from local storage
+          let retrievedObject = localStorage.getItem("wipContent_"+postId);
+          if(retrievedObject){
+            setInitialContent(JSON.parse(retrievedObject));
+          }else{
+            setInitialContent(content);
+          }
+        }else{
+          setInitialContent(content);
+        }
       } else {
         setInitialContent(false);
       }
       //set status
-      setStatus(postObject?.status);
+      const statusKey = Object.keys(POST_STATUSES).find(key => POST_STATUSES[key] === postObject?.status) || 'DRAFT';
+      setPostStatus(POST_STATUSES[statusKey]);
     }
   }, [postObject]);
 

@@ -11,7 +11,9 @@ export const getCreatePostData = ({
   editor,
   postObject,
   user,
-  relatedPost
+  relatedPost,
+  enablePublishingFlow,
+  POST_STATUSES
 }) => {
   const html = editor.getHTML();
   const json = editor.getJSON()?.content;
@@ -28,29 +30,39 @@ export const getCreatePostData = ({
 
   const postRelation = getPostRelation({ relatedPost, postObject });
   
+  if(enablePublishingFlow!==false){
 
-  let entry = {
-    // type: "article",
-    // status: forReview ? "pending" : "draft",
-    title:'',
-    content: '',
-    draft_title: title,
-    draft_content: content,
-    slug: slug, //slug is always the same when editing a draft
-    userId: user?.id,
-  };
-
-  if(postRelation) {
-    // entry.tools = [postRelation];
-    entry.relation = [postRelation];
+    let entry = {
+      // type: "article",
+      status: POST_STATUSES.DRAFT,
+      title:'',
+      content: '',
+      draft_title: title,
+      draft_content: content,
+      slug: slug, //slug is always the same when editing a draft
+      userId: user?.id,
+    };
+  
+    if(postRelation) {
+      // entry.tools = [postRelation];
+      entry.relation = [postRelation];
+    }
+  
+    //change the date on save only if postStatus==draft or postStatus==pending publish
+    // if (postObject?.status !== "publish") {
+    //   entry.date = new Date();
+    // }
+  
+    return {
+      entry,
+    };
+  }else{
+    return {
+      entry: {
+        title: title,
+        content: content,
+      }
+    }
   }
 
-  //change the date on save only if postStatus==draft or postStatus==pending publish
-  // if (postObject?.status !== "publish") {
-  //   entry.date = new Date();
-  // }
-
-  return {
-    entry,
-  };
 };

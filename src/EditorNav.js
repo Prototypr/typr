@@ -3,7 +3,6 @@ import React from "react";
 // import Link from "next/link";
 // import { MenuIcon, XIcon } from "@heroicons/react/outline";
 import { useState, useEffect } from "react";
-import jsCookie from "js-cookie";
 
 import NavigationMenu from "./Nav/navbar-menu";
 
@@ -13,15 +12,15 @@ import {CustomLink} from "./components/CustomLink";
 export default function EditorNav({
   activeNav,
   postStatus,
-  navLogo,
+  enablePublishingFlow,
   tool,
-  post,
   isInterview,
   user,
-  mutateUser,
   router,
   settings,
-  theme
+  theme,
+  POST_STATUSES,
+  hasUnsavedChanges
 }) {
   // const { user, isLoading } = useUser({
   //   redirectIfFound: false,
@@ -36,21 +35,24 @@ export default function EditorNav({
 
   const [statusComponent, setStatusComponent] = useState(null);
   useEffect(() => {
-    if (postStatus == "draft") {
+    // if(enablePublishingFlow === false){
+    //   return; // Just return without any value
+    // }
+    if (postStatus == POST_STATUSES.DRAFT) {
       setStatusComponent(
         <div className="p-2 py-0.5 text-xs bg-gray-300 bg-opacity-20 text-gray-500 rounded-full border border-gray-300">
           Draft
         </div>
       );
     }
-    if (postStatus == "pending") {
+    if (postStatus == POST_STATUSES.PENDING) {
       setStatusComponent(
         <div className="p-2 py-0.5 text-xs bg-yellow-300 bg-opacity-20 text-yellow-600 rounded-full border border-yellow-300">
           Pending Review
         </div>
       );
     }
-    if (postStatus == "publish") {
+    if (postStatus == POST_STATUSES.PUBLISHED) {
       setStatusComponent(
         <div className="p-2 py-0.5 text-xs bg-green-400 bg-opacity-20 text-green-700 rounded-full border border-green-500">
           Published
@@ -140,9 +142,10 @@ export default function EditorNav({
                   </div>
                 </div>
               ) : null}
-              {settings.nav.postStatus.show && <div className="my-auto ml-3">{statusComponent}</div>}
+              {(settings.nav.postStatus.show) ? <div className="my-auto ml-3">{statusComponent}</div> : null}
               {/* Undo/redo */}
               <div className={`${settings.nav.undoRedoButtons.show ? 'block' : 'hidden'}`} id="undoredo-container"></div>
+              {(settings.nav.unsavedChangesNotice.show && hasUnsavedChanges && !enablePublishingFlow) ? <div className="my-auto text-xs my-auto text-gray-400 ml-3">Unsaved changes</div> : null}
             </div>
             <div
               className={`relative block sm:ml-6 transition transition-all duration-500 ease-in-out`}
@@ -164,7 +167,7 @@ export default function EditorNav({
                   editor={true}
                   router={router}
                   settings={settings}
-                  theme={theme}s
+                  theme={theme}
                 />
               </div>
             </div>

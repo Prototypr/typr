@@ -7,7 +7,7 @@ const useCreate = () => {
   const [creatingPost, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
 
-  const createPost = async ({ user, postObject, editor, forReview, relatedPost, createPostOperation }) => {
+  const createPost = async ({ user, postObject, editor, forReview, relatedPost, createPostOperation , enablePublishingFlow}) => {
     setCreating(true);
     if (created) {
       throw new Error("Post already created");
@@ -18,12 +18,14 @@ const useCreate = () => {
       user,
       relatedPost,
       forReview,
+      enablePublishingFlow
     });
 
     try {
 
+
      let postResult = await createPostOperation({entry})
-      console.log('postResult', postResult)
+
      if(postResult){
       setCreated(true);
       setTimeout(() => {

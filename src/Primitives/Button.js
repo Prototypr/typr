@@ -68,12 +68,12 @@ const Button = styled("button", {
         },
       },
       confirm: {
-        backgroundColor: blue.blue11,
-        background: blue.blue11,
-        color: "#fff",
+        // backgroundColor: blue.blue11,
+        // background: blue.blue11,
+        // color: "#fff",
         // boxShadow: `0 2px 10px ${blackA.blackA7}`,
-        "&:hover": { backgroundColor: blue.blue10 },
-        "&:focus": { boxShadow: `0 0 0 2px ${blue.blue12}` },
+        // "&:hover": { backgroundColor: blue.blue10 },
+        // "&:focus": { boxShadow: `0 0 0 2px ${blue.blue12}` },
         "&[disabled]": {
           // disabled styles
           opacity: 0.5,

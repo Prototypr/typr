@@ -12,6 +12,10 @@ export const getEditPostData = ({
   forReview,
   postStatus,
   postObject,
+  enablePublishingFlow,
+  POST_STATUSES,
+  publish,
+  unpublish,
 }) => {
   const html = editor.getHTML();
   const json = editor.getJSON()?.content;
@@ -23,40 +27,66 @@ export const getEditPostData = ({
   const seo = getSeoData({ postObject, title, excerpt, coverImage });
   const legacyFeaturedImage = getLegacyFeaturedImage({ coverImage });
 
-
-  let entry = {
-    type: "article",
-    status: forReview && (!postObject?.status || postObject?.status=='draft') ? "pending" : postStatus ? postStatus : "draft",
-    // removed content for issue #54
-    // content: content,  
-    // #54 save content to draft_content instead:
-    draft_title: title,
-    draft_content:content,
-    esES: false,
-    // slug: slug, //slug is always the same when editing a draft - so we don't need to update it
-  };
-
-  if(forReview && content){
-    //clear the draft version
-    entry.draft_content=''
-    entry.content = content
-    entry.draft_title=''
-    entry.title = title
+  const getPublishStatus = () =>{
+    if (forReview) {
+      if (!postObject?.status || postObject?.status === POST_STATUSES.DRAFT) {
+        return POST_STATUSES.PENDING || POST_STATUSES.PUBLISH;
+      } else if (postStatus) {
+        return postStatus === POST_STATUSES.PUBLISH ? POST_STATUSES.PUBLISH : POST_STATUSES.DRAFT;
+      }
+    }
   }
 
-  //change the date on save only if postStatus==draft or postStatus==pending publish
-  if (postObject?.status !== "publish") {
-    entry.date = new Date();
-  }
+  if (enablePublishingFlow !== false) {
+    let entry = {
+      status: getPublishStatus(),
+      // removed content for issue #54
+      // content: content,
+      // #54 save content to draft_content instead:
+      draft_title: title,
+      draft_content: content,
+    };
 
-  if(forReview || postStatus=="publish"){
-    //only save seo and excerpt if it's for review - then it'll be the latest data
-    entry.seo = seo;
-    entry.excerpt = excerpt;
-    entry.legacyFeaturedImage=legacyFeaturedImage;
-  }
+    if (forReview && content) {
+      //clear the draft version
+      entry.draft_content = "";
+      entry.content = content;
+      entry.draft_title = "";
+      entry.title = title;
+    }
 
-  return {
-    entry
-  };
+    //change the date on save only if postStatus==draft or postStatus==pending publish
+    if (postObject?.status !== POST_STATUSES.PUBLISH) {
+      entry.date = new Date();
+    }
+
+    if (forReview || postStatus == POST_STATUSES.PUBLISH) {
+      //only save seo and excerpt if it's for review - then it'll be the latest data
+      entry.seo = seo;
+      entry.excerpt = excerpt;
+      entry.legacyFeaturedImage = legacyFeaturedImage;
+    }
+
+    return {
+      entry,
+    };
+  } else {
+    let entry = {
+      title: title,
+      content: content,
+      featuredImage: coverImage,
+      excerpt: excerpt,
+      seo: seo,
+    };
+
+    if(publish==true){
+      entry.status = POST_STATUSES.PUBLISHED;
+    }else if(unpublish==true){
+      entry.status = POST_STATUSES.DRAFT;
+    }
+
+    return {
+      entry,
+    };
+  }
 };

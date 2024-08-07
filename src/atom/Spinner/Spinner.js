@@ -2,27 +2,14 @@ import React from 'react';
 import { DetailedHTMLProps, forwardRef, HTMLAttributes } from "react";
 import clsx from "classnames";
 
-const getSize = (size) => {
-  switch (size) {
-    case "sm":
-      return "sm";
-    case "md": {
-      return "md";
-    }
-    case "lg":
-      return "lg";
-    default:
-      return undefined;
-  }
-};
 
 const Spinner = forwardRef((props, ref) => {
-  const { className, size = "md", ...rest } = props;
+  const { className,size, ...rest } = props;
 
-  const merged = clsx("spinner", getSize(size), className);
+  const merged = clsx("spinner", className);
 
   return (
-    <span ref={ref} {...rest}>
+    <span ref={ref} {...rest} style={{width:size,height:size}}>
       <svg
         className={merged}
         xmlns="http://www.w3.org/2000/svg"

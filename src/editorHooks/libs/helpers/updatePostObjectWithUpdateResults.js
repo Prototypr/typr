@@ -6,38 +6,29 @@
  * @param {*} param0 
  */
 export const updatePostObject = ({updatedObject, existingObject}) => {
+    const deepMerge = (target, source) => {
+        for (const key in source) {
+            if (source.hasOwnProperty(key)) {
+                if (source[key] && typeof source[key] === 'object') {
+                    target[key] = target[key] || {};
+                    deepMerge(target[key], source[key]);
+                } else if (source[key] !== undefined) {
+                    target[key] = source[key];
+                }
+            }
+        }
+        return target;
+    };
 
-    const newFields={
-        content: updatedObject.content,
-        draft_content: updatedObject.draft_content,
-        title: updatedObject.title,
-        draft_title: updatedObject.draft_title,
+    const mergedObject = deepMerge({...existingObject}, updatedObject);
 
-        excerpt: updatedObject.excerpt,
-        
-        //focus here on content, the below are saved in the settings panel
-        // date: updatedObject.date,
-        // type: updatedObject.type,
-        // featuredImage: updatedObject.featuredImage?.data?.attributes?.url,
-        // seo:updatedObject.seo,
-        // legacyFeaturedImage: updatedObject.legacyFeaturedImage?.mediaItemUrl || updatedObject.legacyAttributes?.imgUrl,
-        
-        // seo: updatedObject.seo,
-        // published_at: updatedObject.publishedAt,
-        
-        // status: updatedObject.status,
-        // tier: updatedObject.tier,
-        // slug:updatedObject.slug,
+    // Ensure these specific fields are always updated
+    mergedObject.content = updatedObject.content;
+    mergedObject.draft_content = updatedObject.draft_content;
+    mergedObject.title = updatedObject.title;
+    mergedObject.draft_title = updatedObject.draft_title;
 
-    }
-
-    const updatedFields = {
-        ...existingObject,
-        ...newFields
-    }
-
-    return updatedFields;
-
+    return mergedObject;
 };
 
 /**
@@ -69,7 +60,7 @@ export const updatePostObject = ({updatedObject, existingObject}) => {
 //     metaRobotsNofollow: null,
 //     canonical: null,
 //     metaDesc:
-//       "UI Tips are everywhere – is it me, or is it my twi…m seeing lots and lots of ‘UI/UX Tips’. Lists of ",
+//       "UI Tips are everywhere – is it me, or is it my twi…m seeing lots and lots of 'UI/UX Tips'. Lists of ",
 //   },
 //   slug: "are-ui-tips-the-new-clickbait-for-designers---lajhxqoobpq7a3lpjk",
 //   status: "publish",

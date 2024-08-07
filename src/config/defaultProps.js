@@ -11,13 +11,16 @@ const avatars = [
 ];
 
 export const defaultProps = {
+  enablePublishingFlow:false,
   requireLogin: true,
   theme: "gray",
+  customPostStatuses:false,
   components: {
     nav: {
       show: true,
       logo: { image: null, url: "/", show: true },
       undoRedoButtons: { show: true },
+      unsavedChangesNotice: { show: true },
       userBadge: {
         show: true,
         avatarPlaceholder: avatars[Math.floor(Math.random() * 6)],

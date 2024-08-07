@@ -1,4 +1,4 @@
-import React, { useEffect,useRef,useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -11,7 +11,7 @@ import ImageMenu from "./Menus/ImageMenu";
 
 import Link from "@tiptap/extension-link";
 
-import {CustomLink} from "./components/CustomLink";
+import { CustomLink } from "./components/CustomLink";
 
 import Cite from "./CustomExtensions/Cite";
 
@@ -53,7 +53,6 @@ const Editor = ({
   postType = "article",
   canEdit = false,
   initialContent = null,
-  postStatus = "draft",
   postObject = null,
   showNavButtons = true,
   //save status
@@ -70,6 +69,8 @@ const Editor = ({
   settingsOptions,
   theme,
   user,
+  enablePublishingFlow,
+  POST_STATUSES,
 }) => {
   // const { user } = useUser({
   //   redirectIfFound: false,
@@ -173,7 +174,6 @@ const Editor = ({
         return;
       }
 
-
       editor
         ?.chain()
         .setContent(initialContent)
@@ -185,11 +185,13 @@ const Editor = ({
         editor.commands.clearContent();
         setTimeout(() => {
           const json = editor.getJSON();
-      
-          if(json.content?.length > 0){
+
+          if (json.content?.length > 0) {
             // Count the number of paragraphs
-            const paragraphCount = json.content.filter(node => node.type === 'paragraph').length;
-            if(paragraphCount == 0){
+            const paragraphCount = json.content.filter(
+              node => node.type === "paragraph"
+            ).length;
+            if (paragraphCount == 0) {
               editor.chain().focus().setTextSelection(0).enter().run();
             }
           }
@@ -227,7 +229,13 @@ const Editor = ({
 
           <div className="mx-auto mt-4">
             <CustomLink href="/dashboard">
-              <button className={`px-3 h-[35px] ${theme=='blue'?'bg-blue-500 text-white font-semibold text-sm rounded-md w-fit hover:bg-blue-600':'bg-gray-500 text-white font-semibold text-sm rounded-md w-fit hover:bg-gray-600'}`}>
+              <button
+                className={`px-3 h-[35px] ${
+                  theme == "blue"
+                    ? "bg-blue-500 text-white font-semibold text-sm rounded-md w-fit hover:bg-blue-600"
+                    : "bg-gray-500 text-white font-semibold text-sm rounded-md w-fit hover:bg-gray-600"
+                }`}
+              >
                 Go to dashboard
               </button>
             </CustomLink>
@@ -256,15 +264,17 @@ const Editor = ({
           <UndoRedoNavPortal>
             <div className="flex">
               <UndoRedoButtons editor={editor} />
-              <div className={`ml-3 my-auto text-gray-500`}>
-                {isSaving
-                  ? "Saving..."
-                  : hasUnsavedChanges
+              {enablePublishingFlow !== false && (
+                <div className={`ml-3 my-auto text-gray-500`}>
+                  {isSaving
+                    ? "Saving..."
+                    : hasUnsavedChanges
                     ? ""
                     : saved
-                      ? "Saved"
-                      : ""}
-              </div>
+                    ? "Saved"
+                    : ""}
+                </div>
+              )}
             </div>
           </UndoRedoNavPortal>
         ) : null}
@@ -272,25 +282,26 @@ const Editor = ({
         {showNavButtons !== false ? (
           <EditorButtonsNavPortal>
             <div className="flex justify-end w-full sm:w-fit sm:justify-end">
-            <EditorNavButtons
-              theme={theme}
-              user={user}
-              onSave={({ forReview }) => {
-                setForReview(forReview);
-              }}
-              isSaving={isSaving}
-              postStatus={postStatus}
-              saved={saved}
-              canEdit={canEdit}
-              editor={editor}
-              //for settings panel
-              postObject={postObject}
-              updatePostSettings={updatePostSettings}
-              refetchPost={refetchPost}
-
-              settingsPanelSettings={settingsPanelSettings}
-              settingsOptions={settingsOptions}
-            />
+              <EditorNavButtons
+                theme={theme}
+                user={user}
+                onSave={({ forReview }) => {
+                  setForReview(forReview);
+                }}
+                isSaving={isSaving}
+                saved={saved}
+                canEdit={canEdit}
+                editor={editor}
+                //for settings panel
+                postObject={postObject}
+                updatePostSettings={updatePostSettings}
+                refetchPost={refetchPost}
+                settingsPanelSettings={settingsPanelSettings}
+                settingsOptions={settingsOptions}
+                enablePublishingFlow={enablePublishingFlow}
+                forceSave={forceSave}
+                POST_STATUSES={POST_STATUSES}
+              />
             </div>
           </EditorButtonsNavPortal>
         ) : null}
@@ -301,12 +312,12 @@ const Editor = ({
             wrapperClass
               ? wrapperClass
               : postType == "article"
-                ? "my-4 pt-0 mt-[100px] max-w-[44rem] mx-auto relative pb-10 blog-content px-3 sm:px-0"
-                : ""
+              ? "my-4 pt-0 mt-[100px] max-w-[44rem] mx-auto relative pb-10 blog-content px-3 sm:px-0"
+              : ""
           }
         >
-          {editor && <MenuFloating  editor={editor} user={user} theme={theme} />}
-          <TextMenu  editor={editor} theme={theme} />
+          {editor && <MenuFloating editor={editor} user={user} theme={theme} />}
+          <TextMenu editor={editor} theme={theme} />
           {/* <LinkMenu editor={editor} /> */}
           <ImageMenu editor={editor} theme={theme} />
           <VideoMenu editor={editor} theme={theme} />

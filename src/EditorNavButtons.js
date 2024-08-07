@@ -1,4 +1,6 @@
-import React from 'react';
+import React from "react";
+import Button from "./Primitives/Button";
+import Spinner from "./atom/Spinner/Spinner";
 
 import { PublishDialogButton } from "./PublishDialogButton";
 import SidePanelTrigger from "./SidePanel/SidePanelTrigger";
@@ -15,7 +17,6 @@ const EditorNavButtons = ({
   canEdit,
   onSave,
   isSaving,
-  postStatus,
   editor,
   //for updating existing post
   refetchPost,
@@ -25,36 +26,44 @@ const EditorNavButtons = ({
   settingsOptions,
 
   updatePostSettings,
-  theme
+  theme,
+  enablePublishingFlow,
+  forceSave,
+  POST_STATUSES,
 }) => {
   return (
     <>
-      {/* {user?.isLoggedIn ? 
+    <div className="flex gap-0.5">
+      {(enablePublishingFlow == false && user?.isLoggedIn) ? (
         <Button
           variant="ghostBlue"
-          onClick={onSave}
-          className="text-[13px] font-normal h-[25px] px-2 my-auto"
+          onClick={()=>forceSave({ editor,json: editor.getJSON() })}
+          className={`${!enablePublishingFlow && (postObject.status == POST_STATUSES.PUBLISHED || postObject.status == POST_STATUSES.PENDING) ? (theme === 'blue' ? '!bg-blue-600 !outline-blue-600' : '!bg-gray-700 !outline-gray-700') + ' !text-white' : (theme === 'blue' ? '!outline-blue-600' : '!outline-gray-600 !text-gray-700')} !text-[13px] font-normal !h-[25px] !px-2 my-auto mr-2`}
         >
-          {isSaving
-            ? "Saving..."
-            : postStatus == "publish"
-              ? "Update"
-              : "Save Draft "}
+          {isSaving ? <Spinner size={14} className="mx-auto"/> :postObject.status == POST_STATUSES.DRAFT ? "Save draft" : "Save"}
         </Button>
-      :null} */}
-
+      ) : null}
       {/* show publish button if post not published */}
       {/* publish button does same as save draft button, but uses dialog and adds 'forReview' flag */}
-      
-       {postObject? <PublishDialogButton
-        postObject={postObject}
-        canPublish = {canEdit && postObject?.id ? (true) : (false)}
+
+      {postObject ? (
+        <PublishDialogButton
+          className={` ${postObject.status==POST_STATUSES.DRAFT?'':'order-first'}`}
+          postObject={postObject}
+          canPublish={canEdit && postObject?.id ? true : false}
+          POST_STATUSES={POST_STATUSES}
+          editor={editor}
           //save post creates a post or updates an existing one
           //for /write (new post), it creates a new post
           //for /p/[slug] (existing post), it updates the existing post
           onSave={onSave}
+          forceSave={forceSave}
           theme={theme}
-        />:null}
+          enablePublishingFlow={enablePublishingFlow}
+        />
+      ) : null}
+    </div>
+
 
       {/* show side panel trigger if updatePostSettings is defined (in /p/[slug]) */}
       {editor && settingsPanelSettings?.show == true ? (

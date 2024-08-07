@@ -109,6 +109,8 @@ The user object should include the following attributes:
 
 ### postOperations
 
+Each postOperation must return a postObject that has an `id`, `title`, `content`, and `status` attribute.
+
 postOperations is an object that includes the following functions:
 
 - load
@@ -117,12 +119,15 @@ postOperations is an object that includes the following functions:
 
 #### postOperations.load
 
-This is where you load the post from your CMS. It must return `title` and `content` for the editor, plus any other attributes you want to use.
+This is where you load the post from your CMS. It must return the `id`, `title`, `content`, and `status` for the editor, plus any other attributes you want to use.
 I just add an imported function to it:
 
 ```
 postOperations={{
-          load: getUserArticle
+        load:async({postId, user})=>{
+            const postObject = await getUserArticle({postId, user})
+            return postObject;
+          },
         }}
 ```
 
@@ -148,21 +153,30 @@ postObject = {
 This is where you save your post to your CMS. This function is called by Typr when autosaving.
 
 It will call your save function with the following arguments:
+
 - entry
 - postId
 
-Your function should return the saved post, or false if the save failed.
+Your function should return the saved post object, or false if the save failed.
+The returned postObject should have a `title`, `content`, and `status` attribute.
 
 ```
-save: async ({ entry, postId }) => {
-            const saved = await savePost({ entry, postId, user });
-            return saved;
-          }
+save:async ({ entry, postId }) => {
+            const postObject = await savePost({ entry, postId, user });
+            return postObject;
+          },
 ```
 
 #### postOperations.create
 
 This is where you create a new post in your CMS.
+
+```
+create:async ({ entry }) => {
+            const postObject = await createPost({ entry, user });
+            return postObject;
+          }
+```
 
 ## ⚠️ Docs in progress!
 

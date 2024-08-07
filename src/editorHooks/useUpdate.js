@@ -21,7 +21,7 @@ import { updatePostObject } from "./libs/helpers/updatePostObjectWithUpdateResul
  *
  * @returns
  */
-const useUpdate = ({ savePostOperation }) => {
+const useUpdate = ({ savePostOperation, POST_STATUSES }) => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(undefined);
@@ -36,8 +36,12 @@ const useUpdate = ({ savePostOperation }) => {
     user,
     editor,
     forReview,
+    forced,
+    publish,
+    unpublish,
     postStatus,
     postObject,
+    enablePublishingFlow
   }) => {
     //create the entry object with updated post data from the editor content
     const { entry } = getEditPostData({
@@ -45,6 +49,10 @@ const useUpdate = ({ savePostOperation }) => {
       forReview,
       postStatus,
       postObject,
+      enablePublishingFlow,
+      publish,
+      unpublish,
+      POST_STATUSES
     });
 
     //check if session expired
@@ -74,13 +82,21 @@ const useUpdate = ({ savePostOperation }) => {
             duration: 5000,
           });
           localStorage.removeItem("wipContent");
+          localStorage.removeItem("wipContent_"+postId);
         } else if (forReview && postStatus == "publish") {
           toast.success("Your post has been updated!", {
             duration: 5000,
           });
   
           localStorage.removeItem("wipContent");
-        } else {
+        }else if(forced){
+          toast.success("Your post has been saved!", {
+            duration: 5000,
+          });
+          localStorage.removeItem("wipContent_"+postId);
+          localStorage.removeItem("wipContent");
+        }
+        else {
           // toast.success("Your draft has been updated!", {
           //   duration: 5000,
           // });
@@ -105,7 +121,7 @@ const useUpdate = ({ savePostOperation }) => {
 
     //update the initial postobject with the updated data and return it
     const updatedObject = updatePostObject({
-      updatedObject: saveData?.data?.data?.attributes,
+      updatedObject: saveData,
       existingObject: postObject,
     });
 
@@ -172,6 +188,13 @@ const useUpdate = ({ savePostOperation }) => {
         toast.success("Article settings updated!", {
           duration: 5000,
         });
+        //update the initial postobject with the updated data and return it
+      const updatedObject = updatePostObject({
+        updatedObject: saveData,
+        existingObject: postObject,
+      });
+
+      return updatedObject;
       }else{
         console.log('saveData', saveData)
         toast.error("Settings could not be saved!", {

@@ -16,39 +16,18 @@ import Toast from "./toast/Toast";
 import { useConfirmTabClose } from "./useConfirmTabClose";
 import { debounce } from "lodash";
 
+import { customDeepMerge } from "./utils/customDeepMerge";
+
 import { defaultProps } from "./config/defaultProps";
 
-// Custom deep merge function
-function customDeepMerge(target, source) {
-  if (typeof source !== 'object' || source === null) {
-    return source;
-  }
-
-  const output = Array.isArray(target) ? [] : {};
-
-  if (Array.isArray(target) && Array.isArray(source)) {
-    return source;
-  }
-
-  Object.keys({ ...target, ...source }).forEach(key => {
-    if (key in target) {
-      if (typeof source[key] === 'object' && !React.isValidElement(source[key])) {
-        output[key] = customDeepMerge(target[key], source[key]);
-      } else if (source[key] !== undefined) {
-        output[key] = source[key];
-      } else {
-        output[key] = target[key];
-      }
-    } else if (source[key] !== undefined) {
-      output[key] = source[key];
-    }
-  });
-
-  return output;
-}
+export const PostStatus = {
+  DRAFT: 'draft',
+  PENDING: 'pending',
+  PUBLISHED: 'publish',
+  // Add more default statuses as needed
+};
 
 const saveDebounceDelay = 3000;
-
 
 /**
  * Write
@@ -79,15 +58,23 @@ export default function EditorWrapper(props) {
     childProps,
 
     requireLogin,
+    enablePublishingFlow,
+    customPostStatuses,
     
     tool,
     isInterview,
   } = mergedProps;
 
+   // Merge default and custom post statuses
+   const POST_STATUSES = React.useMemo(() => ({
+    ...PostStatus,
+    ...(customPostStatuses || {}),
+  }), [customPostStatuses]);
+
   //merge the settings menus so we can save them as a single object
   const [settingsOptions, setSettingsOptions] = useState({
     general: components?.settingsPanel?.generalTab?.menu || [],
-    seo: components?.settingsPanel?.seoTab?.menu || []
+    seo: components?.settingsPanel?.seoTab?.menu || [],
   });
   /**
    * embed twitter widget if not already loaded
@@ -114,13 +101,15 @@ export default function EditorWrapper(props) {
     requireLogin,
     interview: isInterview,
     productName: tool?.name ? tool.name : false,
-    // @todo make this api stuff work for everyone
     //api calls
     loadPostOperation: postOperations.load,
+    enablePublishingFlow,
+    POST_STATUSES,
   });
   //create new post hook
-  const { createPost, creatingPost, created } = useCreate();
+  const { createPost, creatingPost, created } = useCreate({enablePublishingFlow, POST_STATUSES});
 
+  
   const {
     //update post content
     updatePostById,
@@ -131,7 +120,11 @@ export default function EditorWrapper(props) {
     saving,
     setSaving,
     hasUnsavedChanges,
-  } = useUpdate({ savePostOperation: postOperations.save });
+  } = useUpdate({
+    savePostOperation: postOperations.save,
+    enablePublishingFlow,
+    POST_STATUSES
+  });
 
   useConfirmTabClose(hasUnsavedChanges);
 
@@ -145,13 +138,19 @@ export default function EditorWrapper(props) {
     // send the content to an API here (if new post only)
     if (postId) {
       setHasUnsavedChanges(true);
-      setTimeout(() => {
-        setSaving(!saving);
-      }, 2700);
-      debounceSave({ editor, forReview });
+      if (enablePublishingFlow) {
+        setTimeout(() => {
+          setSaving(!saving);
+        }, 2700);
+        debounceSave({ editor, forReview });
+      } else if (enablePublishingFlow == false) {
+        //delete the local storage
+        localStorage.removeItem("wipContent");
+        //save the new version
+        localStorage.setItem("wipContent_" + postId, JSON.stringify(json));
+      }
     } else {
       localStorage.setItem("wipContent", JSON.stringify(json));
-      debounceSave({ editor, forReview });
     }
   };
 
@@ -159,9 +158,9 @@ export default function EditorWrapper(props) {
    * bypass debounce and save immediately
    * @param {*} param0
    */
-  const forceSave = ({ editor, json, forReview }) => {
+  const forceSave = ({ editor, json, forReview, publish, unpublish }) => {
     setSaving(false);
-    _savePost({ editor, forReview });
+    _savePost({ editor, forReview, forced: true, publish, unpublish });
   };
 
   /**
@@ -192,6 +191,7 @@ export default function EditorWrapper(props) {
   const updatePostByIdRef = useRef(updatePostById);
   const savePostRef = useRef(postOperations.save);
   const createPostOperationRef = useRef(postOperations.create);
+  const enablePublishingFlowRef = useRef(enablePublishingFlow);
 
   useEffect(() => {
     userRef.current = user;
@@ -203,6 +203,7 @@ export default function EditorWrapper(props) {
     updatePostByIdRef.current = updatePostById;
     savePostRef.current = postOperations.save;
     createPostOperationRef.current = postOperations.create;
+    enablePublishingFlowRef.current = enablePublishingFlow;
   }, [
     user,
     postStatus,
@@ -213,29 +214,30 @@ export default function EditorWrapper(props) {
     updatePostById,
     postOperations.save,
     postOperations.create,
+    enablePublishingFlow,
   ]);
 
   /**
-   * when the post object loads, 
+   * when the post object loads,
    * set the fields in the settings menu
    */
   useEffect(() => {
     if (postObject) {
       const getNestedValue = (obj, path) => {
-        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+        return path.split(".").reduce((acc, part) => acc && acc[part], obj);
       };
 
-      const updateSettingsArray = (array) => 
+      const updateSettingsArray = array =>
         array.map(option => ({
           ...option,
           initialValue: option.field
-            ? (getNestedValue(postObject, option.field) ?? option.initialValue)
-            : option.initialValue
+            ? getNestedValue(postObject, option.field) ?? option.initialValue
+            : option.initialValue,
         }));
 
       setSettingsOptions({
         general: updateSettingsArray(settingsOptions.general),
-        seo: updateSettingsArray(settingsOptions.seo)
+        seo: updateSettingsArray(settingsOptions.seo),
       });
     }
   }, [postObject]);
@@ -249,7 +251,7 @@ export default function EditorWrapper(props) {
    * @param {*} param0
    * @returns
    */
-  const _savePost = useCallback(async ({ editor, forReview }) => {
+  const _savePost = useCallback(async ({ editor, forReview , forced, publish, unpublish}) => {
     const currentPostId = postIdRef.current;
     const currentRouterPostId = routerPostIdRef.current;
 
@@ -262,7 +264,65 @@ export default function EditorWrapper(props) {
     }
 
     try {
-      if (currentPostId) {
+      //if publishFlow is not enabled, save to local storage
+      if (enablePublishingFlowRef.current === false) {
+        if(currentPostId){
+          //clear the none id version
+          localStorage.removeItem("wipContent");
+          //save the new version
+          localStorage.setItem(
+            "wipContent_" + currentPostId,
+            JSON.stringify(editor.state.doc.toJSON())
+          );
+        }else{
+          localStorage.setItem(
+            "wipContent",
+            JSON.stringify(editor.state.doc.toJSON())
+          );
+        }
+
+        if((forced && (!publish && !unpublish)) && !currentPostId){
+          //create a new post
+          const postInfo = await createPostRef.current({
+            user: userRef.current,
+            editor,
+            createPostOperation: createPostOperationRef.current,
+            enablePublishingFlow: enablePublishingFlowRef.current,
+          });
+          // Set the new slug
+          
+          if (postInfo?.id) {
+            setPostId(postInfo?.id);
+            onPostCreatedRef.current({ id: postInfo?.id, postInfo });
+          }
+          localStorage.removeItem("wipContent");
+          
+          refetchRef.current();
+          return true;
+        } else if (forced && currentPostId) {
+          // update the post
+          const updatedPostObject = await updatePostByIdRef.current({
+            editor: editor,
+            postId: currentPostId,
+            user: userRef.current,
+            forReview: forReview,
+            forced: forced,
+            publish: publish,
+            unpublish: unpublish,
+            postStatus: postStatusRef.current,
+            postObject: postObjectRef.current,
+            enablePublishingFlow: enablePublishingFlowRef.current,
+          });
+          if (updatedPostObject?.id) {
+            setPostObject(updatedPostObject);
+            // Confirm no unsaved changes
+            setHasUnsavedChanges(false);
+          }
+        }
+
+        return true;
+      } 
+      else if (currentPostId) {
         // Updating an existing post
         const updatedPostObject = await updatePostByIdRef.current({
           editor: editor,
@@ -271,6 +331,7 @@ export default function EditorWrapper(props) {
           forReview: forReview,
           postStatus: postStatusRef.current,
           postObject: postObjectRef.current,
+          enablePublishingFlow: enablePublishingFlowRef.current,
         });
 
         // Update the postObject from useLoad hook
@@ -282,7 +343,10 @@ export default function EditorWrapper(props) {
         return true;
       } else {
         // Creating a new post
-        if (!currentRouterPostId && typeof createPostOperationRef.current === "function") {
+        if (
+          !currentRouterPostId &&
+          typeof createPostOperationRef.current === "function"
+        ) {
           //check if post content is empty
           if (editor.state.doc.textContent.trim() === "") {
             return false;
@@ -292,6 +356,7 @@ export default function EditorWrapper(props) {
             user: userRef.current,
             editor,
             createPostOperation: createPostOperationRef.current,
+            enablePublishingFlow: enablePublishingFlowRef.current,
           });
           // Set the new slug
           localStorage.removeItem("wipContent");
@@ -328,11 +393,11 @@ export default function EditorWrapper(props) {
         postObject: postObject,
       });
 
-      if (updatedPostObject) {
+      if (updatedPostObject?.id) {
         setPostObject(updatedPostObject);
-        return true
-      }else{
-        return false
+        return true;
+      } else {
+        return false;
       }
     } catch (e) {
       console.log(e);
@@ -342,20 +407,25 @@ export default function EditorWrapper(props) {
 
   return (
     <>
-      {components.nav.show && <EditorNav
-        router={router}
-        isInterview={isInterview}
-        tool={tool}
-        post={postObject}
-        postStatus={postStatus}
-        user={user}
-        mutateUser={user.mutate}
-        settings={{
-          userBadge: components.nav.userBadge,
-          nav: components.nav,
-        }}
-        theme={theme}
-      />}
+      {components.nav.show && (
+        <EditorNav
+          router={router}
+          isInterview={isInterview}
+          tool={tool}
+          post={postObject}
+          postStatus={postStatus}
+          enablePublishingFlow={enablePublishingFlow}
+          hasUnsavedChanges={hasUnsavedChanges}
+          user={user}
+          mutateUser={user.mutate}
+          settings={{
+            userBadge: components.nav.userBadge,
+            nav: components.nav,
+          }}
+          theme={theme}
+          POST_STATUSES={POST_STATUSES}
+        />
+      )}
 
       <div
         className={`w-full ${
@@ -367,7 +437,8 @@ export default function EditorWrapper(props) {
           {/* {!user && <Fallback />} */}
 
           {/* only load editor if initialContent is not null */}
-          {(requireLogin==true && !user?.isLoggedIn) || initialContent == null ? (
+          {(requireLogin == true && !user?.isLoggedIn) ||
+          initialContent == null ? (
             // <Layout>
             <div className="my-auto h-screen flex flex-col justify-center text-center">
               <div className="mx-auto opacity-50">
@@ -377,7 +448,8 @@ export default function EditorWrapper(props) {
             </div>
           ) : (
             // </Layout>
-            ((requireLogin==true && user?.isLoggedIn) || requireLogin==false) && (
+            ((requireLogin == true && user?.isLoggedIn) ||
+              requireLogin == false) && (
               <>
                 <div className="my-4">
                   {React.isValidElement(children) ? (
@@ -399,13 +471,14 @@ export default function EditorWrapper(props) {
                       settingsOptions,
                       user,
                       theme,
+                      enablePublishingFlow,
+                      POST_STATUSES,
                       ...childProps, // Spread custom props to override defaults
                     })
                   ) : (
                     <Editor
                       canEdit={canEdit}
                       initialContent={initialContent}
-                      postStatus={postStatus}
                       hasUnsavedChanges={hasUnsavedChanges}
                       isSaving={saving || creatingPost}
                       saved={saved || created}
@@ -416,12 +489,16 @@ export default function EditorWrapper(props) {
                       forceSave={forceSave}
                       refetchPost={refetch}
                       updatePostSettings={
-                        components.settingsPanel?.show ? updatePostSettings : false
+                        components.settingsPanel?.show
+                          ? updatePostSettings
+                          : false
                       }
                       settingsPanelSettings={components.settingsPanel}
                       settingsOptions={settingsOptions}
                       user={user}
                       theme={theme}
+                      enablePublishingFlow={enablePublishingFlow}
+                      POST_STATUSES={POST_STATUSES}
                     />
                   )}
                 </div>
