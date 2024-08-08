@@ -38,14 +38,20 @@ const saveDebounceDelay = 3000;
  * @returns
  */
 export default function EditorWrapper(props) {
+
+  const { children, ...restProps } = props;
+
+  // console.log("restProps", restProps);
+  // console.log("defaultProps", defaultProps);
   const mergedProps = React.useMemo(() => {
     try {
-      return customDeepMerge(defaultProps, props);
+      return customDeepMerge(defaultProps, restProps);
     } catch (error) {
       console.error("Error merging props:", error);
-      return { ...defaultProps, ...props };
+      return { ...defaultProps, ...restProps };
     }
   }, [props]);
+
   const {
     theme,
     components,
@@ -54,7 +60,6 @@ export default function EditorWrapper(props) {
     postOperations,
     hooks,
     router,
-    children,
     childProps,
 
     requireLogin,

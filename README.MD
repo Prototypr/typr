@@ -25,6 +25,16 @@ If you need assistance adapting Typr to work better with your CMS, consider [spo
 - Configurable Fields: You can configure the settings panel to work with any fields in your CMS.
 - Admin only fields: You can hide fields from the settings panel, and the editor, if you want to use Typr as a content manager.
 
+## Save modes
+
+There's 2 publishing modes:
+
+- *Standard mode* (draft/publish): This is a more standard save mode, where the post status is set to draft by default, and the user can publish it themselves at any time. The content is saved to local storage, but you must press the save button to save changes. (todo add autosave for this mode)
+
+- *Publisher Flow* (draft/pending/publish): This mode is for publishing platforms where content needs to be reviewed by editors before publishing. There is a submit button for users to submit their content for review, which will set the post status to pending. An editor can then review the content and publish it, and its status will be set to publish. Publisher flow autosaves as you type.
+
+To enable the publisher flow, set `enablePublishingFlow={true}`.
+
 ## Example usage
 
 Install the package, then import it along with the styles to your project:

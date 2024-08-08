@@ -476,7 +476,7 @@ const SidebarInner = ({
                 theme == "blue"
                   ? "bg-blue-600 hover:bg-blue-500  outline-blue-500"
                   : "bg-gray-600 hover:bg-gray-500  outline-gray-500"
-              } text-white outline outline-1 font-semibold rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed`}
+              } text-white outline outline-1 font-semibold rounded-full disabled:opacity-50 disabled:cursor-not-allowed`}
               onClick={updatePost}
             >
               Save all
