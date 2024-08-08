@@ -29,9 +29,9 @@ If you need assistance adapting Typr to work better with your CMS, consider [spo
 
 There's 2 publishing modes:
 
-- *Standard mode* (draft/publish): This is a more standard save mode, where the post status is set to draft by default, and the user can publish it themselves at any time. The content is saved to local storage, but you must press the save button to save changes. (todo add autosave for this mode)
+- **Standard mode** (draft/publish): This is a more standard save mode, where the post status is set to draft by default, and the user can publish it themselves at any time. The content is saved to local storage, but you must press the save button to save changes. (todo add autosave for this mode)
 
-- *Publisher Flow* (draft/pending/publish): This mode is for publishing platforms where content needs to be reviewed by editors before publishing. There is a submit button for users to submit their content for review, which will set the post status to pending. An editor can then review the content and publish it, and its status will be set to publish. Publisher flow autosaves as you type.
+- **Publisher Flow** (draft/pending/publish): This mode is for publishing platforms where content needs to be reviewed by editors before publishing. There is a submit button for users to submit their content for review, which will set the post status to pending. An editor can then review the content and publish it, and its status will be set to publish. Publisher flow autosaves as you type.
 
 To enable the publisher flow, set `enablePublishingFlow={true}`.
 
@@ -190,12 +190,15 @@ create:async ({ entry }) => {
 
 ## ⚠️ Docs in progress!
 
-This is where I'm up to, I need to add how to configure the editor, how the hooks work and stuff.
-Back soon!
+These docs are still in progress, and the project still needs testing.
+
+### Todo:
+- [ ] Save featured image in settings
+- [ ] Link embed needs api route to get embed data
 
 ## Local development
 
-Clone the folder `prototypr-packages/typr` and run `npm install`
+Clone the folder `typr` and run `npm install`
 
 ### Watch script
 

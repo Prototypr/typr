@@ -20,7 +20,8 @@ export default function EditorNav({
   settings,
   theme,
   POST_STATUSES,
-  hasUnsavedChanges
+  hasUnsavedChanges,
+  signOut
 }) {
   // const { user, isLoading } = useUser({
   //   redirectIfFound: false,
@@ -168,6 +169,7 @@ export default function EditorNav({
                   router={router}
                   settings={settings}
                   theme={theme}
+                  signOut={signOut}
                 />
               </div>
             </div>

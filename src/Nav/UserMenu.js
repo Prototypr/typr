@@ -7,7 +7,7 @@ import ProfileBadge from "./ProfileBadge";
 
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
-const UserMenu = ({ user, router, settings }) => {
+const UserMenu = ({ user, router, settings, signOut }) => {
   return (
     <>
         <NavigationMenuItem
@@ -21,6 +21,7 @@ const UserMenu = ({ user, router, settings }) => {
                 router={router}
                 settings={settings}
                   user={user}
+                  signOut={signOut}
                   icon={
                     <img
                       className="hover:shadow border border-1 !rounded-full my-auto w-full h-full cursor-pointer object-contain"

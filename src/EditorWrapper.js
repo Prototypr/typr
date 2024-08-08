@@ -373,7 +373,7 @@ export default function EditorWrapper(props) {
           enablePublishingFlow={enablePublishingFlow}
           hasUnsavedChanges={hasUnsavedChanges}
           user={user}
-          mutateUser={user.mutate}
+          signOut={user.signOut}
           settings={{
             userBadge: components.nav.userBadge,
             nav: components.nav,

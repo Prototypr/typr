@@ -62,8 +62,8 @@ export const defaultProps = {
     loading: false,
     isLoggedIn: false,
     isAdmin: false,
-    mutate: () => {
-      console.log("mutate user");
+    signOut: () => {
+      console.log("sign out");
       return false;
     },
   },

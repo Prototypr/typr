@@ -3,8 +3,6 @@ import React from "react";
 import { keyframes } from "@stitches/react";
 import { styled } from "./stitches.config";
 import { blue, mauve, blackA, gray, green } from "@radix-ui/colors";
-import { signOut } from "next-auth/react";
-import fetchJson from "../utils/fetchJson";
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 
@@ -212,9 +210,9 @@ const renderMenuItems = (items, user, router) => {
 export const ProfileBadgeDropdown = ({
   icon,
   user,
-  mutateUser,
   router,
-  settings
+  settings,
+  signOut
 }) => {
   return (
     <Box>
@@ -283,11 +281,8 @@ export const ProfileBadgeDropdown = ({
             <DropdownMenuSeparator />
             {(user?.isLoggedIn) ? <DropdownMenuItem
               onSelect={async () => {
-                await signOut({ redirect: false });
-                mutateUser(
-                  await fetchJson("/api/auth/logout", { method: "POST" }),
-                  false
-                );
+                //sign out
+               await signOut();
               }}
             >
               Sign out
