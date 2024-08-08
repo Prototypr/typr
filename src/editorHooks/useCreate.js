@@ -3,11 +3,11 @@ import toast from "react-hot-toast";
 import { getCreatePostData } from "./libs/getCreatePostData";
 import { useState } from "react";
 
-const useCreate = () => {
+const useCreate = ({POST_STATUSES,enablePublishingFlow}) => {
   const [creatingPost, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
 
-  const createPost = async ({ user, postObject, editor, forReview, relatedPost, createPostOperation , enablePublishingFlow}) => {
+  const createPost = async ({ user, postObject, editor, forReview, relatedPost, createPostOperation}) => {
     setCreating(true);
     if (created) {
       throw new Error("Post already created");
@@ -18,7 +18,8 @@ const useCreate = () => {
       user,
       relatedPost,
       forReview,
-      enablePublishingFlow
+      enablePublishingFlow,
+      POST_STATUSES
     });
 
     try {

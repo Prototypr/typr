@@ -102,6 +102,7 @@
     "react-portal": "^4.2.2",
     "sanitize-html": "^2.7.3",
     "tippy.js": "^6.3.7",
+    "use-debounce": "^10.0.2",
     "yup": "^0.32.11"
   },
   "devDependencies": {

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
+import { useDebouncedCallback } from 'use-debounce';
 
 import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
 
@@ -14,7 +15,7 @@ import useUpdate from "./editorHooks/useUpdate";
 import EditorNav from "./EditorNav";
 import Toast from "./toast/Toast";
 import { useConfirmTabClose } from "./useConfirmTabClose";
-import { debounce } from "lodash";
+// import { debounce } from "lodash";
 
 import { customDeepMerge } from "./utils/customDeepMerge";
 
@@ -27,7 +28,7 @@ export const PostStatus = {
   // Add more default statuses as needed
 };
 
-const saveDebounceDelay = 3000;
+const saveDebounceDelay = 2700;
 
 /**
  * Write
@@ -133,6 +134,14 @@ export default function EditorWrapper(props) {
 
   useConfirmTabClose(hasUnsavedChanges);
 
+  const debouncedSave = useDebouncedCallback(
+    async ({ editor, forReview }) => {
+      setSaving(false);
+      await _savePost({ editor, forReview });
+    },
+    saveDebounceDelay
+  );
+
   /**
    * updatePost
    * when editor onUpdate is triggered,
@@ -147,7 +156,7 @@ export default function EditorWrapper(props) {
         setTimeout(() => {
           setSaving(!saving);
         }, 2700);
-        debounceSave({ editor, forReview });
+        debouncedSave({ editor, forReview });
       } else if (enablePublishingFlow == false) {
         //delete the local storage
         localStorage.removeItem("wipContent");
@@ -155,7 +164,16 @@ export default function EditorWrapper(props) {
         localStorage.setItem("wipContent_" + postId, JSON.stringify(json));
       }
     } else {
-      localStorage.setItem("wipContent", JSON.stringify(json));
+      if(enablePublishingFlow){
+        localStorage.setItem("wipContent", JSON.stringify(json));
+        setTimeout(() => {
+          setSaving(!saving);
+        }, 2700);
+        debouncedSave({ editor, forReview });
+
+      }else{
+        localStorage.setItem("wipContent", JSON.stringify(json));
+      }
     }
   };
 
@@ -168,59 +186,131 @@ export default function EditorWrapper(props) {
     _savePost({ editor, forReview, forced: true, publish, unpublish });
   };
 
-  /**
-   * for autosave
-   */
-  const debounceSave = useCallback(
-    debounce(async ({ editor, forReview }) => {
-      setSaving(false);
-      _savePost({ editor, forReview });
-    }, saveDebounceDelay),
-    [user, postId, postObject, postStatus, routerPostId]
-  );
+  const _savePost = async ({ editor, forReview, forced, publish, unpublish }) => {
+    //check if editor has any content
+    if (
+      editor.state.doc.textContent.trim() === "" &&
+      editor.state.doc.childCount <= 2
+    ) {
+      return false;
+    }
 
-  const postIdRef = useRef(postId);
-  const routerPostIdRef = useRef(routerPostId);
+    try {
+      //if publishFlow is not enabled, save to local storage
+      if (enablePublishingFlow === false) {
+        if(postId){
+          //clear the none id version
+          localStorage.removeItem("wipContent");
+          //save the new version
+          localStorage.setItem(
+            "wipContent_" + postId,
+            JSON.stringify(editor.state.doc.toJSON())
+          );
+        }else{
+          localStorage.setItem(
+            "wipContent",
+            JSON.stringify(editor.state.doc.toJSON())
+          );
+        }
 
-  useEffect(() => {
-    postIdRef.current = postId;
-    routerPostIdRef.current = routerPostId;
-  }, [postId, routerPostId]);
+        if((forced && (!publish && !unpublish)) && !postId){
+          //create a new post
+          const postInfo = await createPost({
+            user,
+            editor,
+            createPostOperation: postOperations.create
+          });
+          // Set the new slug
+          
+          if (postInfo?.id) {
+            setPostId(postInfo?.id);
+            hooks.onPostCreated({ id: postInfo?.id, postInfo });
+          }
+          localStorage.removeItem("wipContent");
+          
+          refetch();
+          return true;
+        } else if (forced && postId) {
+          // update the post
+          const updatedPostObject = await updatePostById({
+            editor: editor,
+            postId: postId,
+            user: user,
+            forReview: forReview,
+            forced: forced,
+            publish: publish,
+            unpublish: unpublish,
+            postStatus: postStatus,
+            postObject: postObject,
+            enablePublishingFlow: enablePublishingFlow,
+          });
+          if (updatedPostObject?.id) {
+            setPostObject(updatedPostObject);
+            // Confirm no unsaved changes
+            setHasUnsavedChanges(false);
+          }
+        }
 
-  const userRef = useRef(user);
-  const postStatusRef = useRef(postStatus);
-  const postObjectRef = useRef(postObject);
-  const createPostRef = useRef(createPost);
-  const refetchRef = useRef(refetch);
-  const onPostCreatedRef = useRef(hooks.onPostCreated);
-  const updatePostByIdRef = useRef(updatePostById);
-  const savePostRef = useRef(postOperations.save);
-  const createPostOperationRef = useRef(postOperations.create);
-  const enablePublishingFlowRef = useRef(enablePublishingFlow);
+        return true;
+      } 
+      else if (postId) {
+        // Updating an existing post
+        const updatedPostObject = await updatePostById({
+          editor: editor,
+          postId: postId,
+          user: user,
+          forReview: forReview,
+          postStatus: postStatus,
+          postObject: postObject,
+          enablePublishingFlow: enablePublishingFlow,
+        });
 
-  useEffect(() => {
-    userRef.current = user;
-    postStatusRef.current = postStatus;
-    postObjectRef.current = postObject;
-    createPost.current = createPost;
-    refetchRef.current = refetch;
-    onPostCreatedRef.current = hooks.onPostCreated;
-    updatePostByIdRef.current = updatePostById;
-    savePostRef.current = postOperations.save;
-    createPostOperationRef.current = postOperations.create;
-    enablePublishingFlowRef.current = enablePublishingFlow;
-  }, [
-    user,
-    postStatus,
-    postObject,
-    createPost,
-    refetch,
-    hooks.onPostCreated,
-    updatePostById,
-    postOperations.save,
-    postOperations.create,
-    enablePublishingFlow,
-  ]);
+        // Update the postObject from useLoad hook
+        if (updatedPostObject) {
+          setPostObject(updatedPostObject);
+          // Confirm no unsaved changes
+          setHasUnsavedChanges(false);
+        }
+        return true;
+      } else {
+        // Creating a new post
+        if (
+          !routerPostId &&
+          typeof postOperations.create === "function"
+        ) {
+          //check if post content is empty
+          if (editor.state.doc.textContent.trim() === "") {
+            return false;
+          }
+
+          const postInfo = await createPost({
+            user: user,
+            editor,
+            createPostOperation: postOperations.create,
+            enablePublishingFlow: enablePublishingFlow,
+          });
+          // Set the new slug
+          localStorage.removeItem("wipContent");
+
+          if (postInfo?.id) {
+            setPostId(postInfo?.id);
+            hooks.onPostCreated({ id: postInfo?.id, postInfo });
+          }
+
+          refetch();
+          return true;
+        }
+        if (!routerPostId && typeof postOperations.save !== "function") {
+          return false;
+        } else {
+          return false;
+        }
+      }
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  };
 
   /**
    * when the post object loads,
@@ -246,145 +336,6 @@ export default function EditorWrapper(props) {
       });
     }
   }, [postObject]);
-
-  /**
-   * _savePost
-   * when save button is clicked
-   * save the post to the backend
-   *
-   * for new post, create a new post and redirect to the new post
-   * @param {*} param0
-   * @returns
-   */
-  const _savePost = useCallback(async ({ editor, forReview , forced, publish, unpublish}) => {
-    const currentPostId = postIdRef.current;
-    const currentRouterPostId = routerPostIdRef.current;
-
-    //check if editor has any content
-    if (
-      editor.state.doc.textContent.trim() === "" &&
-      editor.state.doc.childCount <= 2
-    ) {
-      return false;
-    }
-
-    try {
-      //if publishFlow is not enabled, save to local storage
-      if (enablePublishingFlowRef.current === false) {
-        if(currentPostId){
-          //clear the none id version
-          localStorage.removeItem("wipContent");
-          //save the new version
-          localStorage.setItem(
-            "wipContent_" + currentPostId,
-            JSON.stringify(editor.state.doc.toJSON())
-          );
-        }else{
-          localStorage.setItem(
-            "wipContent",
-            JSON.stringify(editor.state.doc.toJSON())
-          );
-        }
-
-        if((forced && (!publish && !unpublish)) && !currentPostId){
-          //create a new post
-          const postInfo = await createPostRef.current({
-            user: userRef.current,
-            editor,
-            createPostOperation: createPostOperationRef.current,
-            enablePublishingFlow: enablePublishingFlowRef.current,
-          });
-          // Set the new slug
-          
-          if (postInfo?.id) {
-            setPostId(postInfo?.id);
-            onPostCreatedRef.current({ id: postInfo?.id, postInfo });
-          }
-          localStorage.removeItem("wipContent");
-          
-          refetchRef.current();
-          return true;
-        } else if (forced && currentPostId) {
-          // update the post
-          const updatedPostObject = await updatePostByIdRef.current({
-            editor: editor,
-            postId: currentPostId,
-            user: userRef.current,
-            forReview: forReview,
-            forced: forced,
-            publish: publish,
-            unpublish: unpublish,
-            postStatus: postStatusRef.current,
-            postObject: postObjectRef.current,
-            enablePublishingFlow: enablePublishingFlowRef.current,
-          });
-          if (updatedPostObject?.id) {
-            setPostObject(updatedPostObject);
-            // Confirm no unsaved changes
-            setHasUnsavedChanges(false);
-          }
-        }
-
-        return true;
-      } 
-      else if (currentPostId) {
-        // Updating an existing post
-        const updatedPostObject = await updatePostByIdRef.current({
-          editor: editor,
-          postId: currentPostId,
-          user: userRef.current,
-          forReview: forReview,
-          postStatus: postStatusRef.current,
-          postObject: postObjectRef.current,
-          enablePublishingFlow: enablePublishingFlowRef.current,
-        });
-
-        // Update the postObject from useLoad hook
-        if (updatedPostObject) {
-          setPostObject(updatedPostObject);
-          // Confirm no unsaved changes
-          setHasUnsavedChanges(false);
-        }
-        return true;
-      } else {
-        // Creating a new post
-        if (
-          !currentRouterPostId &&
-          typeof createPostOperationRef.current === "function"
-        ) {
-          //check if post content is empty
-          if (editor.state.doc.textContent.trim() === "") {
-            return false;
-          }
-
-          const postInfo = await createPostRef.current({
-            user: userRef.current,
-            editor,
-            createPostOperation: createPostOperationRef.current,
-            enablePublishingFlow: enablePublishingFlowRef.current,
-          });
-          // Set the new slug
-          localStorage.removeItem("wipContent");
-
-          if (postInfo?.id) {
-            setPostId(postInfo?.id);
-            onPostCreatedRef.current({ id: postInfo?.id, postInfo });
-          }
-
-          refetchRef.current();
-          return true;
-        }
-        if (!currentRouterPostId && typeof savePostRef.current !== "function") {
-          return false;
-        } else {
-          return false;
-        }
-      }
-    } catch (e) {
-      console.log(e);
-      return false;
-    }
-  }, []);
 
   /**
    * updateSettings
