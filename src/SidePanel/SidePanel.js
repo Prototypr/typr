@@ -92,7 +92,7 @@ const SidebarInner = ({
 
   useEffect(() => {
     const isAllAdminOnly = (options) => options.every(option => option.adminOnly);
-console.log('settingsOptions', settingsOptions)
+// console.log('settingsOptions', settingsOptions)
     if (!user?.isAdmin) {
       const seoOptions = settingsOptions?.seo || [];
       const generalOptions = settingsOptions?.general || [];

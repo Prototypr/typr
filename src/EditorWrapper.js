@@ -248,7 +248,6 @@ export default function EditorWrapper(props) {
         }
 
         if (forced && !publish && !unpublish && !postId) {
-          console.log('creating post')
           //create a new post
           const postInfo = await createPost({
             user,

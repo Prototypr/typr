@@ -324,7 +324,7 @@ export const Figure = Node.create({
                 }
                 else if ((key == 67 && ctrl) || (ctrl)) {              
                     // If key pressed is C and if ctrl is true.
-                    console.log("Ctrl+C is pressed.");
+                    // console.log("Ctrl+C is pressed.");
                 }
 
 

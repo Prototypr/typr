@@ -505,7 +505,7 @@ const fetchOG = async(url) =>{
         }
     )
     .then(function (response) {
-        console.log("success");
+        // console.log("success");
         return response
     })
     .catch(function (error) {

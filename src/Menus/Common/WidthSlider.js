@@ -15,7 +15,7 @@ useEffect(() => {
 
 const updateWidth = (value) => {
     
-    console.log(value);
+    // console.log(value);
     editor.commands.updateAttributes('figure', { width: value+'%' })
     // editor.chain().focus().updateAttributes('figure', { width: value+'%' }).run();
     setValue(value);

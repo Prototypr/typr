@@ -149,7 +149,7 @@ const Figure = Node.create({
                 if ((key == 86 && ctrl) || ctrl) {
                 } else if ((key == 67 && ctrl) || ctrl) {
                   // If key pressed is C and if ctrl is true.
-                  console.log("Ctrl+C is pressed.");
+                  // console.log("Ctrl+C is pressed.");
                 } else if (
                   e.key !== "Enter" &&
                   selectedNode.type.name === "figure" &&
