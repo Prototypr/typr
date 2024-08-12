@@ -149,7 +149,6 @@ const ImageUploader = (props) => {
           toast.success("Image Uploaded!", {
             duration: 5000,
           });
-          console.log(response)
         })
         .catch(function (error) {
             setSavingOnInsert(false)

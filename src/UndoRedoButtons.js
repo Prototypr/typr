@@ -1,15 +1,12 @@
 import React from 'react';
 
-const UndoRedoButtons = ({editor}) =>{
-
-
+const UndoRedoButtons = ({editor, show}) =>{
     return(
-        <div className="flex flex ml-4 rounded" style={{pointerEvents:'all'}}>
+        <div className={`${show ? 'flex' : 'hidden'} ml-4 rounded`} style={{pointerEvents:'all'}}>
                 <button 
                 data-balloon-pos='down'
                 aria-label="Undo" 
                  onClick={()=>{
-                    console.log(editor)
                      if(editor){
                             editor.commands.undo()
                      }

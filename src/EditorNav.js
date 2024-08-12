@@ -7,11 +7,12 @@ import { useState, useEffect } from "react";
 import NavigationMenu from "./Nav/navbar-menu";
 
 // import NavigationMenuMobile from "./Nav/navbar-menu-mobile";
-import {CustomLink} from "./components/CustomLink";
+import { CustomLink } from "./components/CustomLink";
 
 export default function EditorNav({
   activeNav,
   postStatus,
+  postObject,
   enablePublishingFlow,
   tool,
   isInterview,
@@ -21,7 +22,7 @@ export default function EditorNav({
   theme,
   POST_STATUSES,
   hasUnsavedChanges,
-  signOut
+  signOut,
 }) {
   // const { user, isLoading } = useUser({
   //   redirectIfFound: false,
@@ -33,44 +34,51 @@ export default function EditorNav({
     setMobileNavOpen(!mobileNavOpen);
   };
 
-
   const [statusComponent, setStatusComponent] = useState(null);
   useEffect(() => {
     // if(enablePublishingFlow === false){
     //   return; // Just return without any value
     // }
-    if (postStatus == POST_STATUSES.DRAFT) {
+    if (postObject?.status == POST_STATUSES.DRAFT) {
       setStatusComponent(
         <div className="p-2 py-0.5 text-xs bg-gray-300 bg-opacity-20 text-gray-500 rounded-full border border-gray-300">
           Draft
         </div>
       );
-    }
-    if (postStatus == POST_STATUSES.PENDING) {
+    } else if (postObject?.status == POST_STATUSES.PENDING) {
       setStatusComponent(
         <div className="p-2 py-0.5 text-xs bg-yellow-300 bg-opacity-20 text-yellow-600 rounded-full border border-yellow-300">
           Pending Review
         </div>
       );
-    }
-    if (postStatus == POST_STATUSES.PUBLISHED) {
+    } else if (postObject?.status == POST_STATUSES.PUBLISHED) {
       setStatusComponent(
         <div className="p-2 py-0.5 text-xs bg-green-400 bg-opacity-20 text-green-700 rounded-full border border-green-500">
           Published
         </div>
       );
+    } else {
+      setStatusComponent(null);
     }
-  }, [postStatus]);
+  }, [postObject?.status]);
 
   return (
     <div
       id="main-nav"
       as="nav"
-      className={`z-40  ${isInterview ? "fixed w-[calc(100vw-450px)]" : "fixed w-full"}  bg-white/90 backdrop-blur-xs py-3 top-0`}
+      className={`z-40  ${isInterview ? "w-[calc(100vw-450px)]" : "w-full"} ${
+        settings?.nav?.position == "sticky"
+          ? "sticky -mb-[64px]"
+          : settings?.nav?.position == "fixed"
+          ? "fixed"
+          : "relative -mb-[64px]"
+      } top-0 bg-white/90 backdrop-blur-xs py-3`}
     >
       <>
         <div
-          className={`mx-auto text-sm px-2 rounded-xl ${isInterview ? "!max-w-full" : "max-w-[1000px]"}`}
+          className={`mx-auto text-sm px-2 rounded-xl ${
+            isInterview ? "!max-w-full" : "max-w-[1000px]"
+          }`}
         >
           <div
             className={` transition transition-all duration-700 ease-in-out relative flex items-center justify-between h-10`}
@@ -92,7 +100,10 @@ export default function EditorNav({
             </div> */}
             <div className="flex-1 flex items-center justify-start sm:items-stretch sm:justify-start">
               {settings?.nav?.logo?.image && settings?.nav?.logo?.show ? (
-                <CustomLink href={settings?.nav?.logo?.url} as={settings?.nav?.logo?.url}>
+                <CustomLink
+                  href={settings?.nav?.logo?.url}
+                  as={settings?.nav?.logo?.url}
+                >
                   <div
                     className={`flex-shrink-0  flex items-center cursor-pointer transition transition-all duration-300 ease-in-out`}
                   >
@@ -106,7 +117,11 @@ export default function EditorNav({
                 </CustomLink>
               ) : (
                 <svg
-                  className={`${settings?.nav?.logo?.show ? 'h-6 my-auto mr-2 w-auto' : 'hidden'}`}
+                  className={`${
+                    settings?.nav?.logo?.show
+                      ? "h-6 my-auto mr-2 w-auto"
+                      : "hidden"
+                  }`}
                   width="164"
                   height="164"
                   viewBox="0 0 164 164"
@@ -143,10 +158,18 @@ export default function EditorNav({
                   </div>
                 </div>
               ) : null}
-              {(settings.nav.postStatus.show) ? <div className="my-auto ml-3">{statusComponent}</div> : null}
+              {settings.nav.postStatus.show ? (
+                <div className="my-auto ml-3">{statusComponent}</div>
+              ) : null}
               {/* Undo/redo */}
-              <div className={`${settings.nav.undoRedoButtons.show ? 'block' : 'hidden'}`} id="undoredo-container"></div>
-              {(settings.nav.unsavedChangesNotice.show && hasUnsavedChanges && !enablePublishingFlow) ? <div className="my-auto text-xs my-auto text-gray-400 ml-3">Unsaved changes</div> : null}
+              <div className={``} id="undoredo-container"></div>
+              {settings.nav.unsavedChangesNotice.show &&
+              hasUnsavedChanges &&
+              !enablePublishingFlow ? (
+                <div className="my-auto text-xs my-auto text-gray-400 ml-3">
+                  Unsaved changes
+                </div>
+              ) : null}
             </div>
             <div
               className={`relative block sm:ml-6 transition transition-all duration-500 ease-in-out`}

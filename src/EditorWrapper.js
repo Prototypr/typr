@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useDebouncedCallback } from 'use-debounce';
+import { useDebouncedCallback } from "use-debounce";
 
 import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
 
@@ -22,9 +22,9 @@ import { customDeepMerge } from "./utils/customDeepMerge";
 import { defaultProps } from "./config/defaultProps";
 
 export const PostStatus = {
-  DRAFT: 'draft',
-  PENDING: 'pending',
-  PUBLISHED: 'publish',
+  DRAFT: "draft",
+  PENDING: "pending",
+  PUBLISHED: "publish",
   // Add more default statuses as needed
 };
 
@@ -39,11 +39,8 @@ const saveDebounceDelay = 2700;
  * @returns
  */
 export default function EditorWrapper(props) {
-
   const { children, ...restProps } = props;
 
-  // console.log("restProps", restProps);
-  // console.log("defaultProps", defaultProps);
   const mergedProps = React.useMemo(() => {
     try {
       return customDeepMerge(defaultProps, restProps);
@@ -66,22 +63,26 @@ export default function EditorWrapper(props) {
     requireLogin,
     enablePublishingFlow,
     customPostStatuses,
-    
+
     tool,
     isInterview,
   } = mergedProps;
 
-   // Merge default and custom post statuses
-   const POST_STATUSES = React.useMemo(() => ({
-    ...PostStatus,
-    ...(customPostStatuses || {}),
-  }), [customPostStatuses]);
+  // Merge default and custom post statuses
+  const POST_STATUSES = React.useMemo(
+    () => ({
+      ...PostStatus,
+      ...(customPostStatuses || {}),
+    }),
+    [customPostStatuses]
+  );
 
   //merge the settings menus so we can save them as a single object
   const [settingsOptions, setSettingsOptions] = useState({
     general: components?.settingsPanel?.generalTab?.menu || [],
     seo: components?.settingsPanel?.seoTab?.menu || [],
   });
+
   /**
    * embed twitter widget if not already loaded
    */
@@ -112,10 +113,34 @@ export default function EditorWrapper(props) {
     enablePublishingFlow,
     POST_STATUSES,
   });
-  //create new post hook
-  const { createPost, creatingPost, created } = useCreate({enablePublishingFlow, POST_STATUSES});
 
-  
+  useEffect(() => {
+    const getNestedValue = (obj, path) => {
+      return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+    };
+
+    const updateSettingsArray = (array) =>
+      array.map((option) => ({
+        ...option,
+        initialValue:
+          option.field && postObject?.id
+            ? getNestedValue(postObject, option.field) ?? option.initialValue
+            : option.initialValue,
+      }));
+
+    setSettingsOptions({
+      general: updateSettingsArray(components?.settingsPanel?.generalTab?.menu || []),
+      seo: updateSettingsArray(components?.settingsPanel?.seoTab?.menu || []),
+    });
+  }, [components?.settingsPanel, postObject]);
+
+  //create new post hook
+  const { createPost, creatingPost, created } = useCreate({
+    enablePublishingFlow,
+    POST_STATUSES,
+  });
+
+
   const {
     //update post content
     updatePostById,
@@ -129,18 +154,15 @@ export default function EditorWrapper(props) {
   } = useUpdate({
     savePostOperation: postOperations.save,
     enablePublishingFlow,
-    POST_STATUSES
+    POST_STATUSES,
   });
 
   useConfirmTabClose(hasUnsavedChanges);
 
-  const debouncedSave = useDebouncedCallback(
-    async ({ editor, forReview }) => {
-      setSaving(false);
-      await _savePost({ editor, forReview });
-    },
-    saveDebounceDelay
-  );
+  const debouncedSave = useDebouncedCallback(async ({ editor, forReview }) => {
+    setSaving(false);
+    await _savePost({ editor, forReview });
+  }, saveDebounceDelay);
 
   /**
    * updatePost
@@ -148,30 +170,32 @@ export default function EditorWrapper(props) {
    * save the content to local storage
    * @param {*} param0
    */
-  const updatePost = ({ editor, json, forReview }) => {
+  const updatePost = ({ editor, json, forReview, publishFlowEnabled }) => {
     // send the content to an API here (if new post only)
     if (postId) {
       setHasUnsavedChanges(true);
-      if (enablePublishingFlow) {
+      if (publishFlowEnabled) {
         setTimeout(() => {
           setSaving(!saving);
         }, 2700);
         debouncedSave({ editor, forReview });
-      } else if (enablePublishingFlow == false) {
+      } else if (publishFlowEnabled == false) {
         //delete the local storage
         localStorage.removeItem("wipContent");
         //save the new version
         localStorage.setItem("wipContent_" + postId, JSON.stringify(json));
       }
     } else {
-      if(enablePublishingFlow){
+      if (publishFlowEnabled) {
         localStorage.setItem("wipContent", JSON.stringify(json));
         setTimeout(() => {
-          setSaving(!saving);
+          if(!editor.state.doc.textContent.trim() === ""){
+            setSaving(!saving);
+          }
         }, 2700);
         debouncedSave({ editor, forReview });
-
-      }else{
+      } else {
+        setHasUnsavedChanges(true);
         localStorage.setItem("wipContent", JSON.stringify(json));
       }
     }
@@ -183,10 +207,20 @@ export default function EditorWrapper(props) {
    */
   const forceSave = ({ editor, json, forReview, publish, unpublish }) => {
     setSaving(false);
-    _savePost({ editor, forReview, forced: true, publish, unpublish });
+    if (publish !== undefined || unpublish !== undefined) {
+      _savePost({ editor, forReview, forced: true, publish, unpublish });
+    } else {
+      _savePost({ editor, forReview, forced: true });
+    }
   };
 
-  const _savePost = async ({ editor, forReview, forced, publish, unpublish }) => {
+  const _savePost = async ({
+    editor,
+    forReview,
+    forced,
+    publish,
+    unpublish,
+  }) => {
     //check if editor has any content
     if (
       editor.state.doc.textContent.trim() === "" &&
@@ -198,7 +232,7 @@ export default function EditorWrapper(props) {
     try {
       //if publishFlow is not enabled, save to local storage
       if (enablePublishingFlow === false) {
-        if(postId){
+        if (postId) {
           //clear the none id version
           localStorage.removeItem("wipContent");
           //save the new version
@@ -206,28 +240,29 @@ export default function EditorWrapper(props) {
             "wipContent_" + postId,
             JSON.stringify(editor.state.doc.toJSON())
           );
-        }else{
+        } else {
           localStorage.setItem(
             "wipContent",
             JSON.stringify(editor.state.doc.toJSON())
           );
         }
 
-        if((forced && (!publish && !unpublish)) && !postId){
+        if (forced && !publish && !unpublish && !postId) {
+          console.log('creating post')
           //create a new post
           const postInfo = await createPost({
             user,
             editor,
-            createPostOperation: postOperations.create
+            createPostOperation: postOperations.create,
           });
           // Set the new slug
-          
+
           if (postInfo?.id) {
             setPostId(postInfo?.id);
             hooks.onPostCreated({ id: postInfo?.id, postInfo });
           }
           localStorage.removeItem("wipContent");
-          
+
           refetch();
           return true;
         } else if (forced && postId) {
@@ -252,8 +287,7 @@ export default function EditorWrapper(props) {
         }
 
         return true;
-      } 
-      else if (postId) {
+      } else if (postId) {
         // Updating an existing post
         const updatedPostObject = await updatePostById({
           editor: editor,
@@ -274,10 +308,7 @@ export default function EditorWrapper(props) {
         return true;
       } else {
         // Creating a new post
-        if (
-          !routerPostId &&
-          typeof postOperations.create === "function"
-        ) {
+        if (!routerPostId && typeof postOperations.create === "function") {
           //check if post content is empty
           if (editor.state.doc.textContent.trim() === "") {
             return false;
@@ -313,31 +344,6 @@ export default function EditorWrapper(props) {
   };
 
   /**
-   * when the post object loads,
-   * set the fields in the settings menu
-   */
-  useEffect(() => {
-    if (postObject) {
-      const getNestedValue = (obj, path) => {
-        return path.split(".").reduce((acc, part) => acc && acc[part], obj);
-      };
-
-      const updateSettingsArray = array =>
-        array.map(option => ({
-          ...option,
-          initialValue: option.field
-            ? getNestedValue(postObject, option.field) ?? option.initialValue
-            : option.initialValue,
-        }));
-
-      setSettingsOptions({
-        general: updateSettingsArray(settingsOptions.general),
-        seo: updateSettingsArray(settingsOptions.seo),
-      });
-    }
-  }, [postObject]);
-
-  /**
    * updateSettings
    */
   const updatePostSettings = async ({ settings }) => {
@@ -368,7 +374,7 @@ export default function EditorWrapper(props) {
           router={router}
           isInterview={isInterview}
           tool={tool}
-          post={postObject}
+          postObject={postObject}
           postStatus={postStatus}
           enablePublishingFlow={enablePublishingFlow}
           hasUnsavedChanges={hasUnsavedChanges}
@@ -385,7 +391,7 @@ export default function EditorWrapper(props) {
 
       <div
         className={`w-full ${
-          isInterview ? "h-screen overflow-y-auto" : "h-full"
+          isInterview ? "h-screen overflow-y-auto" : "h-fit"
         }`}
         id="editor-container"
       >
@@ -393,14 +399,16 @@ export default function EditorWrapper(props) {
           {/* {!user && <Fallback />} */}
 
           {/* only load editor if initialContent is not null */}
-          {(requireLogin == true && !user?.isLoggedIn) ||
-          initialContent == null ? (
+          {requireLogin == true && !user?.isLoggedIn && !user?.loading ? (
             // <Layout>
+            <div className="my-auto h-screen flex flex-col justify-center text-center">
+              <h2 className="-mt-10">You need to be logged in.</h2>
+            </div>
+          ) : initialContent == null ? (
             <div className="my-auto h-screen flex flex-col justify-center text-center">
               <div className="mx-auto opacity-50">
                 <Spinner />
               </div>
-              {/* <h2>You need to be logged in.</h2> */}
             </div>
           ) : (
             // </Layout>
@@ -453,6 +461,7 @@ export default function EditorWrapper(props) {
                       settingsOptions={settingsOptions}
                       user={user}
                       theme={theme}
+                      navSettings={components.nav}
                       enablePublishingFlow={enablePublishingFlow}
                       POST_STATUSES={POST_STATUSES}
                     />

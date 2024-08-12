@@ -4,7 +4,6 @@ import React from 'react';
 
 const ImageNodeView = props => {
   const [blob, setBlob] = useState(null);
-console.log(blob)
   useEffect(() => {
     if (props.node.attrs.src && !blob) {
       fetch(`https://req.prototypr.io/${props.node.attrs.src}`)
@@ -25,9 +24,7 @@ console.log(blob)
     //   }}
     //   value="Don't drag me :("
       onClick={() => {
-        console.log("click");
         let pos = props.getPos();
-        console.log(pos);
         //set editor selection to pos
         props.editor.commands.setNodeSelection(pos - 1);
       }}

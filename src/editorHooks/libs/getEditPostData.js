@@ -29,11 +29,16 @@ export const getEditPostData = ({
 
   const getPublishStatus = () =>{
     if (forReview) {
-      if (!postObject?.status || postObject?.status === POST_STATUSES.DRAFT) {
-        return POST_STATUSES.PENDING || POST_STATUSES.PUBLISH;
-      } else if (postStatus) {
-        return postStatus === POST_STATUSES.PUBLISH ? POST_STATUSES.PUBLISH : POST_STATUSES.DRAFT;
+      if (!postObject?.status || (postObject?.status === POST_STATUSES.DRAFT)) {
+        return POST_STATUSES.PENDING || POST_STATUSES.PUBLISHED;
+      }else if(enablePublishingFlow && (postObject?.status==POST_STATUSES.PENDING || postObject?.status==POST_STATUSES.PUBLISHED)){
+        return postObject?.status;
       }
+      else if (postStatus) {
+        return postStatus === POST_STATUSES.PUBLISHED ? POST_STATUSES.PUBLISHED : POST_STATUSES.DRAFT;
+      }
+    }else{
+      return postObject?.status;
     }
   }
 
@@ -42,25 +47,25 @@ export const getEditPostData = ({
       status: getPublishStatus(),
       // removed content for issue #54
       // content: content,
-      // #54 save content to draft_content instead:
-      draft_title: title,
-      draft_content: content,
+      // #54 save content to versioned_content instead:
+      versioned_title: title,
+      versioned_content: content,
     };
 
     if (forReview && content) {
       //clear the draft version
-      entry.draft_content = "";
+      entry.versioned_content = "";
       entry.content = content;
-      entry.draft_title = "";
+      entry.versioned_title = "";
       entry.title = title;
     }
 
     //change the date on save only if postStatus==draft or postStatus==pending publish
-    if (postObject?.status !== POST_STATUSES.PUBLISH) {
+    if (postObject?.status !== POST_STATUSES.PUBLISHED) {
       entry.date = new Date();
     }
 
-    if (forReview || postStatus == POST_STATUSES.PUBLISH) {
+    if (forReview || postStatus == POST_STATUSES.PUBLISHED) {
       //only save seo and excerpt if it's for review - then it'll be the latest data
       entry.seo = seo;
       entry.excerpt = excerpt;
@@ -71,10 +76,13 @@ export const getEditPostData = ({
       entry,
     };
   } else {
+
     let entry = {
       title: title,
       content: content,
       featuredImage: coverImage,
+      versioned_title: '',
+      versioned_content: '',
       excerpt: excerpt,
       seo: seo,
     };
@@ -86,7 +94,7 @@ export const getEditPostData = ({
     }
 
     return {
-      entry,
+      entry:entry,
     };
   }
 };

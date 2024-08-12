@@ -9,9 +9,9 @@ const useCreate = ({POST_STATUSES,enablePublishingFlow}) => {
 
   const createPost = async ({ user, postObject, editor, forReview, relatedPost, createPostOperation}) => {
     setCreating(true);
-    if (created) {
-      throw new Error("Post already created");
-    }
+    // if (created) {
+    //   throw new Error("Post already created");
+    // }
     const { entry } = getCreatePostData({
       editor,
       postObject,

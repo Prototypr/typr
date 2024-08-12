@@ -70,7 +70,9 @@ const Editor = ({
   theme,
   user,
   enablePublishingFlow,
+  navSettings,
   POST_STATUSES,
+  postId, // Add postId as a prop
 }) => {
   // const { user } = useUser({
   //   redirectIfFound: false,
@@ -79,13 +81,21 @@ const Editor = ({
   const isFirstMount = useRef(true);
 
   const [saveForReview, setForReview] = useState(false);
+  const [shouldUpdateContent, setShouldUpdateContent] = useState(false);
 
   useEffect(() => {
-    if (forceSave && saveForReview) {
+    //if forceSave is a function
+    if (forceSave!==false && saveForReview==true) {
       forceSave({ editor, json: editor.getJSON(), forReview: saveForReview });
       setForReview(false);
     }
   }, [saveForReview]);
+
+  const enablePublishingFlowRef = useRef(enablePublishingFlow);
+
+  useEffect(() => {
+    enablePublishingFlowRef.current = enablePublishingFlow;
+  }, [enablePublishingFlow]);
 
   const editor = useEditor({
     extensions: [
@@ -207,7 +217,14 @@ const Editor = ({
       try {
         const json = editor.getJSON();
         // autosave would happen in the parent here;
-        updatePost({ editor, json, forReview: saveForReview });
+        // if(shouldUpdateContent){
+          updatePost({ 
+            editor, 
+            json, 
+            forReview: saveForReview, 
+            publishFlowEnabled: enablePublishingFlowRef.current 
+          });
+        // }
       } catch (e) {
         if (typeof updatePost !== "function") {
           console.log(e);
@@ -217,12 +234,43 @@ const Editor = ({
     },
   });
 
+  useEffect(() => {
+    setShouldUpdateContent(true);
+  }, [postId]);
+
+  useEffect(() => {
+    if (shouldUpdateContent && editor) {
+      setShouldUpdateContent(false); // Reset the flag after updating content
+        setTimeout(() => {
+        if (initialContent) {
+          editor.chain().setContent(initialContent).run();
+        } else {
+          editor.chain().clearContent().run();
+          setTimeout(() => {
+            const json = editor.getJSON();
+  
+            if (json.content?.length > 0) {
+              // Count the number of paragraphs
+              const paragraphCount = json.content.filter(
+                node => node.type === "paragraph"
+              ).length;
+              if (paragraphCount == 0) {
+                editor.chain().focus().setTextSelection(0).enter().run();
+              }
+            }
+          }, 10);
+        }
+      }, 20);
+    }
+  }, [initialContent]);
+
+
   if (!canEdit) {
     return (
       <div className="h-full w-full mx-auto  relative">
-        <div className="my-auto h-screen flex -mt-8 flex-col justify-center text-center text-center">
+        <div className="my-auto h-screen flex flex-col justify-center text-center text-center">
           <img
-            className="w-[160px] mx-auto"
+            className="w-[160px] -mt-10 mx-auto"
             src="https://prototypr-media.sfo2.digitaloceanspaces.com/strapi/ecacc329595d009d506f6ec3e6e47d0f.png"
           />
           <p className="text-gray-700">You are not owner of this post</p>
@@ -249,7 +297,7 @@ const Editor = ({
     <>
       <div className={`w-full relative ${postType == "article" ? "my-4" : ""}`}>
         {/* NAVIGATION, WITH BUTTONS EMBEDDED AS A PROP */}
-        {user?.isAdmin && postType == "article" ? (
+        {/* {user?.isAdmin && postType == "article" ? (
           <div className="mt-16 hidden sm:block">
             <div className="fixed bottom-3 z-20 w-full">
               <div className="relative bg-gray-100/80 w-[500px] shadow-sm border border-gray-300/20 mx-auto rounded-xl p-3 text-sm backdrop-blur text-gray-800 flex flex-row justify-center items-center">
@@ -257,13 +305,13 @@ const Editor = ({
               </div>
             </div>
           </div>
-        ) : null}
+        ) : null} */}
 
         {/* undoredo buttons render in a portal on the navbar */}
         {showNavButtons !== false ? (
           <UndoRedoNavPortal>
-            <div className="flex">
-              <UndoRedoButtons editor={editor} />
+            <div className="flex h-full">
+              <UndoRedoButtons show={navSettings.undoRedoButtons.show} editor={editor} />
               {enablePublishingFlow !== false && (
                 <div className={`ml-3 my-auto text-gray-500`}>
                   {isSaving
@@ -301,6 +349,7 @@ const Editor = ({
                 enablePublishingFlow={enablePublishingFlow}
                 forceSave={forceSave}
                 POST_STATUSES={POST_STATUSES}
+                hasUnsavedChanges={hasUnsavedChanges}
               />
             </div>
           </EditorButtonsNavPortal>
@@ -312,7 +361,7 @@ const Editor = ({
             wrapperClass
               ? wrapperClass
               : postType == "article"
-              ? "my-4 pt-0 mt-[100px] max-w-[44rem] mx-auto relative pb-10 blog-content px-3 sm:px-0"
+              ? `my-4 pt-0 mt-[100px] max-w-[44rem] mx-auto relative pb-10 blog-content px-3 sm:px-0`
               : ""
           }
         >

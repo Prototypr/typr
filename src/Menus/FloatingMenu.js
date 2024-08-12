@@ -375,14 +375,14 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
         if (
           state?.selection?.$anchor?.parent?.type?.name == "paragraph" &&
           state?.selection?.$anchor?.parent?.textContent == "" &&
-          !editor.isActive("bulletList") &&
-          !editor.isActive("orderedList")
+          !editor?.isActive("bulletList") &&
+          !editor?.isActive("orderedList")
         ) {
           return true;
         }
 
         if (
-          editor.state.doc.textContent.trim() === "" &&
+          editor?.state?.doc?.textContent?.trim() === "" &&
           state?.selection?.$anchor?.pos == 2
         ) {
           return true;
@@ -418,8 +418,8 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
             sticky="always"
             onPointerDownOutside={e => {
               if (
-                !e.target.closest("#menu-trigger-container") &&
-                !e.target.closest(".menu-item")
+                !e?.target?.closest("#menu-trigger-container") &&
+                !e?.target?.closest(".menu-item")
               ) {
                 setIsOpen(false);
               }

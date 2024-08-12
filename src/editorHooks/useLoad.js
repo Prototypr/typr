@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { getInterViewTemplate } from "./libs/templates/interviewTemplate";
-
+import toast, { Toaster } from "react-hot-toast";
 /**
  * useLoad hook for loading post content
  *
@@ -37,6 +37,7 @@ const useLoad = ({
   const [postObject, setPostObject] = useState(false);
   const [title, setTitle] = useState(null);
   const [postStatus, setPostStatus] = useState(POST_STATUSES.DRAFT);
+  const [activeToasts, setActiveToasts] = useState(new Set());
 
   // New function to check user access
   const hasUserAccess = () => {
@@ -49,7 +50,11 @@ const useLoad = ({
       if (routerPostId) {
         setPostId(routerPostId);
       } else {
-        refetch();
+          setPostId(false);
+          if(!postId){
+
+            refetch();
+          }
       }
     }
   }, [routerPostId, user]);
@@ -57,7 +62,24 @@ const useLoad = ({
   useEffect(() => {
     if (postId && hasUserAccess()) {
       refetch();
+    }else if (!postId && hasUserAccess()){
+      setPostObject({
+        status:POST_STATUSES.DRAFT
+      })
+      setPostId(false);
+      setInitialContent(false);
+      setTitle(null);
+      setPostStatus(POST_STATUSES.DRAFT);
+      setSlug(null);
+      setLoading(false);
+      setCanEdit(true);
+      setIsOwner(true);
+      
+      setTimeout(() => {
+        refetch();
+      }, 100);
     }
+  // }, [postId, user.isLoggedIn]);
   }, [postId, user.isLoggedIn]);
 
   // Refetch content
@@ -104,6 +126,23 @@ const useLoad = ({
     }
   };
 
+  // Function to show toast if not already displayed
+  const showToast = (message) => {
+    if (!activeToasts.has(message)) {
+      toast.error(message, {
+        id: message,
+        onClose: () => {
+          setActiveToasts((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(message);
+            return newSet;
+          });
+        },
+      });
+      setActiveToasts((prev) => new Set(prev).add(message));
+    }
+  };
+
   // Fetch current post from the backend
   const getPostFromDB = async (localContent) => {
     try {
@@ -114,16 +153,25 @@ const useLoad = ({
         return false
       }
       const post = await loadPostOperation({user, postId:postId});
-      
-      if(post?.title === undefined){
-        toast.error('Post title required.');
+
+      if(!post?.id){
+        //post is not found
+        showToast('Post not found.');
         if(!localContent){
           setInitialContent(false);
         }
         return false
       }
-      if(post?.content === undefined){
-        toast.error('Post content required.');
+      
+      if(post?.title === undefined && post?.versioned_title === undefined){
+        showToast('Post title required.');
+        if(!localContent){
+          setInitialContent(false);
+        }
+        return false
+      }
+      if(post?.content === undefined && post?.versioned_content === undefined){
+        showToast('Post content required.');
         if(!localContent){
           setInitialContent(false);
         }
@@ -131,6 +179,9 @@ const useLoad = ({
       }
 
       if (post) {
+        if(!post.status){
+          post.status = POST_STATUSES.DRAFT;
+        }
         setPostObject(post);
         // if(localContent){
         //   setInitialContent(JSON.parse(localContent));
@@ -156,32 +207,32 @@ const useLoad = ({
    */
   useEffect(() => {
     if (postObject) {
-      setPostId(postObject?.id);
+      // setPostId(postObject?.id);
 
       //set content
       // update for #54
-      // load from draft_content if available (draft_content is cleared when post is published/submitted for review)
+      // load from versioned_content if available (versioned_content is cleared when post is published/submitted for review)
       let content = "";
 
-      if (postObject?.draft_content?.length) {
-        content = postObject?.draft_content;
+      if (postObject?.versioned_content?.length) {
+        content = postObject?.versioned_content;
       } else if (postObject?.content?.length) {
-        // legacy support - if there is no draft_content, load content
+        // legacy support - if there is no versioned_content, load content
         content = postObject?.content;
       }
-      if (postObject?.draft_title?.length) {
+      if (postObject?.versioned_title?.length) {
         //set title
-        setTitle(postObject?.draft_title);
+        setTitle(postObject?.versioned_title);
         if (
-          postObject?.draft_title &&
-          content.indexOf(postObject?.draft_title) == -1
+          postObject?.versioned_title &&
+          content.indexOf(postObject?.versioned_title) == -1
         ) {
-          content = `<h1>${postObject?.draft_title}</h1>${content}`;
+          content = `<h1>${postObject?.versioned_title}</h1>${content}`;
         }
       } else if (postObject?.title?.length) {
         //set title
         setTitle(postObject?.title);
-        // legacy support - if there is no draft_title, load content
+        // legacy support - if there is no versioned_title, load content
         if (postObject?.title && content.indexOf(postObject?.title) == -1) {
           content = `<h1>${postObject?.title}</h1>${content}`;
         }

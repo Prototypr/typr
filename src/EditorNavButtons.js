@@ -30,17 +30,19 @@ const EditorNavButtons = ({
   enablePublishingFlow,
   forceSave,
   POST_STATUSES,
+  hasUnsavedChanges,
 }) => {
   return (
     <>
     <div className="flex gap-0.5">
       {(enablePublishingFlow == false && user?.isLoggedIn) ? (
         <Button
+          disabled={!canEdit ||isSaving || !hasUnsavedChanges}
           variant="ghostBlue"
           onClick={()=>forceSave({ editor,json: editor.getJSON() })}
-          className={`${!enablePublishingFlow && (postObject.status == POST_STATUSES.PUBLISHED || postObject.status == POST_STATUSES.PENDING) ? (theme === 'blue' ? '!bg-blue-600 !outline-blue-600' : '!bg-gray-700 !outline-gray-700') + ' !text-white' : (theme === 'blue' ? '!outline-blue-600' : '!outline-gray-600 !text-gray-700')} !text-[13px] font-normal !h-[25px] !px-2 my-auto mr-2`}
+          className={`${!enablePublishingFlow && (postObject?.status == POST_STATUSES.PUBLISHED || postObject?.status == POST_STATUSES.PENDING) ? (theme === 'blue' ? '!bg-blue-600 !outline-blue-600' : '!bg-gray-700 !outline-gray-700') + ' !text-white' : (theme === 'blue' ? '!outline-blue-6000' : '!outline-gray-600 !text-gray-700')} !text-[13px] font-normal !h-[25px] !px-2 my-auto mr-2 ${isSaving || !hasUnsavedChanges ?' !opacity-50 !cursor-not-allowed':''}`}
         >
-          {isSaving ? <Spinner size={14} className="mx-auto"/> :postObject.status == POST_STATUSES.DRAFT ? "Save draft" : "Save"}
+          {isSaving ? <Spinner size={14} className="mx-auto"/> :(postObject.status == POST_STATUSES.DRAFT || postObject.status== null)? "Save draft" : "Save"}
         </Button>
       ) : null}
       {/* show publish button if post not published */}
@@ -66,7 +68,7 @@ const EditorNavButtons = ({
 
 
       {/* show side panel trigger if updatePostSettings is defined (in /p/[slug]) */}
-      {editor && settingsPanelSettings?.show == true ? (
+      {(postObject?.id && (editor && settingsPanelSettings?.show == true)) ? (
         <SidePanelTrigger
           theme={theme}
           user={user}

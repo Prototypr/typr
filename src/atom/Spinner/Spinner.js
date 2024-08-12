@@ -6,7 +6,7 @@ import clsx from "classnames";
 const Spinner = forwardRef((props, ref) => {
   const { className,size, ...rest } = props;
 
-  const merged = clsx("spinner", className);
+  const merged = clsx("spinner animate-spin", className);
 
   return (
     <span ref={ref} {...rest} style={{width:size,height:size}}>

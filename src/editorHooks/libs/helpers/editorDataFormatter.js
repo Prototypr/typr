@@ -140,13 +140,17 @@ export const getSeoData = ({ postObject, title, excerpt, coverImage }) => {
  */
 export const getLegacyFeaturedImage = ({ coverImage }) => {
   //always update to new cover image
-  const legacyFeaturedImage = {
-    mediaItemUrl: coverImage || "",
-    srcSet: generateImageTypes(coverImage || ""),
-    thumb: `${coverImage}-150x150.${getImageExtention(coverImage || "")}`,
-    medium: `${coverImage}-768x336.${getImageExtention(coverImage || "")}`,
-  };
-  return legacyFeaturedImage;
+  if(coverImage?.mediaItemUrl){
+    const legacyFeaturedImage = {
+      mediaItemUrl: coverImage || "",
+      srcSet: generateImageTypes(coverImage || ""),
+      thumb: `${coverImage}-150x150.${getImageExtention(coverImage || "")}`,
+      medium: `${coverImage}-768x336.${getImageExtention(coverImage || "")}`,
+    };
+    return legacyFeaturedImage;
+  } else {
+    return null;
+  }
 };
 
 export const getPostDate = ({ postObject }) => {

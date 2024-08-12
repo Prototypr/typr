@@ -37,8 +37,8 @@ export const getCreatePostData = ({
       status: POST_STATUSES.DRAFT,
       title:'',
       content: '',
-      draft_title: title,
-      draft_content: content,
+      versioned_title: title,
+      versioned_content: content,
       slug: slug, //slug is always the same when editing a draft
       userId: user?.id,
     };
@@ -61,6 +61,7 @@ export const getCreatePostData = ({
       entry: {
         title: title,
         content: content,
+        status: POST_STATUSES.DRAFT,
       }
     }
   }

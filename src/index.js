@@ -26,8 +26,11 @@ import UndoRedoButtons from './UndoRedoButtons';
 import EditorNavButtons from './EditorNavButtons';
 import LinkInput from './Menus/MenuButtons/LinkDropdown/LinkButtonRadix';
 
+import { defaultProps } from './config/defaultProps';
 
 export default EditorWrapper;
+
+export { defaultProps };
 
 export const plugins = {
   //custom plugins

@@ -18,6 +18,7 @@ export const defaultProps = {
   components: {
     nav: {
       show: true,
+      position:'fixed',
       logo: { image: null, url: "/", show: true },
       undoRedoButtons: { show: true },
       unsavedChangesNotice: { show: true },

@@ -161,7 +161,6 @@ const LinkField = ({editor, closePopup, figureNode}) =>{
         //  console.log(attrs)
 
          if(editor.state.selection?.$anchor?.pos){
-          console.log(editor.state.selection?.$anchor)
              tr.setNodeMarkup(editor.state.selection?.$anchor?.pos+1, undefined, {
                 ...attrs,
                 alt: altText

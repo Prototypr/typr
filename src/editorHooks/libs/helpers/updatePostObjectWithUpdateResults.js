@@ -6,6 +6,7 @@
  * @param {*} param0 
  */
 export const updatePostObject = ({updatedObject, existingObject}) => {
+
     const deepMerge = (target, source) => {
         for (const key in source) {
             if (source.hasOwnProperty(key)) {
@@ -24,9 +25,9 @@ export const updatePostObject = ({updatedObject, existingObject}) => {
 
     // Ensure these specific fields are always updated
     mergedObject.content = updatedObject.content;
-    mergedObject.draft_content = updatedObject.draft_content;
+    mergedObject.versioned_content = updatedObject.versioned_content;
     mergedObject.title = updatedObject.title;
-    mergedObject.draft_title = updatedObject.draft_title;
+    mergedObject.versioned_title = updatedObject.versioned_title;
 
     return mergedObject;
 };

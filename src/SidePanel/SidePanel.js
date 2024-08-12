@@ -68,6 +68,7 @@ const SidebarInner = ({
 
   const [hasChanges, setHasChanges] = useState(false);
 
+
   const handleFieldChange = (tabName, fieldIndex, newValue) => {
     setUpdatedSettingsOptions(prevOptions => {
       const newOptions = {
@@ -91,13 +92,16 @@ const SidebarInner = ({
 
   useEffect(() => {
     const isAllAdminOnly = (options) => options.every(option => option.adminOnly);
-
+console.log('settingsOptions', settingsOptions)
     if (!user?.isAdmin) {
       const seoOptions = settingsOptions?.seo || [];
       const generalOptions = settingsOptions?.general || [];
 
       setShowSeoPanel(!isAllAdminOnly(seoOptions));
       setShowGeneralPanel(!isAllAdminOnly(generalOptions));
+    }else{
+      setShowSeoPanel(true);
+      setShowGeneralPanel(true);
     }
   }, [settingsOptions, user]);
 
@@ -134,6 +138,27 @@ const SidebarInner = ({
       });
     }
   }, [postObject]);
+
+  useEffect(()=>{
+    setUpdatedSettingsOptions(prevOptions => {
+      const newOptions = settingsOptions;
+      Object.keys(settingsOptions).forEach(tabName => {
+        if (newOptions[tabName]) {
+          newOptions[tabName] = settingsOptions[tabName].map((field, index) => {
+            const existingField = newOptions[tabName][index];
+            return {
+              ...field,
+              initialValue: existingField ? existingField.initialValue : field.initialValue
+            };
+          });
+        } else {
+          newOptions[tabName] = settingsOptions[tabName];
+        }
+      });
+      return newOptions;
+    });
+
+  },[settingsOptions])
 
   const updatePost = async () => {
     setSaving(true);
@@ -248,6 +273,7 @@ const SidebarInner = ({
               <Tabs.List className="flex border-b border-t border-gray-200">
                 {showSeoPanel && (
                   <Tabs.Trigger
+                    id="seo-tab"
                     className={`flex-1 bg-gray-50/80 px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-900 focus:outline-none border-b-2 border-transparent ${
                       theme == "blue"
                         ? "data-[state=active]:border-blue-500"
@@ -260,6 +286,7 @@ const SidebarInner = ({
                 )}
                 {showGeneralPanel && (
                   <Tabs.Trigger
+                    id="general-tab"
                     className={`flex-1 bg-gray-50/80 px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-900 focus:outline-none border-b-2 border-transparent ${
                       theme == "blue"
                         ? "data-[state=active]:border-blue-500"
@@ -293,11 +320,13 @@ const SidebarInner = ({
                     <div className="bg-white mb-5 border-gray-100">
                       {updatedSettingsOptions?.general?.map(
                         (field, index) => (
-                          <FormField
-                            key={index}
-                            {...field}
-                            onValueChange={(newValue) => handleFieldChange('general', index, newValue)}
-                          />
+                          (!field.adminOnly || (field.adminOnly && user?.isAdmin)) && (
+                            <FormField
+                              key={index}
+                              {...field}
+                              onValueChange={(newValue) => handleFieldChange('general', index, newValue)}
+                            />
+                          )
                         )
                       )}
                       {settingsPanelSettings.featuredImage?.show == true && (
@@ -384,11 +413,13 @@ const SidebarInner = ({
                       <div className="bg-white mb-5 border-gray-100">
                         {updatedSettingsOptions?.general?.map(
                           (field, index) => (
-                            <FormField
-                              key={index}
-                              {...field}
-                              onValueChange={(newValue) => handleFieldChange('general', index, newValue)}
-                            />
+                            (!field.adminOnly || (field.adminOnly && user?.isAdmin)) && (
+                              <FormField
+                                key={index}
+                                {...field}
+                                onValueChange={(newValue) => handleFieldChange('general', index, newValue)}
+                              />
+                            )
                           )
                         )}
                         {settingsPanelSettings.featuredImage?.show == true && (

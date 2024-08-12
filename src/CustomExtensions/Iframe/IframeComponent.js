@@ -3,7 +3,6 @@ import { NodeViewWrapper, NodeViewContent } from "@tiptap/react";
 
 export default (props) => {
   // if (nodes < 2) {
-      console.log(props)
   return (
     <NodeViewWrapper className="react-component mely-editor-block">
       <div contentEditable="false"
