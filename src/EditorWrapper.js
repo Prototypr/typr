@@ -434,6 +434,7 @@ export default function EditorWrapper(props) {
                       settingsOptions,
                       user,
                       theme,
+                      navSettings:components.nav,
                       enablePublishingFlow,
                       POST_STATUSES,
                       ...childProps, // Spread custom props to override defaults

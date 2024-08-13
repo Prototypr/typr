@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { getEditPostData } from "./libs/getEditPostData";
 import { updatePostObject } from "./libs/helpers/updatePostObjectWithUpdateResults";
+import { isValid, parseISO } from "date-fns";
 
 /**
  * updates a post based on its postId
@@ -57,13 +58,26 @@ const useUpdate = ({ savePostOperation, POST_STATUSES }) => {
     setSaving(true);
     setSaved(false);
 
+
     const mergedEntry = deepMerge({}, entry);
-     // For nested objects, merge with existing postObject data
-     for (const key in mergedEntry) {
+    // For nested objects, merge with existing postObject data, except for date fields
+    for (const key in mergedEntry) {
       if (
         typeof mergedEntry[key] === "object" &&
         mergedEntry[key] !== null &&
-        postObject[key]
+        postObject[key] &&
+        !isDateField(mergedEntry[key])
+      ) {
+        mergedEntry[key] = deepMerge(postObject[key], mergedEntry[key]);
+      }
+    }
+
+    for (const key in mergedEntry) {
+      if (
+        typeof mergedEntry[key] === "object" &&
+        mergedEntry[key] !== null &&
+        postObject[key] &&
+        !isDateField(mergedEntry[key])
       ) {
         mergedEntry[key] = deepMerge(postObject[key], mergedEntry[key]);
       }
@@ -73,8 +87,11 @@ const useUpdate = ({ savePostOperation, POST_STATUSES }) => {
 
     try {
       const savePostData = deepMerge(postObject, mergedEntry);
-      
-      saveData = await savePostOperation({ entry:{...savePostData}, postId });
+
+      saveData = await savePostOperation({
+        entry: { ...savePostData },
+        postId,
+      });
       // console.log(saveData)
       if (saveData) {
         setTimeout(() => {
@@ -145,7 +162,8 @@ const useUpdate = ({ savePostOperation, POST_STATUSES }) => {
       if (
         typeof mergedEntry[key] === "object" &&
         mergedEntry[key] !== null &&
-        postObject[key]
+        postObject[key] &&
+        !isDateField(mergedEntry[key])
       ) {
         mergedEntry[key] = deepMerge(postObject[key], mergedEntry[key]);
       }
@@ -222,7 +240,11 @@ const deepMerge = (target, source) => {
   const result = { ...target };
   for (const key in source) {
     if (source.hasOwnProperty(key)) {
-      if (typeof source[key] === "object" && source[key] !== null) {
+      if (
+        typeof source[key] === "object" &&
+        source[key] !== null &&
+        !isDateField(source[key])
+      ) {
         result[key] = deepMerge(target[key] || {}, source[key]);
       } else {
         result[key] = source[key];
@@ -230,4 +252,14 @@ const deepMerge = (target, source) => {
     }
   }
   return result;
+};
+
+const isDateField = value => {
+  if (value instanceof Date) {
+    return isValid(value);
+  }
+  if (typeof value === "string") {
+    return isValid(parseISO(value));
+  }
+  return false;
 };

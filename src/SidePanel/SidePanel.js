@@ -56,7 +56,7 @@ const SidebarInner = ({
   theme,
 }) => {
   const [coverImage, setCoverImage] = useState(null);
-  
+
   const [saving, setSaving] = useState(false);
 
   const [activeTab, setActiveTab] = useState("seo");
@@ -64,10 +64,10 @@ const SidebarInner = ({
   const [showSeoPanel, setShowSeoPanel] = useState(true);
   const [showGeneralPanel, setShowGeneralPanel] = useState(true);
 
-  const [updatedSettingsOptions, setUpdatedSettingsOptions] = useState(settingsOptions);
+  const [updatedSettingsOptions, setUpdatedSettingsOptions] =
+    useState(settingsOptions);
 
   const [hasChanges, setHasChanges] = useState(false);
-
 
   const handleFieldChange = (tabName, fieldIndex, newValue) => {
     setUpdatedSettingsOptions(prevOptions => {
@@ -75,31 +75,32 @@ const SidebarInner = ({
         ...prevOptions,
         [tabName]: prevOptions[tabName].map((field, index) =>
           index === fieldIndex ? { ...field, initialValue: newValue } : field
-        )
+        ),
       };
-      
+
       // Check if there are any changes
       const hasAnyChanges = Object.keys(newOptions).some(tab =>
-        newOptions[tab].some((field, index) => 
-          field.initialValue !== settingsOptions[tab][index].initialValue
+        newOptions[tab].some(
+          (field, index) =>
+            field.initialValue !== settingsOptions[tab][index].initialValue
         )
       );
-      
+
       setHasChanges(hasAnyChanges);
       return newOptions;
     });
   };
 
   useEffect(() => {
-    const isAllAdminOnly = (options) => options.every(option => option.adminOnly);
-// console.log('settingsOptions', settingsOptions)
+    const isAllAdminOnly = options => options.every(option => option.adminOnly);
+    // console.log('settingsOptions', settingsOptions)
     if (!user?.isAdmin) {
       const seoOptions = settingsOptions?.seo || [];
       const generalOptions = settingsOptions?.general || [];
 
       setShowSeoPanel(!isAllAdminOnly(seoOptions));
       setShowGeneralPanel(!isAllAdminOnly(generalOptions));
-    }else{
+    } else {
       setShowSeoPanel(true);
       setShowGeneralPanel(true);
     }
@@ -125,13 +126,16 @@ const SidebarInner = ({
         const newOptions = { ...prevOptions };
         Object.keys(newOptions).forEach(tabName => {
           newOptions[tabName] = newOptions[tabName].map(field => {
-            const fieldParts = field.field.split('.');
+            const fieldParts = field.field.split(".");
             let value = postObject;
             for (const part of fieldParts) {
               value = value?.[part];
               if (value === undefined) break;
             }
-            return { ...field, initialValue: value !== undefined ? value : field.initialValue };
+            return {
+              ...field,
+              initialValue: value !== undefined ? value : field.initialValue,
+            };
           });
         });
         return newOptions;
@@ -139,7 +143,7 @@ const SidebarInner = ({
     }
   }, [postObject]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setUpdatedSettingsOptions(prevOptions => {
       const newOptions = settingsOptions;
       Object.keys(settingsOptions).forEach(tabName => {
@@ -148,7 +152,9 @@ const SidebarInner = ({
             const existingField = newOptions[tabName][index];
             return {
               ...field,
-              initialValue: existingField ? existingField.initialValue : field.initialValue
+              initialValue: existingField
+                ? existingField.initialValue
+                : field.initialValue,
             };
           });
         } else {
@@ -157,8 +163,7 @@ const SidebarInner = ({
       });
       return newOptions;
     });
-
-  },[settingsOptions])
+  }, [settingsOptions]);
 
   const updatePost = async () => {
     setSaving(true);
@@ -167,11 +172,14 @@ const SidebarInner = ({
     Object.keys(updatedSettingsOptions).forEach(tabName => {
       updatedSettingsOptions[tabName].forEach((field, index) => {
         const originalField = settingsOptions[tabName][index];
-        if (originalField && field.initialValue !== originalField.initialValue) {
+        if (
+          originalField &&
+          field.initialValue !== originalField.initialValue
+        ) {
           // Handle dot notation in field names
-          const fieldParts = field.field.split('.');
+          const fieldParts = field.field.split(".");
           let currentObj = settings;
-          
+
           fieldParts.forEach((part, i) => {
             if (i === fieldParts.length - 1) {
               currentObj[part] = field.initialValue;
@@ -186,12 +194,12 @@ const SidebarInner = ({
 
     if (Object.keys(settings).length > 0) {
       try {
-       let updatedData = await updatePostSettings({ settings });
-        if(!updatedData){
+        let updatedData = await updatePostSettings({ settings });
+        if (!updatedData) {
           throw new Error("Failed to update settings. Please try again.");
         }
         const updatedPost = await refetchPost(); // Assume this returns the updated post data
-        
+
         //this is done in the hook above instead
         // Update the local state with the new settings from the refetched post
         // setUpdatedSettingsOptions(prevOptions => {
@@ -263,7 +271,7 @@ const SidebarInner = ({
               <Cross2Icon />
             </div>
           </div>
-          
+
           {showSeoPanel && showGeneralPanel ? (
             <Tabs.Root
               className="flex flex-col h-full"
@@ -305,7 +313,9 @@ const SidebarInner = ({
                       <FormField
                         key={index}
                         {...field}
-                        onValueChange={(newValue) => handleFieldChange('seo', index, newValue)}
+                        onValueChange={newValue =>
+                          handleFieldChange("seo", index, newValue)
+                        }
                       />
                     ))}
                   </div>
@@ -318,17 +328,6 @@ const SidebarInner = ({
                 >
                   <div className="mt-6 px-4 sm:px-6">
                     <div className="bg-white mb-5 border-gray-100">
-                      {updatedSettingsOptions?.general?.map(
-                        (field, index) => (
-                          (!field.adminOnly || (field.adminOnly && user?.isAdmin)) && (
-                            <FormField
-                              key={index}
-                              {...field}
-                              onValueChange={(newValue) => handleFieldChange('general', index, newValue)}
-                            />
-                          )
-                        )
-                      )}
                       {settingsPanelSettings.featuredImage?.show == true && (
                         <div className="border border-gray-100 p-4 rounded-md my-3">
                           <h2 className="font-medium text-md mb-4 font-secondary">
@@ -373,20 +372,34 @@ const SidebarInner = ({
                           ) : (
                             <div className="text-sm text-gray-700">
                               <p className="mb-3">
-                                Dear admin, you can only upload a featured image to
-                                a post that has already been saved as a draft.
+                                Dear admin, you can only upload a featured image
+                                to a post that has already been saved as a
+                                draft.
                               </p>
                               <p className="mb-3">
                                 Press 'Save Draft', and then come back here to
                                 attach a featured image.
                               </p>
                               <p className="mb-3 text-xs text-purple-500">
-                                (Todo: make this work for non drafts where the post
-                                has not been created yet.)
+                                (Todo: make this work for non drafts where the
+                                post has not been created yet.)
                               </p>
                             </div>
                           )}
                         </div>
+                      )}
+                      {updatedSettingsOptions?.general?.map(
+                        (field, index) =>
+                          (!field.adminOnly ||
+                            (field.adminOnly && user?.isAdmin)) && (
+                            <FormField
+                              key={index}
+                              {...field}
+                              onValueChange={newValue =>
+                                handleFieldChange("general", index, newValue)
+                              }
+                            />
+                          )
                       )}
                     </div>
                   </div>
@@ -403,7 +416,9 @@ const SidebarInner = ({
                         <FormField
                           key={index}
                           {...field}
-                          onValueChange={(newValue) => handleFieldChange('seo', index, newValue)}
+                          onValueChange={newValue =>
+                            handleFieldChange("seo", index, newValue)
+                          }
                         />
                       ))}
                     </>
@@ -411,17 +426,6 @@ const SidebarInner = ({
                   {showGeneralPanel && (
                     <>
                       <div className="bg-white mb-5 border-gray-100">
-                        {updatedSettingsOptions?.general?.map(
-                          (field, index) => (
-                            (!field.adminOnly || (field.adminOnly && user?.isAdmin)) && (
-                              <FormField
-                                key={index}
-                                {...field}
-                                onValueChange={(newValue) => handleFieldChange('general', index, newValue)}
-                              />
-                            )
-                          )
-                        )}
                         {settingsPanelSettings.featuredImage?.show == true && (
                           <div className="border border-gray-100 p-4 rounded-md my-3">
                             <h2 className="font-medium text-md mb-4 font-secondary">
@@ -455,7 +459,9 @@ const SidebarInner = ({
                                   return true;
                                 }}
                                 center={false}
-                                uploadImageAPI={"/api/aws/uploadPublicationLogo"}
+                                uploadImageAPI={
+                                  "/api/aws/uploadPublicationLogo"
+                                }
                                 uploadAPI={`/api/publication/updatePublication`}
                                 fieldName="logo"
                                 uploadButtonText={"Browse"}
@@ -466,20 +472,34 @@ const SidebarInner = ({
                             ) : (
                               <div className="text-sm text-gray-700">
                                 <p className="mb-3">
-                                  Dear admin, you can only upload a featured image to
-                                  a post that has already been saved as a draft.
+                                  Dear admin, you can only upload a featured
+                                  image to a post that has already been saved as
+                                  a draft.
                                 </p>
                                 <p className="mb-3">
                                   Press 'Save Draft', and then come back here to
                                   attach a featured image.
                                 </p>
                                 <p className="mb-3 text-xs text-purple-500">
-                                  (Todo: make this work for non drafts where the post
-                                  has not been created yet.)
+                                  (Todo: make this work for non drafts where the
+                                  post has not been created yet.)
                                 </p>
                               </div>
                             )}
                           </div>
+                        )}
+                        {updatedSettingsOptions?.general?.map(
+                          (field, index) =>
+                            (!field.adminOnly ||
+                              (field.adminOnly && user?.isAdmin)) && (
+                              <FormField
+                                key={index}
+                                {...field}
+                                onValueChange={newValue =>
+                                  handleFieldChange("general", index, newValue)
+                                }
+                              />
+                            )
                         )}
                       </div>
                     </>
@@ -488,7 +508,7 @@ const SidebarInner = ({
               </div>
             </div>
           )}
-          
+
           <div className="px-5 flex fixed w-full bg-white bottom-0 justify-start border-t py-3 gap-3 border-gray-300">
             {postObject?.published_at && (
               <button
