@@ -175,32 +175,32 @@ const Editor = ({
       }),
     ],
     onCreate: ({ editor }) => {
-      /**
-       * when the editor is created
-       * set the content to the initial content
-       */
-      if (isFirstMount.current) {
-        isFirstMount.current = false;
+      
+      if (!isFirstMount.current) {
         return;
       }
+      isFirstMount.current = false;
+      
 
-      editor
-        ?.chain()
-        .setContent(initialContent)
-        .setMeta("addToHistory", false)
-        .run();
-
-      //check if editor.state.doc.textContent is white space or empty
-      if (editor.state.doc.textContent.trim() === "") {
+      if (initialContent) {
+        editor
+          .chain()
+          .setContent(initialContent)
+          .setMeta("addToHistory", false)
+          .run();
+      } else {
         editor.commands.clearContent();
+      }
+
+      if (editor.state.doc.textContent.trim() === "") {
         setTimeout(() => {
           const json = editor.getJSON();
 
           if (json.content?.length > 0) {
-            // Count the number of paragraphs
             const paragraphCount = json.content.filter(
               node => node.type === "paragraph"
             ).length;
+
             if (paragraphCount == 0) {
               editor.chain().focus().setTextSelection(0).enter().run();
             }
@@ -210,7 +210,6 @@ const Editor = ({
 
       if (setInitialEditorContent) setInitialEditorContent(editor);
 
-      //add the twitter widget script
       addTwitterScript();
     },
     onUpdate: ({ editor }) => {
@@ -229,7 +228,7 @@ const Editor = ({
         if (typeof updatePost !== "function") {
           console.log(e);
           console.log("updatePost is not a function");
-        } else [console.log(e)];
+        } else {console.log(e)};
       }
     },
   });
@@ -243,7 +242,9 @@ const Editor = ({
       setShouldUpdateContent(false); // Reset the flag after updating content
         setTimeout(() => {
         if (initialContent) {
-          editor.chain().setContent(initialContent).run();
+          if (editor.getHTML() !== initialContent) {
+            editor.chain().setContent(initialContent).run();
+          }
         } else {
           editor.chain().clearContent().run();
           setTimeout(() => {

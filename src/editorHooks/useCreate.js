@@ -43,7 +43,8 @@ const useCreate = ({POST_STATUSES,enablePublishingFlow}) => {
     }
 
       return postResult;
-    } catch {
+    } catch(e) {
+      console.log(e)
       toast.error("Error creating draft! Please contact support for help.", {
         duration: 5000,
       });
