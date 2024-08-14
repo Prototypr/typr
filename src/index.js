@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./page-styles.scss";
  
 import EditorWrapper from './EditorWrapper';
+import Editor from './Editor';
 
 import MenuFloating from './Menus/FloatingMenu';
 import ImageMenu from './Menus/ImageMenu';
@@ -29,6 +30,8 @@ import LinkInput from './Menus/MenuButtons/LinkDropdown/LinkButtonRadix';
 import { defaultProps } from './config/defaultProps';
 
 export default EditorWrapper;
+
+export { Editor };
 
 export { defaultProps };
 
