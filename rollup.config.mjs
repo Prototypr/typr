@@ -19,7 +19,7 @@ export default [
       clearScreen: false
     },
     output: [
-      { dir:'dist', format:'cjs' },
+      // { dir:'dist', format:'cjs' },
       { dir:'dist', format:'es', exports:"named", preserveModules:false }
     ],
     plugins: [
