@@ -119,8 +119,8 @@ export default function EditorWrapper(props) {
       return path.split(".").reduce((acc, part) => acc && acc[part], obj);
     };
 
-    const updateSettingsArray = (array) =>
-      array.map((option) => ({
+    const updateSettingsArray = array =>
+      array.map(option => ({
         ...option,
         initialValue:
           option.field && postObject?.id
@@ -129,7 +129,9 @@ export default function EditorWrapper(props) {
       }));
 
     setSettingsOptions({
-      general: updateSettingsArray(components?.settingsPanel?.generalTab?.menu || []),
+      general: updateSettingsArray(
+        components?.settingsPanel?.generalTab?.menu || []
+      ),
       seo: updateSettingsArray(components?.settingsPanel?.seoTab?.menu || []),
     });
   }, [components?.settingsPanel, postObject]);
@@ -139,7 +141,6 @@ export default function EditorWrapper(props) {
     enablePublishingFlow,
     POST_STATUSES,
   });
-
 
   const {
     //update post content
@@ -189,7 +190,7 @@ export default function EditorWrapper(props) {
       if (publishFlowEnabled) {
         localStorage.setItem("wipContent", JSON.stringify(json));
         setTimeout(() => {
-          if(!editor.state.doc.textContent.trim() === ""){
+          if (!editor.state.doc.textContent.trim() === "") {
             setSaving(!saving);
           }
         }, 2700);
@@ -430,11 +431,14 @@ export default function EditorWrapper(props) {
                       updatePost,
                       forceSave,
                       refetchPost: refetch,
+                      updatePostSettings: components.settingsPanel?.show
+                        ? updatePostSettings
+                        : false,
                       settingsPanelSettings: components.settingsPanel,
                       settingsOptions,
                       user,
                       theme,
-                      navSettings:components.nav,
+                      navSettings: components.nav,
                       enablePublishingFlow,
                       POST_STATUSES,
                       ...childProps, // Spread custom props to override defaults
