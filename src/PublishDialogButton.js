@@ -123,7 +123,7 @@ export const PublishDialogButton = ({
               : "bg-gray-600 hover:bg-gray-500 !outline-gray-600 text-white"
           } !h-[25px] !px-2 !outline !outline-1 !py-0 !mr-2 !my-auto leading-none ${
             disabled ? "opacity-50 cursor-not-allowed" : ""
-          } ${className}`}
+          } ${className} !rounded-full`}
         >
           {!enablePublishingFlow && (postObject?.status == POST_STATUSES.PENDING)
             ? "Revert to Draft"

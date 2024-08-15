@@ -40,7 +40,7 @@ const EditorNavButtons = ({
           disabled={!canEdit ||isSaving || !hasUnsavedChanges}
           variant="ghostBlue"
           onClick={()=>forceSave({ editor,json: editor.getJSON() })}
-          className={`${!enablePublishingFlow && (postObject?.status == POST_STATUSES.PUBLISHED || postObject?.status == POST_STATUSES.PENDING) ? (theme === 'blue' ? '!bg-blue-600 !outline-blue-600' : '!bg-gray-700 !outline-gray-700') + ' !text-white' : (theme === 'blue' ? '!outline-blue-6000' : '!outline-gray-600 !text-gray-700')} !text-[13px] font-normal !h-[25px] !px-2 my-auto mr-2 ${isSaving || !hasUnsavedChanges ?' !opacity-50 !cursor-not-allowed':''}`}
+          className={`${!enablePublishingFlow && (postObject?.status == POST_STATUSES.PUBLISHED || postObject?.status == POST_STATUSES.PENDING) ? (theme === 'blue' ? '!bg-blue-600 !outline-blue-600' : '!bg-gray-700 !outline-gray-700') + ' !text-white' : (theme === 'blue' ? '!outline-blue-600 !text-blue-600' : '!outline-gray-600 !text-gray-700')} !text-[13px] font-normal !h-[25px] !px-2 my-auto !mr-2 ${isSaving || !hasUnsavedChanges ?' !opacity-50 !cursor-not-allowed':''} !outline !outline-1 !rounded-full`}
         >
           {isSaving ? <Spinner size={14} className="mx-auto"/> :(postObject.status == POST_STATUSES.DRAFT || postObject.status== null)? "Save draft" : "Save"}
         </Button>
