@@ -24,6 +24,8 @@ It's a headless editor that lets users publish to your CMS without requiring dir
 
 If you need assistance adapting Typr to work better with your CMS, consider [sponsoring the project](https://github.com/sponsors/Prototypr). Your support can help drive further development and customization.
 
+---
+
 ### Key Features
 
 - React Editor: Easily embed Typr in your React or Next.js projects.
@@ -35,6 +37,8 @@ If you need assistance adapting Typr to work better with your CMS, consider [spo
 - Configurable Fields: You can configure the settings panel to work with any fields in your CMS.
 - Admin only fields: You can hide fields from the settings panel, and the editor, if you want to use Typr as a content manager.
 
+---
+
 ## Save modes
 
 There's 2 publishing modes:
@@ -45,6 +49,8 @@ There's 2 publishing modes:
     -  To use the publisher flow, you also gotta provide `versioned_title` and `versioned_content` properties in your post object. 
 
 To enable the publisher flow, set `enablePublishingFlow={true}`.
+
+---
 
 ## Example usage
 
@@ -96,6 +102,8 @@ Then add the component to your app with the props you need to customise. [Try th
         }}
     />
 ```
+
+---
 
 ## Required Props
 
@@ -200,6 +208,8 @@ create:async ({ entry }) => {
             return postObject;
           }
 ```
+
+---
 
 ## ⚠️ Docs in progress!
 
