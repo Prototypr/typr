@@ -18,26 +18,24 @@ const useLoad = ({
   interview,
   productName,
   loadPostOperation,
-  routerPostId=false,
+  routerPostId = false,
   requireLogin,
   enablePublishingFlow,
-  POST_STATUSES
+  POST_STATUSES,
 } = {}) => {
   // const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [initialContent, setInitialContent] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
-  const [postId, setPostId] = useState(()=>{
-   if( routerPostId){
-    return routerPostId
-   }
-  });
+  const [postId, setPostId] = useState(-1);
   const [slug, setSlug] = useState(null);
   const [postObject, setPostObject] = useState(false);
   const [title, setTitle] = useState(null);
   const [postStatus, setPostStatus] = useState(POST_STATUSES.DRAFT);
   const [activeToasts, setActiveToasts] = useState(new Set());
+
+  const [refetching, setRefetching] = useState(false)
 
   // New function to check user access
   const hasUserAccess = () => {
@@ -47,25 +45,29 @@ const useLoad = ({
   // Load content when user or postId changes
   useEffect(() => {
     if (hasUserAccess()) {
-      if (routerPostId) {
+      if (routerPostId && routerPostId !== -1) {
         setPostId(routerPostId);
-      } else {
-          setPostId(false);
-          if(!postId){
-
-            refetch();
-          }
+      } else if (routerPostId === -1) {
+        setPostId(-1)
+        setLoading(true)
+      }
+       else {
+        setPostId(false);
+        if (!postId && postId !== -1) {
+          
+          refetch();
+        }
       }
     }
-  }, [routerPostId, user]);
+  }, [routerPostId, user.isLoggedIn]);
 
   useEffect(() => {
-    if (postId && hasUserAccess()) {
+    if ((postId && postId !== -1) && (hasUserAccess()==true)) {
       refetch();
-    }else if (!postId && hasUserAccess()){
+    } else if ((!postId && postId !== -1) && hasUserAccess()) {
       setPostObject({
-        status:POST_STATUSES.DRAFT
-      })
+        status: POST_STATUSES.DRAFT,
+      });
       setPostId(false);
       setInitialContent(false);
       setTitle(null);
@@ -74,38 +76,52 @@ const useLoad = ({
       setLoading(false);
       setCanEdit(true);
       setIsOwner(true);
-      
       setTimeout(() => {
         refetch();
       }, 100);
     }
-  // }, [postId, user.isLoggedIn]);
+    // }, [postId, user.isLoggedIn]);
   }, [postId, user.isLoggedIn]);
 
   // Refetch content
   const refetch = async () => {
-    if (postId && enablePublishingFlow!==false) {
-      await getPostFromDB();
-      setLoading(false);
-    } else if(postId && enablePublishingFlow === false){
-      //load local content by id - check local storage first:
-      let localContent = localStorage.getItem("wipContent_"+postId);
-      if(localContent){
-        setIsOwner(true);
-        setCanEdit(true);
-        await getPostFromDB(localContent);
-        setLoading(false);
-      }else{
-        //no content found, try to load from database with postid
+    // if (refetching) {
+    //   console.log("Already refetching, skipping");
+    //   return;
+    // }
+
+    setRefetching(true);
+
+    try {
+      if(postId === -1){
+        setLoading(true)
+        return 
+      }
+      if ((postId && postId !== -1) && enablePublishingFlow !== false) {
         await getPostFromDB();
         setLoading(false);
+      } else if ((postId && postId !== -1) && enablePublishingFlow === false) {
+        //load local content by id - check local storage first:
+        let localContent = localStorage.getItem("wipContent_" + postId);
+        if (localContent) {
+          setIsOwner(true);
+          setCanEdit(true);
+          await getPostFromDB(localContent);
+          setLoading(false);
+        } else {
+          //no content found, try to load from database with postid
+          await getPostFromDB();
+          setLoading(false);
+        }
+      } else {
+        //load local content
+        setIsOwner(true);
+        setCanEdit(true);
+        getPostFromLocalStorage();
+        setLoading(false);
       }
-    }else {
-      //load local content
-      setIsOwner(true);
-      setCanEdit(true);
-      getPostFromLocalStorage();
-      setLoading(false);
+    } finally {
+      setRefetching(false);
     }
   };
 
@@ -127,59 +143,56 @@ const useLoad = ({
   };
 
   // Function to show toast if not already displayed
-  const showToast = (message) => {
+  const showToast = message => {
     if (!activeToasts.has(message)) {
       toast.error(message, {
         id: message,
         onClose: () => {
-          setActiveToasts((prev) => {
+          setActiveToasts(prev => {
             const newSet = new Set(prev);
             newSet.delete(message);
             return newSet;
           });
         },
       });
-      setActiveToasts((prev) => new Set(prev).add(message));
+      setActiveToasts(prev => new Set(prev).add(message));
     }
   };
 
   // Fetch current post from the backend
-  const getPostFromDB = async (localContent) => {
+  const getPostFromDB = async localContent => {
     try {
-      if(!postId){
+      if(!postId && postId !== -1){
         if(!localContent) {
           setInitialContent(false);
         }
         return false
       }
-      const post = await loadPostOperation({user, postId:postId});
-
-      if(!post?.id){
+      const post = await loadPostOperation({ user, postId: postId });
+      if (!post?.id) {
         //post is not found
-        showToast('Post not found.');
-        if(!localContent){
+        showToast("Post not found. No id returned.");
+        if (!localContent) {
           setInitialContent(false);
         }
-        return false
+        return false;
       }
-      
-      if(post?.title === undefined && post?.versioned_title === undefined){
-        showToast('Post title required.');
-        if(!localContent){
+
+      if (
+        post?.title === undefined &&
+        post?.versioned_title === undefined &&
+        post?.content === undefined &&
+        post?.versioned_content === undefined
+      ) {
+        showToast("Post title and content required.");
+        if (!localContent) {
           setInitialContent(false);
         }
-        return false
-      }
-      if(post?.content === undefined && post?.versioned_content === undefined){
-        showToast('Post content required.');
-        if(!localContent){
-          setInitialContent(false);
-        }
-        return false
+        return false;
       }
 
       if (post) {
-        if(!post.status){
+        if (!post.status) {
           post.status = POST_STATUSES.DRAFT;
         }
         setPostObject(post);
@@ -191,7 +204,7 @@ const useLoad = ({
         setSlug(post?.slug);
       } else {
         setPostObject(null);
-        if(!localContent){
+        if (!localContent) {
           setInitialContent(false);
         }
       }
@@ -239,22 +252,25 @@ const useLoad = ({
       }
       //if title isn't part of body, add it in
       if (content) {
-        if(enablePublishingFlow==false){
+        if (enablePublishingFlow == false) {
           //get content from local storage
-          let retrievedObject = localStorage.getItem("wipContent_"+postId);
-          if(retrievedObject){
+          let retrievedObject = localStorage.getItem("wipContent_" + postId);
+          if (retrievedObject) {
             setInitialContent(JSON.parse(retrievedObject));
-          }else{
+          } else {
             setInitialContent(content);
           }
-        }else{
+        } else {
           setInitialContent(content);
         }
       } else {
         setInitialContent(false);
       }
       //set status
-      const statusKey = Object.keys(POST_STATUSES).find(key => POST_STATUSES[key] === postObject?.status) || 'DRAFT';
+      const statusKey =
+        Object.keys(POST_STATUSES).find(
+          key => POST_STATUSES[key] === postObject?.status
+        ) || "DRAFT";
       setPostStatus(POST_STATUSES[statusKey]);
     }
   }, [postObject]);
@@ -271,7 +287,8 @@ const useLoad = ({
     canEdit,
     refetch,
     setPostObject,
-    setPostId
+    setPostId,
+    refetching,
   };
 };
 

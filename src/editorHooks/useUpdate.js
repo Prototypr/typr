@@ -87,7 +87,7 @@ const useUpdate = ({ savePostOperation, POST_STATUSES }) => {
 
     try {
       const savePostData = deepMerge(postObject, mergedEntry);
-
+      localStorage.removeItem("wipContent_" + postId);
       saveData = await savePostOperation({
         entry: { ...savePostData },
         postId,
@@ -110,7 +110,7 @@ const useUpdate = ({ savePostOperation, POST_STATUSES }) => {
           toast.success("Your post has been updated!", {
             duration: 5000,
           });
-
+          localStorage.removeItem("wipContent_" + postId);
           localStorage.removeItem("wipContent");
         } else if (forced) {
           toast.success("Your post has been saved!", {

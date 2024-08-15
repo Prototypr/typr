@@ -114,6 +114,14 @@ export default function EditorWrapper(props) {
     POST_STATUSES,
   });
 
+  const [contentReady, setContentReady] = useState(false);
+
+  useEffect(() => {
+    if (initialContent !== null) {
+      setContentReady(true);
+    }
+  }, [initialContent]);
+
   useEffect(() => {
     const getNestedValue = (obj, path) => {
       return path.split(".").reduce((acc, part) => acc && acc[part], obj);
@@ -263,7 +271,6 @@ export default function EditorWrapper(props) {
           }
           localStorage.removeItem("wipContent");
 
-          refetch();
           return true;
         } else if (forced && postId) {
           // update the post
@@ -327,8 +334,6 @@ export default function EditorWrapper(props) {
             setPostId(postInfo?.id);
             hooks.onPostCreated({ id: postInfo?.id, postInfo });
           }
-
-          refetch();
           return true;
         }
         if (!routerPostId && typeof postOperations.save !== "function") {
@@ -404,7 +409,7 @@ export default function EditorWrapper(props) {
             <div className="my-auto h-screen flex flex-col justify-center text-center">
               <h2 className="-mt-10">You need to be logged in.</h2>
             </div>
-          ) : initialContent == null ? (
+          ) : !contentReady || postId === -1 ? (
             <div className="my-auto h-screen flex flex-col justify-center text-center">
               <div className="mx-auto opacity-50">
                 <Spinner />

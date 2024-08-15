@@ -872,7 +872,7 @@ export const PenLineSimple = ({ size, className, color }) => {
         stroke="currentColor"
         stroke-linecap="round"
         stroke-linejoin="round"
-        stroke-width="16"
+        strokeWidth="16"
       />
       <line
         x1="216"
@@ -883,7 +883,7 @@ export const PenLineSimple = ({ size, className, color }) => {
         stroke="currentColor"
         stroke-linecap="round"
         stroke-linejoin="round"
-        stroke-width="16"
+        strokeWidth="16"
       />
       <line
         x1="136"
@@ -894,7 +894,7 @@ export const PenLineSimple = ({ size, className, color }) => {
         stroke="currentColor"
         stroke-linecap="round"
         stroke-linejoin="round"
-        stroke-width="16"
+        strokeWidth="16"
       />
     </svg>
   );

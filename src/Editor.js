@@ -177,6 +177,7 @@ const Editor = ({
     ],
     onCreate: ({ editor }) => {
       
+      console.log("--");
       if (!isFirstMount.current) {
         return;
       }
@@ -236,17 +237,17 @@ const Editor = ({
 
   useEffect(() => {
     setShouldUpdateContent(true);
-  }, [postId]);
+  }, [initialContent]);
 
   useEffect(() => {
-    if (shouldUpdateContent && editor) {
-      setShouldUpdateContent(false); // Reset the flag after updating content
+    if ( editor && shouldUpdateContent) {
+      // setShouldUpdateContent(false); // Reset the flag after updating content
         setTimeout(() => {
         if (initialContent) {
           if (editor.getHTML() !== initialContent) {
             editor.chain().setContent(initialContent).run();
           }
-        } else {
+        } else if (postId === null || postId === false || postId === undefined) {
           editor.chain().clearContent().run();
           setTimeout(() => {
             const json = editor.getJSON();
