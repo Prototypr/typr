@@ -41,7 +41,7 @@ To enable the publisher flow, set `enablePublishingFlow={true}`.
 
 ## Example usage
 
-Install the package, then import it along with the styles to your project:
+Install the package, then import it along with the styles to your project ([see the demo project for examples](https://github.com/Prototypr/typr-editor-demo)):
 
 ```
 import Tiptypr from "tiptypr";
@@ -56,7 +56,7 @@ If you already have tailwind installed on your project, you can also add the fol
   ],
 ```
 
-Then add the component to your app with the props you need to customise. Here is an example:
+Then add the component to your app with the props you need to customise. [Try this editor customizer to get your props](https://typr-editor-demo.vercel.app/demo). Here is an example:
 ⚠️ Docs in progress - I need to add all the available props and explain how to use them.
 
 ```
@@ -94,7 +94,7 @@ Then add the component to your app with the props you need to customise. Here is
 
 If you're saving, loading, and creating posts in a CMS, you'll need to pass the following props:
 
-- postId
+- postId: (put an ID *set it to -1 if your post is loading* - otherwise it creates a new post)
 - user
 - postOperations
   - load (must return `title` and `content`)
