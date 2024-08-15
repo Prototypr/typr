@@ -14,6 +14,8 @@ Typr was built with Tiptap for [Prototypr](https://prototypr.io) (so the npm pac
 
 It's currently live in use on [Prototypr](https://prototypr.io), a platform built with Strapi and Next.js, but it can be used with any Content Management System:
 
+---
+
 ## Built for any CMS
 
 Typr editor is designed to seamlessly integrate with React projects (e.g. Next.js applications).
