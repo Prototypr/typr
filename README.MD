@@ -1,6 +1,9 @@
 # Typr Editor
 
-Typr is a Medium-like editor (for react.js) built with Tiptap for [Prototypr](https://prototypr.io) (so the npm package is called 'tiptypr').
+Typr is a Medium-like editor (for react.js) with user management, draft/publish system, and also takes care of saving, loading, and creating posts. 
+
+Built with Tiptap for [Prototypr](https://prototypr.io) (so the npm package is called 'tiptypr'). 
+
 
 <a href="https://typr-editor-demo.vercel.app/demo"><img src="https://prototypr-media.sfo2.digitaloceanspaces.com/strapi/af968e21ccb808a0a57c4a7827a44237.png"/></a>
 
