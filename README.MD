@@ -1,15 +1,16 @@
 # Typr Editor
 
-Typr is a Medium-like editor (for react.js) with user management, draft/publish system, and also takes care of saving, loading, and creating posts. 
+Typr is a Medium-like editor for React that integrates with your user system and CMS. It handles content loading, creation, and auto-saving out of the box. Add your user data and database props to get a fully functional editor with draft and publishing workflows. 
 
-Built with Tiptap for [Prototypr](https://prototypr.io) (so the npm package is called 'tiptypr'). 
+`npm install tiptypr`
+
+
+[Try the demo here](https://typr-editor-demo.vercel.app/demo) - customize the editor, and get a copy/pastable component with config.
 
 
 <a href="https://typr-editor-demo.vercel.app/demo"><img src="https://prototypr-media.sfo2.digitaloceanspaces.com/strapi/af968e21ccb808a0a57c4a7827a44237.png"/></a>
 
-[Try the demo here](https://typr-editor-demo.vercel.app/demo) - the demo lets you customize the editor, giving a copy/paste component with config/props filled in.
-
-`npm install tiptypr`
+Typr was built with Tiptap for [Prototypr](https://prototypr.io) (so the npm package is called 'tiptypr'). I separated it to a standalone package to help streamline the process of adding an editing experience with publishing and autosaving to any React project.
 
 It's currently live in use on [Prototypr](https://prototypr.io), a platform built with Strapi and Next.js, but it can be used with any Content Management System:
 
