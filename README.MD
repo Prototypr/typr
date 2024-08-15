@@ -42,6 +42,7 @@ There's 2 publishing modes:
 - **Standard mode** (draft/publish): This is a more standard save mode, where the post status is set to draft by default, and the user can publish it themselves at any time. The content is saved to local storage, but you must press the save button to save changes. (todo add autosave for this mode)
 
 - **Publisher Flow** (draft/pending/publish): This mode is for publishing platforms where content needs to be reviewed by editors before publishing. There is a submit button for users to submit their content for review, which will set the post status to pending. An editor can then review the content and publish it, and its status will be set to publish. Publisher flow autosaves as you type.
+    -  To use the publisher flow, you also gotta provide `versioned_title` and `versioned_content` properties in your post object. 
 
 To enable the publisher flow, set `enablePublishingFlow={true}`.
 
@@ -100,7 +101,7 @@ Then add the component to your app with the props you need to customise. [Try th
 
 If you're saving, loading, and creating posts in a CMS, you'll need to pass the following props:
 
-- postId: (put an ID *set it to -1 if your post is loading* - otherwise it creates a new post)
+- postId: (put an ID **set it to -1 if your post is loading** - otherwise it creates a new post)
 - user
 - postOperations
   - load (must return `title` and `content`)
@@ -130,6 +131,8 @@ The user object should include the following attributes:
 ### postOperations
 
 Each postOperation must return a postObject that has an `id`, `title`, `content`, and `status` attribute.
+
+If you're using the publishing flow (with `enablePublishingFlow={true}`), you also need to provide `versioned_title` and `versioned_content`
 
 postOperations is an object that includes the following functions:
 
