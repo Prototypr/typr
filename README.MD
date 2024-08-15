@@ -1,10 +1,20 @@
 # Typr Editor
 
-Typr is a Medium-like editor (for react.js) built with Tiptap for [Prototypr](https://prototypr.io) (so the npm package is called 'tiptypr').
+Typr is a Medium-like editor for React that integrates with your user system and CMS. It handles content loading, creation, and auto-saving out of the box. Add your user data and database props to get a fully functional editor with draft and publishing workflows. 
 
-Install with `npm install tiptypr`
+`npm install tiptypr`
+
+
+[Try the demo here](https://typr-editor-demo.vercel.app/demo) - customize the editor, and get a copy/pastable component with config.
+
+
+<a href="https://typr-editor-demo.vercel.app/demo"><img src="https://prototypr-media.sfo2.digitaloceanspaces.com/strapi/af968e21ccb808a0a57c4a7827a44237.png"/></a>
+
+Typr was built with Tiptap for [Prototypr](https://prototypr.io) (so the npm package is called 'tiptypr'). I separated it to a standalone package to help streamline the process of adding an editing experience with publishing and autosaving to any React project.
 
 It's currently live in use on [Prototypr](https://prototypr.io), a platform built with Strapi and Next.js, but it can be used with any Content Management System:
+
+---
 
 ## Built for any CMS
 
@@ -13,6 +23,8 @@ The editor is built to work with any CMS backend, allowing users to publish cont
 It's a headless editor that lets users publish to your CMS without requiring direct access to your backend admin dashboard.
 
 If you need assistance adapting Typr to work better with your CMS, consider [sponsoring the project](https://github.com/sponsors/Prototypr). Your support can help drive further development and customization.
+
+---
 
 ### Key Features
 
@@ -25,6 +37,8 @@ If you need assistance adapting Typr to work better with your CMS, consider [spo
 - Configurable Fields: You can configure the settings panel to work with any fields in your CMS.
 - Admin only fields: You can hide fields from the settings panel, and the editor, if you want to use Typr as a content manager.
 
+---
+
 ## Save modes
 
 There's 2 publishing modes:
@@ -32,12 +46,15 @@ There's 2 publishing modes:
 - **Standard mode** (draft/publish): This is a more standard save mode, where the post status is set to draft by default, and the user can publish it themselves at any time. The content is saved to local storage, but you must press the save button to save changes. (todo add autosave for this mode)
 
 - **Publisher Flow** (draft/pending/publish): This mode is for publishing platforms where content needs to be reviewed by editors before publishing. There is a submit button for users to submit their content for review, which will set the post status to pending. An editor can then review the content and publish it, and its status will be set to publish. Publisher flow autosaves as you type.
+    -  To use the publisher flow, you also gotta provide `versioned_title` and `versioned_content` properties in your post object. 
 
 To enable the publisher flow, set `enablePublishingFlow={true}`.
 
+---
+
 ## Example usage
 
-Install the package, then import it along with the styles to your project:
+Install the package, then import it along with the styles to your project ([see the demo project for examples](https://github.com/Prototypr/typr-editor-demo)):
 
 ```
 import Tiptypr from "tiptypr";
@@ -52,7 +69,7 @@ If you already have tailwind installed on your project, you can also add the fol
   ],
 ```
 
-Then add the component to your app with the props you need to customise. Here is an example:
+Then add the component to your app with the props you need to customise. [Try this editor customizer to get your props](https://typr-editor-demo.vercel.app/demo). Here is an example:
 ⚠️ Docs in progress - I need to add all the available props and explain how to use them.
 
 ```
@@ -86,11 +103,13 @@ Then add the component to your app with the props you need to customise. Here is
     />
 ```
 
+---
+
 ## Required Props
 
 If you're saving, loading, and creating posts in a CMS, you'll need to pass the following props:
 
-- postId
+- postId: (put an ID **set it to -1 if your post is loading** - otherwise it creates a new post)
 - user
 - postOperations
   - load (must return `title` and `content`)
@@ -120,6 +139,8 @@ The user object should include the following attributes:
 ### postOperations
 
 Each postOperation must return a postObject that has an `id`, `title`, `content`, and `status` attribute.
+
+If you're using the publishing flow (with `enablePublishingFlow={true}`), you also need to provide `versioned_title` and `versioned_content`
 
 postOperations is an object that includes the following functions:
 
@@ -187,6 +208,8 @@ create:async ({ entry }) => {
             return postObject;
           }
 ```
+
+---
 
 ## ⚠️ Docs in progress!
 
