@@ -1,8 +1,7 @@
 import { ImageIcon, BoldIcon, ItalicIcon, CodeIcon, ListIcon } from "./icons";
 import toast from "react-hot-toast";
 import React from 'react';
-
-let axios = require("axios");
+import axios from "axios";
 
 export const MenuActions = {
   bold: {

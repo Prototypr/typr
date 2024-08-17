@@ -3,8 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { styled } from "@stitches/react";
 import { indigo, slate } from "@radix-ui/colors";
 import toast from "react-hot-toast";
-
-var axios = require("axios");
+import axios from "axios";
 
 var spinnerIcon = (
   <svg

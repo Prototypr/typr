@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { styled, keyframes } from "@stitches/react";
 import { violet, mauve, blackA } from "@radix-ui/colors";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
-
+import axios from "axios";
 import {
   ImageIcon,
   DividerIcon,
@@ -18,7 +18,7 @@ import {
 
 import { ImageDecorationKey } from "../CustomExtensions/Figure2/CustomImage";
 
-let axios = require("axios");
+
 
 const slideUpAndFade = keyframes({
   "0%": { opacity: 0, transform: "translateY(2px)" },
@@ -128,7 +128,7 @@ const isVideo = file => {
   return file && file["type"].split("/")[0] === "video";
 };
 
-const uploadMedia = (event, editor, user, setLoading, setIsOpen) => {
+const uploadMedia = (event, editor, user, setLoading, setIsOpen, mediaHandler) => {
   const files = event.target.files;
 
   //if image
@@ -152,14 +152,15 @@ const uploadMedia = (event, editor, user, setLoading, setIsOpen) => {
         const data = new FormData();
         data.append("files", file);
 
-        var configUpload = {
-          method: "post",
-          url: `${process.env.NEXT_PUBLIC_API_URL}/api/users-permissions/users/article/image/upload`,
-          headers: {
-            Authorization: `Bearer ${user?.jwt}`,
-          },
-          data: data,
+
+        const configUpload = mediaHandler?.config;
+        if(!configUpload) {
+          toast.error("Media Handler not found.", {
+            duration: 5000,
+          });
+          return;
         };
+        configUpload.data = data;
 
         await axios(configUpload)
           .then(async function (response) {
@@ -217,14 +218,22 @@ const uploadMedia = (event, editor, user, setLoading, setIsOpen) => {
         const data = new FormData();
         data.append("files", file);
 
-        var configUpload = {
-          method: "post",
-          url: `${process.env.NEXT_PUBLIC_API_URL}/api/users-permissions/users/article/image/upload`,
-          headers: {
-            Authorization: `Bearer ${user?.jwt}`,
-          },
-          data: data,
+        // var configUpload = {
+        //   method: "post",
+        //   url: `${process.env.NEXT_PUBLIC_API_URL}/api/users-permissions/users/article/image/upload`,
+        //   headers: {
+        //     Authorization: `Bearer ${user?.jwt}`,
+        //   },
+        //   data: data,
+        // };
+        const configUpload = mediaHandler?.config;
+        if(!configUpload) {
+          toast.error("Media Handler not found.", {
+            duration: 5000,
+          });
+          return;
         };
+        configUpload.data = data;
 
         await axios(configUpload)
           .then(async function (response) {
@@ -335,7 +344,7 @@ const IconButton = styled("button", {
   //   "&:focus": { boxShadow: `0 0 0 2px black` }
 });
 
-const MenuFloating = ({ editor, isSelecting, user }) => {
+const MenuFloating = ({ editor, isSelecting, user, mediaHandler }) => {
   // const { user } = useUser({
   //   redirectIfFound: false,
   // });
@@ -445,7 +454,7 @@ const MenuFloating = ({ editor, isSelecting, user }) => {
                       className="hidden"
                       onChange={event => {
                         setIsOpen(false);
-                        uploadMedia(event, editor, user, setLoading, setIsOpen);
+                        uploadMedia(event, editor, user, setLoading, setIsOpen, mediaHandler);
                       }}
                     />
                   </>

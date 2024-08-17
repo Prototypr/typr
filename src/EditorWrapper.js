@@ -56,6 +56,7 @@ export default function EditorWrapper(props) {
     user,
     postId: routerPostId,
     postOperations,
+    mediaHandler,
     hooks,
     router,
     childProps,
@@ -434,6 +435,7 @@ export default function EditorWrapper(props) {
                       postObject,
                       toolContext: tool,
                       updatePost,
+                      mediaHandler,
                       forceSave,
                       refetchPost: refetch,
                       updatePostSettings: components.settingsPanel?.show
@@ -459,6 +461,7 @@ export default function EditorWrapper(props) {
                       postId={postId}
                       postObject={postObject}
                       updatePost={updatePost}
+                      mediaHandler={mediaHandler}
                       forceSave={forceSave}
                       refetchPost={refetch}
                       updatePostSettings={

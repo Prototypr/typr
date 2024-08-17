@@ -1,12 +1,10 @@
 # Typr Editor
 
-Typr is a Medium-like editor for React that integrates with your user system and CMS. It handles content loading, creation, and auto-saving out of the box. Add your user data and database props to get a fully functional editor with draft and publishing workflows. 
+Typr is a Medium-like editor for React that integrates with your user system and CMS. It handles content loading, creation, and auto-saving out of the box. Add your user data and database props to get a fully functional editor with draft and publishing workflows.
 
 `npm install tiptypr`
 
-
 [Try the demo here](https://typr-editor-demo.vercel.app/demo) - customize the editor, and get a copy/pastable component with config.
-
 
 <a href="https://typr-editor-demo.vercel.app/demo"><img src="https://prototypr-media.sfo2.digitaloceanspaces.com/strapi/af968e21ccb808a0a57c4a7827a44237.png"/></a>
 
@@ -46,7 +44,7 @@ There's 2 publishing modes:
 - **Standard mode** (draft/publish): This is a more standard save mode, where the post status is set to draft by default, and the user can publish it themselves at any time. The content is saved to local storage, but you must press the save button to save changes. (todo add autosave for this mode)
 
 - **Publisher Flow** (draft/pending/publish): This mode is for publishing platforms where content needs to be reviewed by editors before publishing. There is a submit button for users to submit their content for review, which will set the post status to pending. An editor can then review the content and publish it, and its status will be set to publish. Publisher flow autosaves as you type.
-    -  To use the publisher flow, you also gotta provide `versioned_title` and `versioned_content` properties in your post object. 
+  - To use the publisher flow, you also gotta provide `versioned_title` and `versioned_content` properties in your post object.
 
 To enable the publisher flow, set `enablePublishingFlow={true}`.
 
@@ -100,6 +98,15 @@ Then add the component to your app with the props you need to customise. [Try th
             return saved;
           }
         }}
+        mediaHandler={{
+        config: {
+          method: "post",
+          url: `${process.env.NEXT_PUBLIC_API_URL}/api/users-permissions/users/article/image/upload`,
+          headers: {
+            Authorization: `Bearer ${user?.jwt}`,
+          }
+        },
+      }}
     />
 ```
 
@@ -209,6 +216,42 @@ create:async ({ entry }) => {
           }
 ```
 
+## mediaHandler
+
+You can add a config object to the mediaHandler prop to handle image uploads.
+
+Example:
+
+```
+mediaHandler:{
+    config: {
+      method: "post",
+      url: `${process.env.NEXT_PUBLIC_API_URL}/api/users-permissions/users/article/image/upload`,
+      headers: {
+        Authorization: `Bearer ${user?.jwt}`,
+      }
+    },
+  },
+```
+
+A file is created and appended to a form data object, which is sent to the url provided in the config provided like this:
+
+```
+const file = new File([blob], `${files[0].name || "image.png"}`, {
+  type: "image/png",
+});
+
+const data = new FormData();
+data.append("files", file);
+
+const configUpload = mediaHandler?.config;
+configUpload.data = data;
+
+await axios(configUpload)
+  .then(async function (response) {
+    toast.success("Image Uploaded!", {...
+```
+
 ---
 
 ## ⚠️ Docs in progress!
@@ -216,6 +259,7 @@ create:async ({ entry }) => {
 These docs are still in progress, and the project still needs testing.
 
 ### Todo:
+
 - [ ] Save featured image in settings
 - [ ] Link embed needs api route to get embed data
 

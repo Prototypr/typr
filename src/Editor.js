@@ -64,6 +64,7 @@ const Editor = ({
   refetchPost = false,
   updatePost = false,
   forceSave = false,
+  mediaHandler = false,
   updatePostSettings = false,
   setInitialEditorContent = false,
   settingsPanelSettings,
@@ -368,7 +369,7 @@ const Editor = ({
               : ""
           }
         >
-          {editor && <MenuFloating editor={editor} user={user} theme={theme} />}
+          {editor && <MenuFloating editor={editor} user={user} theme={theme} mediaHandler={mediaHandler} />}
           <TextMenu editor={editor} theme={theme} />
           {/* <LinkMenu editor={editor} /> */}
           <ImageMenu editor={editor} theme={theme} />
