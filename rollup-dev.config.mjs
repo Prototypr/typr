@@ -19,9 +19,8 @@ export default [
       clearScreen: false
     },
     output: [
-      // { dir:'dist', format:'cjs' },
-      
-      {strict:false,indent:false, dir:'dist', format:'es', exports:"named", preserveModules:false }
+      { dir: 'dist/esm', format: 'es', exports: "named", preserveModules: false },
+      { dir: 'dist/cjs', format: 'cjs', exports: "named", preserveModules: false }
     ],
     plugins: [
         postcss({
