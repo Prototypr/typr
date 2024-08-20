@@ -15,6 +15,9 @@ export const defaultProps = {
   requireLogin: true,
   theme: "gray",
   customPostStatuses:false,
+  onEditorReady: () => {
+    console.log("editor ready")
+  },
   components: {
     nav: {
       show: true,

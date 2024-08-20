@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
+import Editor from "./Editor/Editor";
+
 import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
 
-import Editor from "./Editor";
 import Spinner from "./atom/Spinner/Spinner.js";
 
 import useLoad from "./editorHooks/useLoad";
@@ -14,7 +15,7 @@ import useUpdate from "./editorHooks/useUpdate";
 
 import EditorNav from "./EditorNav";
 import Toast from "./toast/Toast";
-import { useConfirmTabClose } from "./useConfirmTabClose";
+import { useConfirmTabClose } from "./editorHooks/useConfirmTabClose";
 // import { debounce } from "lodash";
 
 import { customDeepMerge } from "./utils/customDeepMerge";
@@ -64,9 +65,11 @@ export default function EditorWrapper(props) {
     requireLogin,
     enablePublishingFlow,
     customPostStatuses,
+    editorWidth,
 
     tool,
     isInterview,
+    onReady:onEditorReady,
   } = mergedProps;
 
   // Merge default and custom post statuses
@@ -421,9 +424,10 @@ export default function EditorWrapper(props) {
             ((requireLogin == true && user?.isLoggedIn) ||
               requireLogin == false) && (
               <>
-                <div className="my-4">
+                <div className="mt-16 mb-3">
                   {React.isValidElement(children) ? (
                     React.cloneElement(children, {
+                      maxWidth: editorWidth,
                       canEdit,
                       initialContent,
                       postStatus,
@@ -448,10 +452,13 @@ export default function EditorWrapper(props) {
                       navSettings: components.nav,
                       enablePublishingFlow,
                       POST_STATUSES,
+                      onEditorReady,
                       ...childProps, // Spread custom props to override defaults
                     })
                   ) : (
                     <Editor
+                      onEditorReady={onEditorReady}
+                      maxWidth={editorWidth}
                       canEdit={canEdit}
                       initialContent={initialContent}
                       hasUnsavedChanges={hasUnsavedChanges}

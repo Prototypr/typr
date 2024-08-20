@@ -11,9 +11,9 @@ import {
   DialogDescription,
   DialogClose,
   IconButton,
-} from "./Primitives/Dialog";
-import Button from "./Primitives/Button";
-import Spinner from "./atom/Spinner/Spinner";
+} from "../../Primitives/Dialog";
+import Button from "../../Primitives/Button";
+import Spinner from "../../atom/Spinner/Spinner";
 
 export const PublishDialogButton = ({
   onSave,

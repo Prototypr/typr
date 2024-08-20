@@ -98,6 +98,9 @@ Then add the component to your app with the props you need to customise. [Try th
             return saved;
           }
         }}
+        onReady={({editor})=>{
+            //setEditorInstance(editor)
+        }}
         mediaHandler={{
         config: {
           method: "post",
@@ -108,6 +111,34 @@ Then add the component to your app with the props you need to customise. [Try th
         },
       }}
     />
+```
+
+You can use the `onReady` prop to access the underlying Tiptap editor instance and use it to insert content into the editor like this:
+
+```
+onReady={({editor})=>{
+    editor.commands.insertContent('Prototypr');
+}}
+```
+
+Or set the editor instance to your state:
+
+```
+const [editorInstance, setEditorInstance] = useState(null);
+
+return (
+<>
+  <Typr
+  onReady={({editor})=>{
+      setEditorInstance(editor)
+  }}
+  />
+
+  <button onClick={()=>{
+      editorInstance.commands.insertContent('Hello!');
+  }}>Insert Hello</button>
+</>
+)
 ```
 
 ---

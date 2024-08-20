@@ -2,52 +2,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 
-import { useEditor, EditorContent } from "@tiptap/react";
-import MenuFloating from "./Menus/FloatingMenu";
+import { EditorContent } from "@tiptap/react";
+import { useEditor } from "@tiptap/react";
 
-import Placeholder from "@tiptap/extension-placeholder";
-import Document from "@tiptap/extension-document";
-import TextMenu from "./Menus/TextMenu";
-import ImageMenu from "./Menus/ImageMenu";
-
-import Link from "@tiptap/extension-link";
+import TextMenu from "./extensions/Menus/TextMenu";
+import ImageMenu from "./extensions/Menus/ImageMenu";
+import MenuFloating from "./extensions/Menus/FloatingMenu";
+import VideoMenu from "./extensions/Menus/VideoMenu";
 
 import { CustomLink } from "./components/CustomLink";
+import { addTwitterScript } from "../editorHooks/libs/addTwitterScript";
+import UndoRedoButtons from "./UI/UndoRedoButtons";
+import EditorNavButtons from "./UI/EditorNavButtons";
 
-import Cite from "./CustomExtensions/Cite";
-
-import Iframe from "./CustomExtensions/Iframe/Iframe";
-import Gapcursor from "@tiptap/extension-gapcursor";
-import Youtube from "@tiptap/extension-youtube";
-import HorizontalRule from "@tiptap/extension-horizontal-rule";
-import Text from "@tiptap/extension-text";
-import Heading from "@tiptap/extension-heading";
-import Paragraph from "@tiptap/extension-paragraph";
-import CodeBlock from "@tiptap/extension-code-block";
-import Bold from "@tiptap/extension-bold";
-import HardBreak from "@tiptap/extension-hard-break";
-import Underline from "@tiptap/extension-underline";
-import Italic from "@tiptap/extension-italic";
-import ListItem from "@tiptap/extension-list-item";
-import BulletList from "@tiptap/extension-bullet-list";
-import OrderedList from "@tiptap/extension-ordered-list";
-import Dropcursor from "@tiptap/extension-dropcursor";
-import History from "@tiptap/extension-history";
-import { Blockquote } from "./CustomExtensions/CustomBlockquote";
-import { Image } from "./CustomExtensions/Figure2/CustomImage";
-
-import Figure from "./CustomExtensions/Figure2/Figure";
-import FigCaption from "./CustomExtensions/Figure2/Figcaption";
-import { PasteFilter } from "./CustomExtensions/PasteFilter";
-
-import Tweet from "./CustomExtensions/Tweet/Tweet";
-import LinkEmbed from "./CustomExtensions/LinkEmbed/LinkEmbed";
-import Video from "./CustomExtensions/Video/Video";
-
-import VideoMenu from "./Menus/VideoMenu";
-import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
-import UndoRedoButtons from "./UndoRedoButtons";
-import EditorNavButtons from "./EditorNavButtons";
+import { extensions as defaultExtensions } from "./extensions/extensions";
 
 const Editor = ({
   wrapperClass = false,
@@ -75,12 +43,12 @@ const Editor = ({
   navSettings,
   POST_STATUSES,
   postId, // Add postId as a prop
+  maxWidth,
+  onEditorReady,
 }) => {
   // const { user } = useUser({
   //   redirectIfFound: false,
   // });
-
-  const isFirstMount = useRef(true);
 
   const [saveForReview, setForReview] = useState(false);
   const [shouldUpdateContent, setShouldUpdateContent] = useState(false);
@@ -99,92 +67,12 @@ const Editor = ({
     enablePublishingFlowRef.current = enablePublishingFlow;
   }, [enablePublishingFlow]);
 
-  const editor = useEditor({
-    extensions: [
-      // CustomDocument,
-      //if postType is article, then the document should start with a heading
-      Document.extend({
-        content: postType == "article" ? "heading block*" : "block*",
-        atom: true,
-      }),
-      Text,
-      History,
-      Paragraph,
-      Heading,
-      Tweet,
-      CodeBlock,
-      HorizontalRule,
-      Bold,
-      HardBreak,
-      Underline,
-      Italic,
-      ListItem,
-      Gapcursor,
-      BulletList,
-      OrderedList,
-      Dropcursor,
-      Cite,
-      Video,
-      Iframe,
-      Youtube,
-      Blockquote,
-      LinkEmbed,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          target: "_blank",
-          rel: null,
-          class: null,
-        },
-      }),
-
-      // images are converted to figures now
-      Figure,
-      Image.configure({
-        allowBase64: true,
-      }),
-      FigCaption,
-      PasteFilter,
-      // Figure.configure({
-      //   allowBase64: true,
-      // }),
-      Placeholder.configure({
-        showOnlyCurrent: false,
-        includeChildren: false,
-        placeholder: ({ editor, node }) => {
-          if (node.type.name === "heading") {
-            return "Title";
-          }
-          if (node.type.name === "figcaption") {
-            return "Enter a caption";
-          }
-          if (node.type.name === "figure") {
-            return "Enter a caption";
-          }
-          if (node.type.name === "tweet") {
-            return "Paste a tweet link and press enter";
-          }
-          if (node.type.name == "paragraph") {
-            //check if editor has 3 or more nodes
-            if (
-              editor.state.doc.textContent.trim() === "" &&
-              editor.state.doc.childCount <= 2
-            ) {
-              return "Tell your story...";
-            }
-          }
-        },
-      }),
+    const editor = useEditor({
+      extensions: [
+        ...defaultExtensions({ postType: postType })
+      // ...extensions,
     ],
     onCreate: ({ editor }) => {
-      
-      console.log("--");
-      if (!isFirstMount.current) {
-        return;
-      }
-      isFirstMount.current = false;
-      
-
       if (initialContent) {
         editor
           .chain()
@@ -214,6 +102,10 @@ const Editor = ({
       if (setInitialEditorContent) setInitialEditorContent(editor);
 
       addTwitterScript();
+
+      if (onEditorReady) {
+        onEditorReady({editor});
+      }
     },
     onUpdate: ({ editor }) => {
       try {
@@ -361,11 +253,15 @@ const Editor = ({
 
         {/* NAVIGATION END */}
         <div
+          style={{
+            maxWidth: maxWidth?maxWidth:postType == "article" ? "44rem" : "44rem",
+            margin: "0 auto",
+          }}
           className={
             wrapperClass
               ? wrapperClass
               : postType == "article"
-              ? `my-4 pt-0 mt-[100px] max-w-[44rem] mx-auto relative pb-10 blog-content px-3 sm:px-0`
+              ? `my-4 pt-0 mt-[100px]  mx-auto relative pb-10 blog-content px-3 sm:px-0`
               : ""
           }
         >
@@ -376,7 +272,7 @@ const Editor = ({
           <VideoMenu editor={editor} theme={theme} />
 
           <EditorContent editor={editor} />
-          <div className="popup-modal mb-6 relative bg-white p-6 pt-3 rounded-lg w-full"></div>
+          <div className="popup-modal mb-6 relative  p-6 pt-3 rounded-lg w-full"></div>
         </div>
       </div>
       {/* )} */}

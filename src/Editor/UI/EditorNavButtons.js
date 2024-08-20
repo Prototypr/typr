@@ -1,6 +1,6 @@
 import React from "react";
-import Button from "./Primitives/Button";
-import Spinner from "./atom/Spinner/Spinner";
+import Button from "../../Primitives/Button";
+import Spinner from "../../atom/Spinner/Spinner";
 
 import { PublishDialogButton } from "./PublishDialogButton";
 import SidePanelTrigger from "./SidePanel/SidePanelTrigger";

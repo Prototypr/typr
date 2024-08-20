@@ -3,7 +3,7 @@ import { styled } from "./stitches.config";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import Button from "../Primitives/Button";
 
-import { CustomLink } from "../components/CustomLink";
+import { CustomLink } from "../Editor/components/CustomLink";
 // import { useState, useEffect } from "react";
 
 

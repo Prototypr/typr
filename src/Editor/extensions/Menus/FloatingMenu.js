@@ -13,7 +13,7 @@ import {
   YouTubeIcon,
   XIcon,
   CodeIcon,
-} from "../icons/icons";
+} from "../../../icons/icons";
 
 
 import { ImageDecorationKey } from "../CustomExtensions/Figure2/CustomImage";

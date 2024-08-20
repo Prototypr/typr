@@ -14,7 +14,7 @@ import {
   H2IconBold,
   ItalicIconBold,
   QuoteIconBold,
-} from "../icons/icons";
+} from "../../../icons/icons";
 
 const switchBlockQuote = editor => {
   // editor.chain().focus().updateAttributes('blockquote',{ class: 'wp-block-quote' }).run();

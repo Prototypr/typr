@@ -6,9 +6,9 @@ import * as PopoverPrimitive from '@radix-ui/react-popover';
 // import ImageLinkField from './ImageLinkField/ImageLinkField'
 import LinkField from './LinkField/LinkField'
 
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../../Primitives/Collabsible';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../../../../Primitives/Collabsible';
 import { useEffect } from 'react';
-import { LinkIcon2Bold } from '../../../icons/icons';
+import { LinkIcon2Bold } from '../../../../../icons/icons';
 
 const slideUpAndFade = keyframes({
   '0%': { opacity: 0, transform: 'translateY(2px)' },

@@ -1,7 +1,7 @@
 import React from "react";
 
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
-import { CustomLink } from "../components/CustomLink";
+import { CustomLink } from "../Editor/components/CustomLink";
 import Button from "../Primitives/Button";
 import ProfileBadge from "./ProfileBadge";
 

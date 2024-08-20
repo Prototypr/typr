@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import NavigationMenu from "./Nav/navbar-menu";
 
 // import NavigationMenuMobile from "./Nav/navbar-menu-mobile";
-import { CustomLink } from "./components/CustomLink";
+import { CustomLink } from "./Editor/components/CustomLink";
 
 export default function EditorNav({
   activeNav,
