@@ -69,6 +69,7 @@ export default function EditorWrapper(props) {
 
     tool,
     isInterview,
+    extensions,
     onReady:onEditorReady,
   } = mergedProps;
 
@@ -453,6 +454,7 @@ export default function EditorWrapper(props) {
                       enablePublishingFlow,
                       POST_STATUSES,
                       onEditorReady,
+                      extensions,
                       ...childProps, // Spread custom props to override defaults
                     })
                   ) : (
@@ -483,6 +485,7 @@ export default function EditorWrapper(props) {
                       navSettings={components.nav}
                       enablePublishingFlow={enablePublishingFlow}
                       POST_STATUSES={POST_STATUSES}
+                      extensions={extensions}
                     />
                   )}
                 </div>

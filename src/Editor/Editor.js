@@ -45,6 +45,7 @@ const Editor = ({
   postId, // Add postId as a prop
   maxWidth,
   onEditorReady,
+  extensions,
 }) => {
   // const { user } = useUser({
   //   redirectIfFound: false,
@@ -69,9 +70,9 @@ const Editor = ({
 
     const editor = useEditor({
       extensions: [
-        ...defaultExtensions({ postType: postType })
-      // ...extensions,
-    ],
+        ...defaultExtensions({ postType: postType }),
+        ...extensions,
+      ],
     onCreate: ({ editor }) => {
       if (initialContent) {
         editor
