@@ -18,6 +18,13 @@ export const defaultProps = {
   onEditorReady: () => {
     console.log("editor ready")
   },
+  editorSettings:{
+    menus:{
+        floatingMenu:{
+            show:true,
+        }
+    }
+  },
   components: {
     nav: {
       show: true,

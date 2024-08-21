@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 
@@ -46,6 +46,7 @@ const Editor = ({
   maxWidth,
   onEditorReady,
   extensions,
+  editorSettings,
 }) => {
   // const { user } = useUser({
   //   redirectIfFound: false,
@@ -56,7 +57,7 @@ const Editor = ({
 
   useEffect(() => {
     //if forceSave is a function
-    if (forceSave!==false && saveForReview==true) {
+    if (forceSave !== false && saveForReview == true) {
       forceSave({ editor, json: editor.getJSON(), forReview: saveForReview });
       setForReview(false);
     }
@@ -68,11 +69,11 @@ const Editor = ({
     enablePublishingFlowRef.current = enablePublishingFlow;
   }, [enablePublishingFlow]);
 
-    const editor = useEditor({
-      extensions: [
-        ...defaultExtensions({ postType: postType }),
-        ...extensions,
-      ],
+  const editor = useEditor({
+    extensions: [
+      ...defaultExtensions({ postType: postType }),
+      ...(extensions || []), // Include extensions if provided, otherwise use an empty array
+    ],
     onCreate: ({ editor }) => {
       if (initialContent) {
         editor
@@ -105,7 +106,7 @@ const Editor = ({
       addTwitterScript();
 
       if (onEditorReady) {
-        onEditorReady({editor});
+        onEditorReady({ editor });
       }
     },
     onUpdate: ({ editor }) => {
@@ -113,18 +114,20 @@ const Editor = ({
         const json = editor.getJSON();
         // autosave would happen in the parent here;
         // if(shouldUpdateContent){
-          updatePost({ 
-            editor, 
-            json, 
-            forReview: saveForReview, 
-            publishFlowEnabled: enablePublishingFlowRef.current 
-          });
+        updatePost({
+          editor,
+          json,
+          forReview: saveForReview,
+          publishFlowEnabled: enablePublishingFlowRef.current,
+        });
         // }
       } catch (e) {
         if (typeof updatePost !== "function") {
           console.log(e);
           console.log("updatePost is not a function");
-        } else {console.log(e)};
+        } else {
+          console.log(e);
+        }
       }
     },
   });
@@ -134,18 +137,22 @@ const Editor = ({
   }, [initialContent]);
 
   useEffect(() => {
-    if ( editor && shouldUpdateContent) {
+    if (editor && shouldUpdateContent) {
       // setShouldUpdateContent(false); // Reset the flag after updating content
-        setTimeout(() => {
+      setTimeout(() => {
         if (initialContent) {
           if (editor.getHTML() !== initialContent) {
             editor.chain().setContent(initialContent).run();
           }
-        } else if (postId === null || postId === false || postId === undefined) {
+        } else if (
+          postId === null ||
+          postId === false ||
+          postId === undefined
+        ) {
           editor.chain().clearContent().run();
           setTimeout(() => {
             const json = editor.getJSON();
-  
+
             if (json.content?.length > 0) {
               // Count the number of paragraphs
               const paragraphCount = json.content.filter(
@@ -160,7 +167,6 @@ const Editor = ({
       }, 20);
     }
   }, [initialContent]);
-
 
   if (!canEdit) {
     return (
@@ -208,7 +214,10 @@ const Editor = ({
         {showNavButtons !== false ? (
           <UndoRedoNavPortal>
             <div className="flex h-full">
-              <UndoRedoButtons show={navSettings.undoRedoButtons.show} editor={editor} />
+              <UndoRedoButtons
+                show={navSettings.undoRedoButtons.show}
+                editor={editor}
+              />
               {enablePublishingFlow !== false && (
                 <div className={`ml-3 my-auto text-gray-500`}>
                   {isSaving
@@ -255,7 +264,11 @@ const Editor = ({
         {/* NAVIGATION END */}
         <div
           style={{
-            maxWidth: maxWidth?maxWidth:postType == "article" ? "44rem" : "44rem",
+            maxWidth: maxWidth
+              ? maxWidth
+              : postType == "article"
+              ? "44rem"
+              : "44rem",
             margin: "0 auto",
           }}
           className={
@@ -266,7 +279,14 @@ const Editor = ({
               : ""
           }
         >
-          {editor && <MenuFloating editor={editor} user={user} theme={theme} mediaHandler={mediaHandler} />}
+          {editor && editorSettings?.menus?.floatingMenu?.show && (
+            <MenuFloating
+              editor={editor}
+              user={user}
+              theme={theme}
+              mediaHandler={mediaHandler}
+            />
+          )}
           <TextMenu editor={editor} theme={theme} />
           {/* <LinkMenu editor={editor} /> */}
           <ImageMenu editor={editor} theme={theme} />
