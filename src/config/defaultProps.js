@@ -12,6 +12,7 @@ const avatars = [
 
 export const defaultProps = {
   enablePublishingFlow:false,
+  autosave:true,
   requireLogin: true,
   theme: "gray",
   customPostStatuses:false,

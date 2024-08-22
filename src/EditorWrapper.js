@@ -189,7 +189,7 @@ export default function EditorWrapper(props) {
     // send the content to an API here (if new post only)
     if (postId) {
       setHasUnsavedChanges(true);
-      if (publishFlowEnabled) {
+      if (publishFlowEnabled || mergedProps.autosave==true) {
         setTimeout(() => {
           setSaving(!saving);
         }, 2700);
@@ -201,7 +201,7 @@ export default function EditorWrapper(props) {
         localStorage.setItem("wipContent_" + postId, JSON.stringify(json));
       }
     } else {
-      if (publishFlowEnabled) {
+      if (publishFlowEnabled || mergedProps.autosave==true) {
         localStorage.setItem("wipContent", JSON.stringify(json));
         setTimeout(() => {
           if (!editor.state.doc.textContent.trim() === "") {
@@ -246,7 +246,7 @@ export default function EditorWrapper(props) {
 
     try {
       //if publishFlow is not enabled, save to local storage
-      if (enablePublishingFlow === false) {
+      if (enablePublishingFlow === false && mergedProps.autosave!==true) {
         if (postId) {
           //clear the none id version
           localStorage.removeItem("wipContent");
@@ -394,6 +394,7 @@ export default function EditorWrapper(props) {
           settings={{
             userBadge: components.nav.userBadge,
             nav: components.nav,
+            autosave: mergedProps.autosave,
           }}
           theme={theme}
           POST_STATUSES={POST_STATUSES}
@@ -457,6 +458,7 @@ export default function EditorWrapper(props) {
                       onEditorReady,
                       extensions,
                       editorSettings,
+                      autosave: mergedProps.autosave,
                       ...childProps, // Spread custom props to override defaults
                     })
                   ) : (
@@ -489,6 +491,7 @@ export default function EditorWrapper(props) {
                       POST_STATUSES={POST_STATUSES}
                       extensions={extensions}
                       editorSettings={editorSettings}
+                      autosave={mergedProps.autosave}
                     />
                   )}
                 </div>

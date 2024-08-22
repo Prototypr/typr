@@ -33,7 +33,7 @@ export const PublishDialogButton = ({
     publish: {
       title: "Save and Publish",
       description:
-        "You have made changes to your story. Publish your changes to make them live.",
+        "Publish your post and make it live.",
       button: "Publish",
     },
     unpublish: {
@@ -137,7 +137,7 @@ export const PublishDialogButton = ({
             ? "Submit changes"
             : postObject?.status == POST_STATUSES.PUBLISHED
             ? "Publish changes"
-            : "Submit"}
+            : "Submit for review"}
         </button>
       </DialogTrigger>
       <DialogContentLarge variant="big">

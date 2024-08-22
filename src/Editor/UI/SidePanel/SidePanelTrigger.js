@@ -22,12 +22,12 @@ export const SidePanelTrigger = ({
       <button
         onClick={toggleOpen}
         id="settings-menu-btn"
-        className={`${isOpen ? "bg-gray-200 is-open" : "bg-transparent is-closed"} h-[25px] px-2 rounded-xl`}
+        className={`${isOpen ? "bg-gray-200 is-open" : "bg-transparent is-closed"} h-[28px] px-2 rounded-xl`}
         variant="preview"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className={`w-4 h-4 my-auto`}
+          className={`w-6 h-6 my-auto text-gray-500/90`} 
           viewBox="0 0 24 24"
           width="24"
           height="24"

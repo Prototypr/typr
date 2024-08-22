@@ -227,7 +227,7 @@ const Twitter = Node.create({
            //check link
            let url = e.target.fname?.value
            let foundTweet = false
-           if(url?.indexOf('/')>-1 && url?.indexOf('twitter')>-1){
+           if(url?.indexOf('/')>-1 && (url?.indexOf('twitter')>-1 || url?.indexOf('x.com')>-1)){
             let embed = await axios.get('https://req.prototypr.io/https://publish.twitter.com/oembed?url='+url)
               .then(function (response) {
                 return response

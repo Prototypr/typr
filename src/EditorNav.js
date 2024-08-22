@@ -23,6 +23,7 @@ export default function EditorNav({
   POST_STATUSES,
   hasUnsavedChanges,
   signOut,
+  autosave,
 }) {
   // const { user, isLoading } = useUser({
   //   redirectIfFound: false,
@@ -165,7 +166,7 @@ export default function EditorNav({
               <div className={``} id="undoredo-container"></div>
               {settings.nav.unsavedChangesNotice.show &&
               hasUnsavedChanges &&
-              !enablePublishingFlow ? (
+              !enablePublishingFlow && !settings.autosave ? (
                 <div className="my-auto text-xs my-auto text-gray-400 ml-3">
                   Unsaved changes
                 </div>
@@ -176,7 +177,7 @@ export default function EditorNav({
             >
               <div className="flex ">
                 <div
-                  className="my-auto flex fixed bottom-0 left-0 p-3 w-full bg-white/90 backdrop-blur-xs sm:bg-none sm:w-fit sm:relative"
+                  className="my-auto flex fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xs sm:bg-none sm:w-fit sm:relative"
                   id="editor-nav-buttons"
                 ></div>
 

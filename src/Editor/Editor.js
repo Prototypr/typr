@@ -47,6 +47,7 @@ const Editor = ({
   onEditorReady,
   extensions,
   editorSettings,
+  autosave,
 }) => {
   // const { user } = useUser({
   //   redirectIfFound: false,
@@ -218,7 +219,7 @@ const Editor = ({
                 show={navSettings.undoRedoButtons.show}
                 editor={editor}
               />
-              {enablePublishingFlow !== false && (
+              {enablePublishingFlow !== false || autosave == true && (
                 <div className={`ml-3 my-auto text-gray-500`}>
                   {isSaving
                     ? "Saving..."
@@ -237,6 +238,7 @@ const Editor = ({
           <EditorButtonsNavPortal>
             <div className="flex justify-end w-full sm:w-fit sm:justify-end">
               <EditorNavButtons
+                autosave={autosave}
                 theme={theme}
                 user={user}
                 onSave={({ forReview }) => {

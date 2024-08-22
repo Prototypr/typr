@@ -72,6 +72,7 @@ Then add the component to your app with the props you need to customise. [Try th
 
 ```
 <Tiptypr
+    autosave={true}
     components={
           {
             nav:{

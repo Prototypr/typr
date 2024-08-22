@@ -842,3 +842,7 @@ figure, pre{
       transform: scale(1);
     }
   }
+
+  [data-tippy-root]{
+    z-index: 50!important;
+  }

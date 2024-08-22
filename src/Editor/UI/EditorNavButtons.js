@@ -31,11 +31,12 @@ const EditorNavButtons = ({
   forceSave,
   POST_STATUSES,
   hasUnsavedChanges,
+  autosave,
 }) => {
   return (
     <>
     <div className="flex gap-0.5">
-      {(enablePublishingFlow == false && user?.isLoggedIn) ? (
+      {(enablePublishingFlow == false && user?.isLoggedIn && !autosave) ? (
         <Button
           disabled={!canEdit ||isSaving || !hasUnsavedChanges}
           variant="ghostBlue"
