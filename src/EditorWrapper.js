@@ -246,7 +246,7 @@ export default function EditorWrapper(props) {
 
     try {
       //if publishFlow is not enabled, save to local storage
-      if (enablePublishingFlow === false && mergedProps.autosave!==true) {
+      if ((enablePublishingFlow === false && mergedProps.autosave!==true) || (enablePublishingFlow === false && forced == true)) {
         if (postId) {
           //clear the none id version
           localStorage.removeItem("wipContent");

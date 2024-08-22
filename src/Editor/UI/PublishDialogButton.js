@@ -62,7 +62,6 @@ export const PublishDialogButton = ({
   };
 
   const onSubmit = async () => {
- 
     setSubmitting(true);
     if (!enablePublishingFlow && (postObject?.status == POST_STATUSES.DRAFT || postObject?.status == null || postObject?.status == undefined)) {
       forceSave({ publish: true, editor: editor });

@@ -1,6 +1,6 @@
 {
   "name": "tiptypr",
-  "version": "0.0.85",
+  "version": "0.0.86",
   "description": "Prototypr Editor",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
