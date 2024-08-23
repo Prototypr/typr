@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { getCreatePostData } from "./libs/getCreatePostData";
 import { useState } from "react";
 
-const useCreate = ({POST_STATUSES,enablePublishingFlow}) => {
+const useCreate = ({POST_STATUSES,enablePublishingFlow, autosave}) => {
   const [creatingPost, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
 
@@ -19,8 +19,11 @@ const useCreate = ({POST_STATUSES,enablePublishingFlow}) => {
       relatedPost,
       forReview,
       enablePublishingFlow,
-      POST_STATUSES
+      POST_STATUSES,
+      autosave
     });
+
+    console.log('entry',entry)
 
     try {
 

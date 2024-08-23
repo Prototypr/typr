@@ -13,7 +13,8 @@ export const getCreatePostData = ({
   user,
   relatedPost,
   enablePublishingFlow,
-  POST_STATUSES
+  POST_STATUSES,
+  autosave
 }) => {
   const html = editor.getHTML();
   const json = editor.getJSON()?.content;
@@ -30,7 +31,8 @@ export const getCreatePostData = ({
 
   const postRelation = getPostRelation({ relatedPost, postObject });
   
-  if(enablePublishingFlow!==false){
+  console.log('autosave',autosave)
+  if(enablePublishingFlow!==false || autosave==true){
 
     let entry = {
       // type: "article",

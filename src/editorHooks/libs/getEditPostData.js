@@ -16,6 +16,7 @@ export const getEditPostData = ({
   POST_STATUSES,
   publish,
   unpublish,
+  autosave
 }) => {
   const html = editor.getHTML();
   const json = editor.getJSON()?.content;
@@ -42,7 +43,7 @@ export const getEditPostData = ({
     }
   }
 
-  if (enablePublishingFlow !== false) {
+  if (enablePublishingFlow !== false || (autosave==true && !publish && !unpublish)) {
     let entry = {
       status: getPublishStatus(),
       // removed content for issue #54

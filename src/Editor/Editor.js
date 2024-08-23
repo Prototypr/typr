@@ -27,6 +27,7 @@ const Editor = ({
   //save status
   isSaving = false,
   hasUnsavedChanges = false,
+  unpublishedChanges = false,
   saved = false,
   //functions
   refetchPost = false,
@@ -258,6 +259,7 @@ const Editor = ({
                 forceSave={forceSave}
                 POST_STATUSES={POST_STATUSES}
                 hasUnsavedChanges={hasUnsavedChanges}
+                unpublishedChanges={unpublishedChanges}
               />
             </div>
           </EditorButtonsNavPortal>

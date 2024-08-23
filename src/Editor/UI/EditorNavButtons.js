@@ -4,6 +4,7 @@ import Spinner from "../../atom/Spinner/Spinner";
 
 import { PublishDialogButton } from "./PublishDialogButton";
 import SidePanelTrigger from "./SidePanel/SidePanelTrigger";
+import { PublishChangesDialog } from "./PublishChangesDialog";
 /**
  * EditorButtons
  * render buttons for saving and publishing
@@ -31,8 +32,10 @@ const EditorNavButtons = ({
   forceSave,
   POST_STATUSES,
   hasUnsavedChanges,
+  unpublishedChanges,
   autosave,
 }) => {
+
   return (
     <>
     <div className="flex gap-0.5">
@@ -54,6 +57,22 @@ const EditorNavButtons = ({
           className={` ${postObject.status==POST_STATUSES.DRAFT?'':'order-first'}`}
           postObject={postObject}
           canPublish={canEdit && postObject?.id ? true : false}
+          POST_STATUSES={POST_STATUSES}
+          editor={editor}
+          //save post creates a post or updates an existing one
+          //for /write (new post), it creates a new post
+          //for /p/[slug] (existing post), it updates the existing post
+          onSave={onSave}
+          forceSave={forceSave}
+          theme={theme}
+          enablePublishingFlow={enablePublishingFlow}
+        />
+      ) : null}
+      {(!enablePublishingFlow) && postObject && autosave==true && postObject.status==POST_STATUSES.PUBLISHED ? (
+        <PublishChangesDialog
+          className={` ${postObject.status==POST_STATUSES.DRAFT?'':'order-first'}`}
+          postObject={postObject}
+          canPublish={canEdit && unpublishedChanges}
           POST_STATUSES={POST_STATUSES}
           editor={editor}
           //save post creates a post or updates an existing one

@@ -21,7 +21,7 @@ import { isValid, parseISO } from "date-fns";
  *
  * @returns
  */
-const useUpdate = ({ savePostOperation, POST_STATUSES }) => {
+const useUpdate = ({ savePostOperation, POST_STATUSES, autosave }) => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(undefined);
@@ -53,6 +53,7 @@ const useUpdate = ({ savePostOperation, POST_STATUSES }) => {
       publish,
       unpublish,
       POST_STATUSES,
+      autosave
     });
 
     setSaving(true);

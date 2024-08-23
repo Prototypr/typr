@@ -150,10 +150,28 @@ export default function EditorWrapper(props) {
     });
   }, [components?.settingsPanel, postObject]);
 
+
+  const [unpublishedChanges, setUnpublishedChanges] = useState(false);
+  useEffect(() => {
+    if (
+      postObject.versioned_content &&
+      postObject.content !== postObject.versioned_content ||
+      postObject.versioned_title &&
+      postObject.title !== postObject.versioned_title
+    ) {
+      // If there are differences, set hasUnsavedChanges to true
+      setUnpublishedChanges(true);
+    } else {
+      // If there are no differences, set hasUnsavedChanges to false
+      setUnpublishedChanges(false);
+    }
+  }, [postObject]);
+
   //create new post hook
   const { createPost, creatingPost, created } = useCreate({
     enablePublishingFlow,
     POST_STATUSES,
+    autosave: mergedProps.autosave
   });
 
   const {
@@ -170,6 +188,7 @@ export default function EditorWrapper(props) {
     savePostOperation: postOperations.save,
     enablePublishingFlow,
     POST_STATUSES,
+    autosave: mergedProps.autosave
   });
 
   useConfirmTabClose(hasUnsavedChanges);
@@ -188,6 +207,7 @@ export default function EditorWrapper(props) {
   const updatePost = ({ editor, json, forReview, publishFlowEnabled }) => {
     // send the content to an API here (if new post only)
     if (postId) {
+      
       setHasUnsavedChanges(true);
       if (publishFlowEnabled || mergedProps.autosave==true) {
         setTimeout(() => {
@@ -215,6 +235,8 @@ export default function EditorWrapper(props) {
       }
     }
   };
+
+
 
   /**
    * bypass debounce and save immediately
@@ -435,6 +457,7 @@ export default function EditorWrapper(props) {
                       initialContent,
                       postStatus,
                       hasUnsavedChanges,
+                      unpublishedChanges,
                       isSaving: saving || creatingPost,
                       saved: saved || created,
                       slug,
@@ -468,6 +491,7 @@ export default function EditorWrapper(props) {
                       canEdit={canEdit}
                       initialContent={initialContent}
                       hasUnsavedChanges={hasUnsavedChanges}
+                      unpublishedChanges={unpublishedChanges}
                       isSaving={saving || creatingPost}
                       saved={saved || created}
                       slug={slug}
