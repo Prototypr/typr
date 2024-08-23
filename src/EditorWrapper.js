@@ -120,6 +120,8 @@ export default function EditorWrapper(props) {
     POST_STATUSES,
   });
 
+  console.log('initialContent',initialContent)
+
   const [contentReady, setContentReady] = useState(false);
 
   useEffect(() => {

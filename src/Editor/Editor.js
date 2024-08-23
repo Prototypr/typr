@@ -136,7 +136,7 @@ const Editor = ({
 
   useEffect(() => {
     setShouldUpdateContent(true);
-  }, [initialContent]);
+  }, [postObject?.id]);
 
   useEffect(() => {
     if (editor && shouldUpdateContent) {
@@ -220,7 +220,7 @@ const Editor = ({
                 show={navSettings.undoRedoButtons.show}
                 editor={editor}
               />
-              {enablePublishingFlow !== false || autosave == true && (
+              {(enablePublishingFlow !== false || autosave == true) && (
                 <div className={`ml-3 my-auto text-gray-500`}>
                   {isSaving
                     ? "Saving..."
