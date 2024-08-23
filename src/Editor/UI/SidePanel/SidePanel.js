@@ -510,7 +510,7 @@ const SidebarInner = ({
           )}
 
           <div className="px-5 flex fixed w-full bg-white bottom-0 justify-start border-t py-3 gap-3 border-gray-300">
-            {postObject?.published_at && (
+            {/* {postObject?.published_at && (
               <button
                 className="w-fit px-4 h-[40px] bg-gray-50 hover:bg-gray-100 outline outline-gray-400 outline-1 text-gray-500 font-semibold rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
                 variant={"ghostBlue"}
@@ -520,7 +520,7 @@ const SidebarInner = ({
               >
                 View
               </button>
-            )}
+            )} */}
             <button
               disabled={saving || !hasChanges}
               className={`w-fit px-4 h-[40px] ${
