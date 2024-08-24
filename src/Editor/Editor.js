@@ -140,7 +140,7 @@ const Editor = ({
 
   useEffect(() => {
     if (editor && shouldUpdateContent) {
-      // setShouldUpdateContent(false); // Reset the flag after updating content
+      setShouldUpdateContent(false); // Reset the flag after updating content
       setTimeout(() => {
         if (initialContent) {
           if (editor.getHTML() !== initialContent) {
