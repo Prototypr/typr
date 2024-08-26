@@ -32,8 +32,7 @@ export const PublishDialogButton = ({
   const modalText = {
     publish: {
       title: "Save and Publish",
-      description:
-        "Publish your post and make it live.",
+      description: "Publish your post and make it live.",
       button: "Publish",
     },
     unpublish: {
@@ -43,7 +42,7 @@ export const PublishDialogButton = ({
       button: "Unpublish",
     },
     revert: {
-      title: "Revert to Draft", 
+      title: "Revert to Draft",
       description:
         "Your story is currently published. Reverting to draft will unpublish it so it is no longer visible to the public.",
       button: "Revert to Draft",
@@ -63,14 +62,19 @@ export const PublishDialogButton = ({
 
   const onSubmit = async () => {
     setSubmitting(true);
-    if (!enablePublishingFlow && (postObject?.status == POST_STATUSES.DRAFT || postObject?.status == null || postObject?.status == undefined)) {
-      forceSave({ publish: true, editor: editor });
+    if (
+      !enablePublishingFlow &&
+      (postObject?.status == POST_STATUSES.DRAFT ||
+        postObject?.status == null ||
+        postObject?.status == undefined)
+    ) {
+      await forceSave({ publish: true, editor: editor });
     } else if (
       !enablePublishingFlow &&
       (postObject?.status == POST_STATUSES.PUBLISHED ||
         postObject?.status == POST_STATUSES.PENDING)
     ) {
-      forceSave({ unpublish: true, editor: editor });
+      await forceSave({ unpublish: true, editor: editor });
     } else {
       onSave({ forReview: true });
     }
@@ -89,9 +93,11 @@ export const PublishDialogButton = ({
   }, [submitOpen]);
 
   const disabled =
-    (!(!enablePublishingFlow &&
-    (postObject?.status == POST_STATUSES.PUBLISHED ||
-      postObject?.status == POST_STATUSES.PENDING))) &&
+    !(
+      !enablePublishingFlow &&
+      (postObject?.status == POST_STATUSES.PUBLISHED ||
+        postObject?.status == POST_STATUSES.PENDING)
+    ) &&
     (!canPublish ||
       ((postObject?.status == POST_STATUSES.PENDING ||
         postObject?.status == POST_STATUSES.PUBLISHED) &&
@@ -124,7 +130,7 @@ export const PublishDialogButton = ({
             disabled ? "opacity-50 cursor-not-allowed" : ""
           } ${className} !rounded-full`}
         >
-          {!enablePublishingFlow && (postObject?.status == POST_STATUSES.PENDING)
+          {!enablePublishingFlow && postObject?.status == POST_STATUSES.PENDING
             ? "Revert to Draft"
             : !enablePublishingFlow &&
               postObject?.status == POST_STATUSES.PUBLISHED
@@ -142,22 +148,28 @@ export const PublishDialogButton = ({
       <DialogContentLarge variant="big">
         <div>
           <DialogTitle>
-            {(!enablePublishingFlow && postObject?.status == POST_STATUSES.PENDING)
+            {!enablePublishingFlow &&
+            postObject?.status == POST_STATUSES.PENDING
               ? modalText.revert.title
-              : (!enablePublishingFlow && postObject?.status == POST_STATUSES.PUBLISHED)
+              : !enablePublishingFlow &&
+                postObject?.status == POST_STATUSES.PUBLISHED
               ? modalText.revert.title
-              : (!enablePublishingFlow && postObject?.status == POST_STATUSES.DRAFT)
-                ? modalText.publish.title
+              : !enablePublishingFlow &&
+                postObject?.status == POST_STATUSES.DRAFT
+              ? modalText.publish.title
               : modalText.submit.title}
           </DialogTitle>
           <DialogDescription>
             <p className="mb-4">
-              {(!enablePublishingFlow && postObject?.status == POST_STATUSES.PENDING)
+              {!enablePublishingFlow &&
+              postObject?.status == POST_STATUSES.PENDING
                 ? modalText.revert.description
-                : (!enablePublishingFlow && postObject?.status == POST_STATUSES.PUBLISHED)
+                : !enablePublishingFlow &&
+                  postObject?.status == POST_STATUSES.PUBLISHED
                 ? modalText.revert.description
-                : (!enablePublishingFlow && postObject?.status == POST_STATUSES.DRAFT)
-                  ? modalText.publish.description
+                : !enablePublishingFlow &&
+                  postObject?.status == POST_STATUSES.DRAFT
+                ? modalText.publish.description
                 : modalText.submit.description}
             </p>
           </DialogDescription>
@@ -172,13 +184,19 @@ export const PublishDialogButton = ({
           >
             {submitting ? (
               <Spinner size="sm" className="mx-auto p-1 cursor-loading " />
-            ) : (!enablePublishingFlow && postObject?.status == POST_STATUSES.PENDING) ? (
+            ) : !enablePublishingFlow &&
+              postObject?.status == POST_STATUSES.PENDING ? (
               modalText.revert.button
-            ) : (!enablePublishingFlow && postObject?.status == POST_STATUSES.PUBLISHED) ? (
+            ) : !enablePublishingFlow &&
+              postObject?.status == POST_STATUSES.PUBLISHED ? (
               modalText.unpublish.button
-            ) : (!enablePublishingFlow && (postObject?.status == POST_STATUSES.DRAFT || postObject?.status == null || postObject?.status == undefined)) ? (
+            ) : !enablePublishingFlow &&
+              (postObject?.status == POST_STATUSES.DRAFT ||
+                postObject?.status == null ||
+                postObject?.status == undefined) ? (
               modalText.publish.button
-            ) : (!enablePublishingFlow && postObject?.status == POST_STATUSES.PUBLISHED) ? (
+            ) : !enablePublishingFlow &&
+              postObject?.status == POST_STATUSES.PUBLISHED ? (
               "Publish changes"
             ) : (
               "Submit"

@@ -243,12 +243,14 @@ export default function EditorWrapper(props) {
    * bypass debounce and save immediately
    * @param {*} param0
    */
-  const forceSave = ({ editor, json, forReview, publish, unpublish }) => {
+  const forceSave = async ({ editor, json, forReview, publish, unpublish }) => {
     setSaving(false);
     if (publish !== undefined || unpublish !== undefined) {
-      _savePost({ editor, forReview, forced: true, publish, unpublish });
+      const res = await _savePost({ editor, forReview, forced: true, publish, unpublish });
+      return res
     } else {
-      _savePost({ editor, forReview, forced: true });
+      const res = await _savePost({ editor, forReview, forced: true });
+      return res
     }
   };
 
@@ -483,6 +485,7 @@ export default function EditorWrapper(props) {
                       extensions,
                       editorSettings,
                       autosave: mergedProps.autosave,
+                      router,
                       ...childProps, // Spread custom props to override defaults
                     })
                   ) : (
@@ -517,6 +520,7 @@ export default function EditorWrapper(props) {
                       extensions={extensions}
                       editorSettings={editorSettings}
                       autosave={mergedProps.autosave}
+                      router={router}
                     />
                   )}
                 </div>

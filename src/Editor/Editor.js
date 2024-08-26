@@ -49,6 +49,7 @@ const Editor = ({
   extensions,
   editorSettings,
   autosave,
+  router
 }) => {
   // const { user } = useUser({
   //   redirectIfFound: false,
@@ -135,7 +136,10 @@ const Editor = ({
   });
 
   useEffect(() => {
-    setShouldUpdateContent(true);
+    if (postObject?.id !== undefined && typeof postObject?.id !== 'undefined' && postObject?.id !== false) {
+      console.log('--',postObject?.id)
+      setShouldUpdateContent(true);
+    }
   }, [postObject?.id]);
 
   useEffect(() => {

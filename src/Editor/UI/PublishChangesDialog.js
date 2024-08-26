@@ -40,8 +40,7 @@ export const PublishChangesDialog = ({
 
   const onSubmit = async () => {
     setSubmitting(true);
-    forceSave({ publish: true, editor: editor });
-
+   await forceSave({ publish: true, editor: editor });
     setSubmitOpen(false);
   };
 
