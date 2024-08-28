@@ -93,7 +93,7 @@ export const useTypr = props => {
     setPostId,
   } = useLoad({
     user,
-    routerPostId,
+    routerPostId:parseInt(routerPostId, 10),
     requireLogin,
     interview: isInterview,
     productName: tool?.name ? tool.name : false,
@@ -471,7 +471,6 @@ export const useTypr = props => {
     refetch,
     updatePostSettings,
     _onEditorReady,
-    
     editor: editorInstance, 
     publish:forcePublish,
     unpublish:forceUnpublish,
