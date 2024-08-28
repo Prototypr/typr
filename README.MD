@@ -56,6 +56,8 @@ Install the package, then import it along with the styles to your project ([see 
 
 ```
 import Tiptypr from "tiptypr";
+import { useTypr } from "tiptypr";
+
 import "tiptypr/dist/styles.css";
 ```
 
@@ -67,81 +69,105 @@ If you already have tailwind installed on your project, you can also add the fol
   ],
 ```
 
-Then add the component to your app with the props you need to customise. [Try this editor customizer to get your props](https://typr-editor-demo.vercel.app/demo). Here is an example:
+Then add the component to your app with the props you need to customise.. Here is an example:
 ⚠️ Docs in progress - I need to add all the available props and explain how to use them.
+🎉 Aug 28 2024 update - Now the editor is a hook, and works just like Tiptap editor, also giving you access to the underlying Tiptap editor instance with `typr.editor` - this lets you use the editor like a normal Tiptap editor, but with added features like autosaving and publishing flows.
 
 ```
-<Tiptypr
-    autosave={true}
-    components={
-          {
-            nav:{
-              show:true,
-              logo:{image:`/static/images/logo-small.svg`, url:'/', show:true},
-              userMenu:{
-                avatarPlaceholder:'https://prototypr-media.sfo2.digitaloceanspaces.com/strapi/4f9713374ad556ff3b8ca33e241f6c43.png?updated_at=2022-12-14T10:55:38.818Z',
-              }
-            },
-          }
-        }
-        extensions={extensions}
-        theme={'blue'}
-        user={{
-          id:user?.id,
-          avatar:user?.profile?.avatar?.url,
-          isLoggedIn:user?.isLoggedIn,
-          isAdmin:user?.isAdmin
-        }}
-        postId={router?.isReady && (router.query.slug || router.query.id)}
-        postOperations={{
-          load: getUserArticle,
-          save: async ({ entry, postId }) => {
-            const saved = await savePost({ entry, postId, user });
-            return saved;
-          }
-        }}
-        onReady={({editor})=>{
-            //setEditorInstance(editor)
-        }}
-        mediaHandler={{
-        config: {
-          method: "post",
-          url: `${process.env.NEXT_PUBLIC_API_URL}/api/users-permissions/users/article/image/upload`,
-          headers: {
-            Authorization: `Bearer ${user?.jwt}`,
-          }
+    const typr = useTypr({
+      requireLogin: editorProps.requireLogin,
+      components: editorProps.components,
+      theme: editorProps.theme,
+      user: editorProps.user,
+      enablePublishingFlow: editorProps.enablePublishingFlow,
+      customPostStatuses: editorProps.customPostStatuses,
+      postId: postId, // Update to use postId state
+      postOperations: {
+        load: async function ({ postId }) {
+          const postObject = await loadPostById(parseInt(postId, 10));
+          console.log("loaded", postObject);
+          return postObject;
         },
+        save: async function ({ postId, entry }) {
+          console.log("saving entry", entry);
+          const postObject = await savePost(
+            entry,
+            parseInt(postId, 10)
+          );
+          fetchData();
+          return postObject;
+        },
+        create: async function ({ entry }) {
+          console.log("creating post", entry);
+          const postObject = await createPost(entry);
+          fetchData();
+          return postObject;
+        },
+      },
+      hooks: {
+        onPostCreated: ({ id }) => {
+          const params = new URLSearchParams(searchParams);
+          params.set("id", id);
+          router.push(`?${params.toString()}`, undefined, {
+            shallow: true,
+            scroll: false,
+          });
+        },
+      },
+    });
+
+    return (
+     <Tiptypr
+      typr={typr}
+      onReady={({editor})=>{
+        //setEditorInstance(editor)
       }}
     />
+    )
 ```
 
-You can use the `onReady` prop to access the underlying Tiptap editor instance and use it to insert content into the editor like this:
+There was a demo [on here to get your props](https://typr-editor-demo.vercel.app/demo), but it needs updating to use the new hook editor.
+
+### Access the underlying Tiptap editor instance
+
+The hook editor returns the Tiptap instance, so you can use it to insert content into the editor like this:
 
 ```
-onReady={({editor})=>{
-    editor.commands.insertContent('Prototypr');
-}}
+const {typr} = useTypr({...editorProps});
+
+typr.editor.commands.insertContent('Hello');
 ```
 
-Or set the editor instance to your state:
+### Using the hook editor
 
-```
-const [editorInstance, setEditorInstance] = useState(null);
+Here's how you can use the hook editor to perform various actions and access the editor state:
 
-return (
-<>
-  <Typr
-  onReady={({editor})=>{
-      setEditorInstance(editor)
-  }}
-  />
+- Publish a post:
+  ```javascript
+  const { typr } = useTypr({...editorProps});
+  typr.publish();
+  ```
 
-  <button onClick={()=>{
-      editorInstance.commands.insertContent('Hello!');
-  }}>Insert Hello</button>
-</>
-)
-```
+- Unpublish a post:
+  ```javascript
+  const { typr } = useTypr({...editorProps});
+  typr.unpublish();
+  ```
+
+- Save a post:
+  ```javascript
+  const { typr } = useTypr({...editorProps});
+  typr.save();
+  ```
+
+- Access the editor state:
+  ```javascript
+  const { typr } = useTypr({...editorProps});
+  const { hasUnsavedChanges, saving, saved } = typr;
+  ```
+
+You can use these states to create your own custom buttons or UI elements
+
 
 ---
 
