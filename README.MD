@@ -175,7 +175,7 @@ You can use these states to create your own custom buttons or UI elements
 
 If you're saving, loading, and creating posts in a CMS, you'll need to pass the following props:
 
-- postId: (put an ID **set it to -1 if your post is loading** - otherwise it creates a new post)
+- postId: (must be a number - put an ID **set it to -1 if your post is loading** - otherwise it creates a new post)
 - user
 - postOperations
   - load (must return `title` and `content`)
