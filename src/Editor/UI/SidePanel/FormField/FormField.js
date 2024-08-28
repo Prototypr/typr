@@ -124,7 +124,7 @@ const FormField = ({ type, label, initialValue, onValueChange, description, opti
               <Select.Portal>
                 <Select.Content className="overflow-hidden bg-white rounded-md shadow-lg" style={{ zIndex: 9999 }}>
                   <Select.Viewport className="p-1">
-                    {options.map((option) => (
+                    {options?.length > 0 && options.map((option) => (
                       <Select.Item
                         key={option.value}
                         value={option.value}

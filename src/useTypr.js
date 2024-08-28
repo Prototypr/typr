@@ -10,9 +10,6 @@ import { useConfirmTabClose } from "./editorHooks/useConfirmTabClose";
 import { customDeepMerge } from "./utils/customDeepMerge";
 import { defaultProps } from "./config/defaultProps";
 
-// import Editor from "./Editor/Editor";
-// import Spinner from "./atom/Spinner/Spinner.js";
-
 export const PostStatus = {
   DRAFT: "draft",
   PENDING: "pending",
@@ -23,14 +20,11 @@ export const PostStatus = {
 const saveDebounceDelay = 2700;
 
 export const useTypr = props => {
-  //   const { ...restProps } = props;
-
-  //   const mergedProps = {}
 
   const { ...restProps } = props;
 
   const mergedProps = React.useMemo(() => {
-    // return{}
+
     try {
       return customDeepMerge(defaultProps, restProps);
     } catch (error) {
@@ -84,17 +78,9 @@ export const useTypr = props => {
     addTwitterScript();
   }, []);
 
-  //initialContent is null until loaded - so is 'false' when it's a new post
-  //useLoad hook
-  //   const canEdit = null;
-  //   const initialContent = null;
-  //   const postStatus = null;
-  //   const postObject = null;
-  //   const slug = null;
-  //   const postId = null;
-  //   const refetch = null;
-  //   const setPostObject = null;
-  //   const setPostId = null;
+
+  const [editorInstance, setEditorInstance] = useState(null);
+
   const {
     canEdit,
     initialContent,
@@ -247,14 +233,26 @@ export const useTypr = props => {
   };
 
   const forcePublish = useCallback(() => {
-    console.log("force publish");
-    // forceSave({ editor: editorInstance, publish: true, unpublish: false });
-  }, []);
+    if (editorInstance) {
+      forceSave({ editor: editorInstance, publish: true});
+    }
+  }, [editorInstance]);
 
   const forceUnpublish = useCallback(() => {
     console.log("force unpublish");
-    // forceSave({ editor: editorInstance, publish: false, unpublish: true });
-  }, []);
+    if (editorInstance) {
+      forceSave({ editor: editorInstance, unpublish: true });
+    }
+  }, [editorInstance]);
+
+  /**
+   * call save from outside
+   */
+  const doSave = useCallback(({forReview=false}) => {
+    if (editorInstance) {
+      forceSave({ editor: editorInstance, forReview });
+    }
+  }, [editorInstance]);
 
   /**
    * bypass debounce and save immediately
@@ -430,9 +428,10 @@ export const useTypr = props => {
   };
 
   const _onEditorReady = ({ editor }) => {
-    if (onEditorReady) {
-      onEditorReady({ editor });
-    }
+      setEditorInstance(editor);
+      if (typeof onEditorReady === 'function') {
+        onEditorReady({ editor });
+      }
   };
 
   return {
@@ -472,5 +471,10 @@ export const useTypr = props => {
     refetch,
     updatePostSettings,
     _onEditorReady,
+    
+    editor: editorInstance, 
+    publish:forcePublish,
+    unpublish:forceUnpublish,
+    save:doSave,
   };
 };
