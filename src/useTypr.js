@@ -1,34 +1,17 @@
-"use client";
-/**
- * this is the old editor wrapper
- * it's not used anymore
- * it's kept here for reference
- * 
- * it was originally imported as Tiptypr, but 
- * now we use the Hooks version
- */
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
-import Editor from "./Editor/Editor";
-
 import { addTwitterScript } from "./editorHooks/libs/addTwitterScript";
-
-import Spinner from "./atom/Spinner/Spinner.js";
 
 import useLoad from "./editorHooks/useLoad";
 import useCreate from "./editorHooks/useCreate";
 import useUpdate from "./editorHooks/useUpdate";
-
-import EditorNav from "./EditorNav";
-import Toast from "./toast/Toast";
 import { useConfirmTabClose } from "./editorHooks/useConfirmTabClose";
-// import { debounce } from "lodash";
-
 import { customDeepMerge } from "./utils/customDeepMerge";
-
 import { defaultProps } from "./config/defaultProps";
+
+// import Editor from "./Editor/Editor";
+// import Spinner from "./atom/Spinner/Spinner.js";
 
 export const PostStatus = {
   DRAFT: "draft",
@@ -39,18 +22,15 @@ export const PostStatus = {
 
 const saveDebounceDelay = 2700;
 
-/**
- * Write
- * used to create new post
- *
- * this hook loads the editor with any content stored in local storage
- *
- * @returns
- */
-export default function EditorWrapper(props) {
-  const { children, ...restProps } = props;
+export const useTypr = props => {
+  //   const { ...restProps } = props;
+
+  //   const mergedProps = {}
+
+  const { ...restProps } = props;
 
   const mergedProps = React.useMemo(() => {
+    // return{}
     try {
       return customDeepMerge(defaultProps, restProps);
     } catch (error) {
@@ -106,6 +86,15 @@ export default function EditorWrapper(props) {
 
   //initialContent is null until loaded - so is 'false' when it's a new post
   //useLoad hook
+  //   const canEdit = null;
+  //   const initialContent = null;
+  //   const postStatus = null;
+  //   const postObject = null;
+  //   const slug = null;
+  //   const postId = null;
+  //   const refetch = null;
+  //   const setPostObject = null;
+  //   const setPostId = null;
   const {
     canEdit,
     initialContent,
@@ -123,7 +112,7 @@ export default function EditorWrapper(props) {
     interview: isInterview,
     productName: tool?.name ? tool.name : false,
     //api calls
-    loadPostOperation: postOperations.load,
+    loadPostOperation: postOperations?.load,
     enablePublishingFlow,
     POST_STATUSES,
   });
@@ -150,11 +139,24 @@ export default function EditorWrapper(props) {
             : option.initialValue,
       }));
 
-    setSettingsOptions({
-      general: updateSettingsArray(
-        components?.settingsPanel?.generalTab?.menu || []
-      ),
-      seo: updateSettingsArray(components?.settingsPanel?.seoTab?.menu || []),
+    setSettingsOptions(prevOptions => {
+      const newOptions = {
+        general: updateSettingsArray(
+          components?.settingsPanel?.generalTab?.menu || []
+        ),
+        seo: updateSettingsArray(components?.settingsPanel?.seoTab?.menu || []),
+      };
+
+      // Only update state if there are actual changes
+      if (
+        JSON.stringify(prevOptions.general) !==
+          JSON.stringify(newOptions.general) ||
+        JSON.stringify(prevOptions.seo) !== JSON.stringify(newOptions.seo)
+      ) {
+        return newOptions;
+      }
+
+      return prevOptions;
     });
   }, [components?.settingsPanel, postObject]);
 
@@ -192,7 +194,7 @@ export default function EditorWrapper(props) {
     setSaving,
     hasUnsavedChanges,
   } = useUpdate({
-    savePostOperation: postOperations.save,
+    savePostOperation: postOperations?.save,
     enablePublishingFlow,
     POST_STATUSES,
     autosave: mergedProps.autosave,
@@ -244,15 +246,15 @@ export default function EditorWrapper(props) {
     }
   };
 
-  const forcePublish = () => {
+  const forcePublish = useCallback(() => {
     console.log("force publish");
     // forceSave({ editor: editorInstance, publish: true, unpublish: false });
-  };
+  }, []);
 
-  const forceUnpublish = () => {
+  const forceUnpublish = useCallback(() => {
     console.log("force unpublish");
     // forceSave({ editor: editorInstance, publish: false, unpublish: true });
-  };
+  }, []);
 
   /**
    * bypass debounce and save immediately
@@ -391,7 +393,7 @@ export default function EditorWrapper(props) {
           }
           return true;
         }
-        if (!routerPostId && typeof postOperations.save !== "function") {
+        if (!routerPostId && typeof postOperations?.save !== "function") {
           return false;
         } else {
           return false;
@@ -433,135 +435,42 @@ export default function EditorWrapper(props) {
     }
   };
 
-  return (
-    <>
-      {components.nav.show && (
-        <EditorNav
-          router={router}
-          isInterview={isInterview}
-          tool={tool}
-          postObject={postObject}
-          postStatus={postStatus}
-          enablePublishingFlow={enablePublishingFlow}
-          hasUnsavedChanges={hasUnsavedChanges}
-          user={user}
-          signOut={user.signOut}
-          settings={{
-            userBadge: components.nav.userBadge,
-            nav: components.nav,
-            autosave: mergedProps.autosave,
-          }}
-          theme={theme}
-          POST_STATUSES={POST_STATUSES}
-        />
-      )}
-
-      <div
-        className={`w-full ${
-          isInterview ? "h-screen overflow-y-auto" : "h-fit"
-        }`}
-        id="editor-container"
-      >
-        <div className="w-full h-full mx-auto  relative">
-          {/* {!user && <Fallback />} */}
-
-          {/* only load editor if initialContent is not null */}
-          {requireLogin == true && !user?.isLoggedIn && !user?.loading ? (
-            // <Layout>
-            <div className="my-auto h-screen flex flex-col justify-center text-center">
-              <h2 className="-mt-10">You need to be logged in.</h2>
-            </div>
-          ) : !contentReady || postId === -1 ? (
-            <div className="my-auto h-screen flex flex-col justify-center text-center">
-              <div className="mx-auto opacity-50">
-                <Spinner />
-              </div>
-            </div>
-          ) : (
-            // </Layout>
-            ((requireLogin == true && user?.isLoggedIn) ||
-              requireLogin == false) && (
-              <>
-                <div className="mt-16 mb-3">
-                  {React.isValidElement(children) ? (
-                    React.cloneElement(children, {
-                      maxWidth: editorWidth,
-                      canEdit,
-                      initialContent,
-                      postStatus,
-                      hasUnsavedChanges,
-                      unpublishedChanges,
-                      isSaving: saving || creatingPost,
-                      saved: saved || created,
-                      slug,
-                      postId,
-                      postObject,
-                      toolContext: tool,
-                      updatePost,
-                      mediaHandler,
-                      forceSave,
-                      refetchPost: refetch,
-                      updatePostSettings: components.settingsPanel?.show
-                        ? updatePostSettings
-                        : false,
-                      settingsPanelSettings: components.settingsPanel,
-                      settingsOptions,
-                      user,
-                      theme,
-                      navSettings: components.nav,
-                      enablePublishingFlow,
-                      POST_STATUSES,
-                      onEditorReady: _onEditorReady,
-                      extensions,
-                      editorSettings,
-                      autosave: mergedProps.autosave,
-                      router,
-                      // editorInstance,
-                      ...childProps, // Spread custom props to override defaults
-                    })
-                  ) : (
-                    <Editor
-                      onEditorReady={_onEditorReady}
-                      maxWidth={editorWidth}
-                      canEdit={canEdit}
-                      initialContent={initialContent}
-                      hasUnsavedChanges={hasUnsavedChanges}
-                      unpublishedChanges={unpublishedChanges}
-                      isSaving={saving || creatingPost}
-                      saved={saved || created}
-                      slug={slug}
-                      postId={postId}
-                      postObject={postObject}
-                      updatePost={updatePost}
-                      mediaHandler={mediaHandler}
-                      forceSave={forceSave}
-                      refetchPost={refetch}
-                      updatePostSettings={
-                        components.settingsPanel?.show
-                          ? updatePostSettings
-                          : false
-                      }
-                      settingsPanelSettings={components.settingsPanel}
-                      settingsOptions={settingsOptions}
-                      user={user}
-                      theme={theme}
-                      navSettings={components.nav}
-                      enablePublishingFlow={enablePublishingFlow}
-                      POST_STATUSES={POST_STATUSES}
-                      extensions={extensions}
-                      editorSettings={editorSettings}
-                      autosave={mergedProps.autosave}
-                      router={router}
-                      // editorInstance={editorInstance}
-                    />
-                  )}
-                </div>
-              </>
-            )
-          )}
-        </div>
-      </div>
-      <Toast />
-    </>
-  );
-}
+  return {
+    postId,
+    postObject,
+    initialContent,
+    hasUnsavedChanges,
+    unpublishedChanges,
+    saving,
+    creatingPost,
+    saved,
+    created,
+    contentReady,
+    slug,
+    canEdit,
+    settingsOptions,
+    POST_STATUSES,
+    theme,
+    components,
+    user,
+    postOperations,
+    mediaHandler,
+    hooks,
+    router,
+    childProps,
+    requireLogin,
+    enablePublishingFlow,
+    customPostStatuses,
+    editorWidth,
+    tool,
+    isInterview,
+    extensions,
+    mergedProps,
+    editorSettings,
+    updatePost,
+    forceSave,
+    refetch,
+    updatePostSettings,
+    _onEditorReady,
+  };
+};

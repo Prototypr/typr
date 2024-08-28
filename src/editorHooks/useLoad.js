@@ -39,7 +39,7 @@ const useLoad = ({
 
   // New function to check user access
   const hasUserAccess = () => {
-    return (requireLogin === true && user.isLoggedIn) || requireLogin === false;
+    return (requireLogin === true && user?.isLoggedIn) || requireLogin === false;
   };
 
   // Load content when user or postId changes
@@ -59,7 +59,7 @@ const useLoad = ({
         }
       }
     }
-  }, [routerPostId, user.isLoggedIn]);
+  }, [routerPostId, user?.isLoggedIn]);
 
   useEffect(() => {
     if ((postId && postId !== -1) && (hasUserAccess()==true)) {
@@ -81,7 +81,7 @@ const useLoad = ({
       }, 100);
     }
     // }, [postId, user.isLoggedIn]);
-  }, [postId, user.isLoggedIn]);
+  }, [postId, user?.isLoggedIn]);
 
   // Refetch content
   const refetch = async () => {

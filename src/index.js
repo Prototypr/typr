@@ -5,7 +5,9 @@ import 'tippy.js/animations/scale-subtle.css';
 import "react-datepicker/dist/react-datepicker.css";
 import "./page-styles.scss";
  
-import EditorWrapper from './EditorWrapper';
+import Tiptypr from './Tiptypr';
+import {useTypr} from './useTypr'
+
 import Editor from './Editor/Editor';
 import MenuFloating from './Editor/extensions/Menus/FloatingMenu';
 import ImageMenu from './Editor/extensions/Menus/ImageMenu';
@@ -28,10 +30,13 @@ import LinkInput from './Editor/extensions/Menus/MenuButtons/LinkDropdown/LinkBu
 
 import { defaultProps } from './config/defaultProps';
 
-export default EditorWrapper;
+export default Tiptypr;
+export { useTypr };
 
-export { Editor };
 export { defaultProps };
+export { Editor };
+
+
 
 export const plugins = {
   //custom plugins

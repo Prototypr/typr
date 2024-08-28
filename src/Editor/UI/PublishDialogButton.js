@@ -148,29 +148,32 @@ export const PublishDialogButton = ({
       <DialogContentLarge variant="big">
         <div>
           <DialogTitle>
-            {!enablePublishingFlow &&
-            postObject?.status == POST_STATUSES.PENDING
+            {(!enablePublishingFlow &&
+            postObject?.status == POST_STATUSES.PENDING)
               ? modalText.revert.title
-              : !enablePublishingFlow &&
-                postObject?.status == POST_STATUSES.PUBLISHED
+              : (!enablePublishingFlow &&
+                postObject?.status) == POST_STATUSES.PUBLISHED
               ? modalText.revert.title
-              : !enablePublishingFlow &&
-                postObject?.status == POST_STATUSES.DRAFT
+              : (!enablePublishingFlow &&
+                postObject?.status == POST_STATUSES.DRAFT)
               ? modalText.publish.title
+              : (enablePublishingFlow && postObject?.status == POST_STATUSES.PUBLISHED)?
+              'Publish changes'
               : modalText.submit.title}
           </DialogTitle>
           <DialogDescription>
             <p className="mb-4">
-              {!enablePublishingFlow &&
-              postObject?.status == POST_STATUSES.PENDING
+              {(!enablePublishingFlow &&
+              postObject?.status == POST_STATUSES.PENDING)
                 ? modalText.revert.description
-                : !enablePublishingFlow &&
-                  postObject?.status == POST_STATUSES.PUBLISHED
+                :( !enablePublishingFlow &&
+                  postObject?.status == POST_STATUSES.PUBLISHED)
                 ? modalText.revert.description
-                : !enablePublishingFlow &&
-                  postObject?.status == POST_STATUSES.DRAFT
-                ? modalText.publish.description
-                : modalText.submit.description}
+                : (!enablePublishingFlow &&
+                  postObject?.status == POST_STATUSES.DRAFT)
+                ? modalText.publish.description : (enablePublishingFlow && postObject?.status == POST_STATUSES.PUBLISHED)?
+                'Your updates will be published and live for everyone to see.'
+                :modalText.submit.description}
             </p>
           </DialogDescription>
         </div>
